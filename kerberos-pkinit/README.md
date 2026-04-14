@@ -9,7 +9,7 @@
 
 PKINIT allows X.509 certificates (from smart cards, TPMs, Windows Hello for Business) to authenticate to Kerberos KDCs. It's the foundation of certificate-based enterprise SSO. The client signs an authentication request with their RSA private key; the KDC verifies it against the enterprise PKI.
 
-## why it's a full domain compromise vector
+## why is this hella bad
 
 - Every enterprise PKI issues RSA certificates. The client cert, the KDC cert, the CA cert — all RSA.
 - Certificates are public: they're in Active Directory's LDAP (`userCertificate` attribute), readable by any domain user.

@@ -34,6 +34,17 @@ Mission-critical targets: weather satellites (GOES-R, Meteosat), Earth
 observation (Sentinel, Landsat), science missions (James Webb, Hubble servicing
 was RSA-era), ISS commanding infrastructure.
 
+## why is this hella bad
+
+Spacecraft are unreachable after launch — there is no "patch Tuesday" in orbit. Compromising telecommand authentication means:
+
+- **Permanently disable satellites**: forge commands to power off transponders, vent propellant, or enter safe mode → satellite becomes a dead object
+- **Orbital manipulation**: forge attitude control or thruster commands → change satellite orbit → collision risk with other satellites or the ISS
+- **Data falsification**: forge commands to alter instrument calibration or downlink parameters → corrupt scientific data (climate models, GPS corrections, weather forecasting)
+- **Hijack communication payload**: redirect transponder beams, change frequencies, broadcast false signals
+- **Weather and navigation denial**: compromise GOES-R (US weather), Copernicus Sentinel (EU Earth observation), or GPS augmentation signals (WAAS/EGNOS) → aviation and maritime navigation degradation
+- Spacecraft RSA keys are generated pre-launch and cannot be updated without a new key-injection command — which itself requires authenticating with the *current* RSA key
+
 ## Code
 
 `ccsds_sdls_rsa_auth.c` — `ccsds_sdls_wrap_session_key()` showing RSA-OAEP-2048

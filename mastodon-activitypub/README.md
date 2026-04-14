@@ -28,6 +28,15 @@ Any CRQC can:
 2. Forge arbitrary posts, follows, or boosts from any user on any server
 3. Impersonate entire Mastodon instances to other servers
 
+## why is this hella bad
+
+Any CRQC operator can recover the RSA-2048 private key of any Mastodon actor from their public key (published in every actor's JSON-LD profile at `/.well-known/...`). With it they can:
+
+- **Forge posts from any public figure** — world leaders, journalists, institutions — appearing authentic to all 20,000 servers
+- **Impersonate entire instances** — make mastodon.social appear to send announcements or follow/block actions
+- **Silently re-sign intercepted activities** — rewrite post content in transit between servers without breaking federation
+- The fediverse has no revocation mechanism; a forged key is indistinguishable from the real one until the owner notices and manually notifies every server
+
 ## Code
 
 `linked_data_signature.rb` — `sign!` and `verify_actor!` methods showing

@@ -37,6 +37,16 @@ signatures (typically 1-3 KB for ML-DSA) to a protocol designed for
 **Lifespan**: Cardiac implants have 10-15yr battery lifetimes. A pacemaker
 implanted in 2024 may still be operating in 2039 with the same RSA key.
 
+## why is this hella bad
+
+Medical device firmware controls therapeutic delivery. Forging firmware signing keys means:
+
+- **Insulin pumps (AID systems)**: forge a malicious firmware update → manipulate basal rate calculations or disable closed-loop control → hypoglycemia or hyperglycemia in diabetic patients
+- **Pacemakers / ICDs**: forge programmer commands authenticated with RSA → alter pacing parameters, disable defibrillation therapy, or trigger inappropriate shocks
+- **Infusion pumps (hospital PCA)**: forge firmware to modify drug concentration limits → overdose patients
+- The attack vector is **supply chain or OTA delivery** — no physical proximity to the patient required for an OTA-capable device
+- FDA's 510(k) process means patching the underlying crypto takes 6-18 months *after* a vulnerability is identified — the attack window is measured in years
+
 ## Code
 
 `fda_firmware_signing.c` — `medical_device_verify_firmware()` (RSA-2048

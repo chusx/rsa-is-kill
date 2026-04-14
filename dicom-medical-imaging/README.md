@@ -33,6 +33,16 @@ FDA 21 CFR Part 11 requires authentic electronic signatures on clinical trial
 data. DICOM RSA signatures are used for this purpose. Forged clinical trial
 imaging data undermines drug/device regulatory approvals.
 
+## why is this hella bad
+
+DICOM signatures are the legal and clinical attestation that medical images are authentic. Forging them enables:
+
+- **Alter cancer screening results**: modify CT/MRI to remove tumors from images → patient not treated → delayed diagnosis
+- **Insert false findings**: add apparent masses to images → unnecessary surgery on healthy patients
+- **Forge clinical trial imaging data**: DICOM signatures are used for FDA 21 CFR Part 11 compliance on clinical trials. Forged trial data → fraudulent drug/device approval → patient harm at scale
+- **Radiology AI training data poisoning**: DICOM datasets with forged signatures look authentic → poison AI model training sets → compromise future AI diagnostics
+- Attacks are undetectable: the forged RSA signature is mathematically valid; radiologists have no mechanism to distinguish it from an authentic signature
+
 ## Code
 
 `dcmtk_rsa_signature_profile.cc` — `SiBaseRSAProfile::isAllowableAlgorithmType()`

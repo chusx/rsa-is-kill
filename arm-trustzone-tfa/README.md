@@ -25,6 +25,16 @@ can forge any firmware in the boot chain.
 - **SoC lifecycle**: i.MX 8M processors in 2025 automotive head units will be
   running in 2040 with the same OTP-locked ROTPK
 
+## why is this hella bad
+
+TF-A runs at EL3 — the highest privilege level on ARM processors, above the hypervisor (EL2) and OS kernel (EL1). Compromising it means:
+
+- **Forge any firmware in the BL1→BL2→BL31 chain** → execute arbitrary code in EL3 → full control of the Trusted Execution Environment (TEE), TrustZone secure world
+- **Persistent hypervisor-level rootkit**: malicious BL31 survives OS reinstalls, hypervisor updates, and "secure wipe" operations — it runs before any OS gets control
+- **Break OP-TEE (BL32)**: the secure world TEE runs trusted applications (DRM, mobile payments, biometric processing). A compromised TF-A can inspect or modify all TEE memory
+- **NXP i.MX 8 automotive head units**: TF-A compromise → access to CAN bus routing, ECU communication proxied through the infotainment SoC
+- The ROTPK hash is burned into OTP — the hardware can't tell the difference between a legitimate signed firmware and a forged one with the same RSA key
+
 ## Code
 
 `mbedtls_crypto_verify.c` — `verify_signature()` (mbedTLS-based RSA/ECDSA

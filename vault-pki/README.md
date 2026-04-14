@@ -32,6 +32,15 @@ service in the entire Vault PKI hierarchy.
 - Even if Vault added PQC, the receiving mTLS endpoints (Envoy, NGINX, Go services)
   cannot validate PQC certificates
 
+## why is this hella bad
+
+Vault PKI is the internal certificate authority for cloud-native infrastructure. When the RSA-2048 root CA key falls:
+
+- **Forge TLS certificates for any internal service**: forge a cert for `payments-api.internal` → MitM every microservice-to-microservice payment call in the service mesh
+- **Poison Kubernetes secret delivery**: forge a cert for the Vault agent injector → intercept all secrets being injected into pods (database passwords, API keys, other private keys)
+- **Break service mesh mTLS**: Consul Connect and Istio use Vault-issued certs for mutual TLS between every service. Forge any service's identity → accepted as legitimate by every other service
+- The blast radius is the entire application infrastructure, not a single service. One compromised Vault root CA key gives MitM access to every mTLS-protected API call in the cluster
+
 ## Code
 
 `vault_pki_rsa_default.go` — `GeneratePrivateKey()` returning `rsa.GenerateKey()`

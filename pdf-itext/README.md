@@ -8,7 +8,7 @@
 
 iText and Apache PDFBox are the two most widely used libraries for PDF digital signatures in Java. They power government portals, enterprise document workflows, legal systems, and e-signature platforms across hundreds of countries. `sha256WithRSAEncryption` (OID 1.2.840.113549.1.1.11) is the overwhelmingly dominant algorithm in production PDF signatures.
 
-## why it matters legally and practically
+## why is this hella bad
 
 - PDF digital signatures have **legal standing** under eIDAS (EU), ESIGN Act (US), and equivalent laws in 50+ countries. A forged RSA signature on a PDF is legally indistinguishable from a real one.
 - Contracts, court documents, wills, tax filings, medical records, property deeds — all signed with RSA. A CRQC retroactively forges any of them.

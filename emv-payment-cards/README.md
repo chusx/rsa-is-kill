@@ -34,6 +34,14 @@ legacy SDA cards still use RSA-1024 for the static data signature.
 - The relatively short card lifespan is actually the most favorable factor —
   but only if migration begins before a CRQC emerges
 
+## why is this hella bad
+
+- **SDA cards (RSA-1024)**: factor the issuing bank CA RSA-1024 key → forge the Signed Static Application Data for *any* card issued by that bank → unlimited card cloning in software, no physical access required
+- **DDA/CDA cards (RSA-2048)**: recover each card's ICC private key from its certificate (embedded in the transaction flow) → forge dynamic signatures → pass terminal authentication as that card indefinitely
+- Attack is **invisible at the terminal**: the forged RSA signature is mathematically valid, no behavioral anomaly
+- Scale: compromising a single issuer CA RSA key affects every card issued by that bank (potentially millions). Compromising Visa/Mastercard root CA RSA key affects *every card on the network*
+- At ~$10 trillion in annual card transaction volume, even 0.01% fraud represents $1 billion/year
+
 ## Code
 
 `emv_rsa_card_auth.c` — `emv_verify_sda()` (RSA public key operation on CA key

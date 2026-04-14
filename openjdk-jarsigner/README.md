@@ -13,7 +13,7 @@
 - Java EE / Jakarta EE deployment archives
 - Maven Central artifact integrity
 
-## why it's broken
+## why is this hella bad
 
 - `getDefaultSignatureAlgorithm()` delegates to `SignatureUtil.getDefaultSigAlgForKey()`, which returns `SHA384withRSA` for RSA keys and has no PQC branch on JDK < 24.
 - The signature file is named `*.RSA` — the extension is determined by the key algorithm. Every signed JAR in existence has a `.RSA` file whose signature is forgeable by a CRQC.

@@ -8,7 +8,7 @@
 
 `kubeadm init` bootstraps a Kubernetes cluster by generating all required PKI material. `GeneratePrivateKey()` is the single function used for every CA and leaf certificate. The empty algorithm type — what you get when you run `kubeadm init` with no special flags, which is essentially everyone — maps to RSA-2048.
 
-## why it's broken
+## why is this hella bad
 
 - Every kubeadm-bootstrapped cluster has an RSA-2048 cluster CA with **10-year validity**. A cluster created in 2025 has certs expiring in 2035 — right in the window where CRQCs may exist.
 - The CA signs etcd server/client certs, the apiserver cert, kubelet client certs, and the front-proxy cert. Forging any of these gives full cluster control.

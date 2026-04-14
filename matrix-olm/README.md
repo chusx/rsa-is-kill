@@ -8,7 +8,7 @@
 
 Olm is the end-to-end encryption library used by Element (the largest Matrix client) and all Matrix homeservers. It implements X3DH (Extended Triple Diffie-Hellman) for session setup and a Double Ratchet for forward secrecy. Megolm is the variant used for multi-party room encryption. Both use Curve25519 throughout.
 
-## why it's broken
+## why is this hella bad
 
 - Every X3DH operation (`DH1`, `DH2`, `DH3`, `DH4`) is Curve25519 ECDH. Shor's algorithm breaks Curve25519 the same way it breaks RSA.
 - `CURVE25519_KEY_LENGTH = 32` is hardcoded in the ratchet struct. ML-KEM-768 ciphertexts are 1088 bytes — a fundamentally different wire format requiring a new protocol version.

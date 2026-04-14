@@ -8,7 +8,7 @@
 
 RPKI (Resource Public Key Infrastructure) is the cryptographic layer that secures BGP routing. Route Origin Authorizations (ROAs) are signed certificates that say which AS is allowed to announce which IP prefix. Routinator is the most widely deployed RPKI validator (NLnetLabs, used by major ISPs and IXPs worldwide).
 
-## why it's the most dangerous one on this list
+## why is this hella bad
 
 This one has a unique property: **breaking it makes the internet less secure than having no security at all.**
 

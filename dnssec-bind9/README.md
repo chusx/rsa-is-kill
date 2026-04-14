@@ -8,7 +8,7 @@
 
 BIND9 is the most deployed DNS server software. `opensslrsa_link.c` implements the RSA backend for DNSSEC zone signing. Every signed DNS record (A, AAAA, MX, CNAME, TXT...) is signed with an RSA key. Algorithm numbers 5, 7, 8, and 10 in the IANA registry are all RSA variants.
 
-## why it matters
+## why is this hella bad
 
 - The DNS root zone KSK is **RSA-2048**. It signs the root zone, which signs all TLD zones (.com, .net, .org, etc.), which sign everything under them.
 - If the root KSK is forged, every DNSSEC-validated response on the internet is forgeable. DNS is the phonebook of the internet.

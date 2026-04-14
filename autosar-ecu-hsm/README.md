@@ -38,6 +38,17 @@ The deeper problem: replacing the OEM firmware-signing RSA key requires:
 Vehicle lifespan: 15-20 years. ECUs provisioned in 2025 are expected to be
 operational in 2045. No automotive OEM has published a PQC migration roadmap.
 
+## why is this hella bad
+
+ECU firmware signing keys authorize *what code runs in the car*. Breaking them means:
+
+- **Forge malicious ECU firmware**: craft a firmware update that passes RSA-2048 verification → flash via OTA or workshop tool → persistent vehicle compromise
+- **Targeting**: ADAS ECU (autonomous emergency braking, lane keeping) → disable safety functions or inject false object detection
+- **Brake controller ECU**: manipulate brake force distribution → cause loss of vehicle control at highway speed
+- **Powertrain ECU**: modify fuel maps, rev limiters, transmission behavior
+- A single compromised OEM RSA signing key affects **every vehicle of that model that accepts OTA updates** — potentially millions of vehicles fleet-wide
+- Vehicle exploitation that survives ignition cycles, software resets, and "factory reset" procedures
+
 ## Code
 
 `autosar_secoc_rsa.c` — AUTOSAR CsmSignatureVerify interface, `EVITA_RSA_PublicKey`

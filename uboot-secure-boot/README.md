@@ -33,6 +33,15 @@ NXP i.MX 6/8 (automotive head units, industrial HMIs), TI AM335x
 (industrial PLCs, HMIs), Rockchip RK3588 (NAS, AI boxes), Allwinner H616
 (TV boxes), and any ARM board using U-Boot Verified Boot.
 
+## why is this hella bad
+
+The bootloader runs before the OS — it is the first layer of trust. Subverting it means:
+
+- **Persistent pre-OS rootkit**: forge a malicious kernel or initramfs that passes RSA verification → survives OS reinstalls, disk wipes, and "factory resets"
+- **Bypass all OS security**: SELinux, AppArmor, Secure Boot protections, IMA/EVM integrity measurements — all initialized after U-Boot hands off. A compromised boot stage poisons everything above it
+- On eFUSE-locked industrial devices (PLCs, medical devices, network appliances), the compromised firmware is **physically irremovable** — the only fix is hardware replacement
+- Affects: Raspberry Pi (consumer/industrial), NXP i.MX (automotive infotainment, industrial HMI), Rockchip (AI edge devices), Allwinner (embedded displays)
+
 ## Code
 
 `rsa_verify.c` — `rsa_verify_key()` (modular exponentiation + PKCS#1.5 verify

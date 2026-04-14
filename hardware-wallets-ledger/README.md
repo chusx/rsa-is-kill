@@ -8,7 +8,7 @@
 
 Ledger hardware wallets store private keys in a secure element (SE050 or proprietary ST chip) and sign cryptocurrency transactions on-device. The Bitcoin and Ethereum apps use `cx_ecdsa_sign()` with `CX_CURVE_256K1` (secp256k1) for all transaction signing.
 
-## the fundamental misunderstanding about hardware wallet quantum security
+## why is this hella bad
 
 Hardware wallets are designed to protect private keys from software extraction. They do nothing to protect against Shor's algorithm, which attacks the **public key** — which is permanently on the blockchain.
 

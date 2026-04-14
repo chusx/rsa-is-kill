@@ -8,7 +8,7 @@
 
 Every Bitcoin transaction is authorized by an ECDSA (or Schnorr) signature over the secp256k1 elliptic curve. `CKey::Sign()` is called every time a wallet spends a UTXO. The signature is included in the transaction and verified by every full node.
 
-## why it's broken
+## why is this hella bad
 
 - secp256k1 ECDSA is broken by Shor's algorithm. A CRQC can compute the private key from a public key in polynomial time.
 - **~4 million BTC** sit in P2PK outputs where the public key is directly exposed on-chain — these are immediately spendable by a CRQC operator without waiting for a transaction to appear.

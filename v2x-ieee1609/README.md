@@ -35,6 +35,16 @@ it breaks RSA.
 A CRQC forging BSMs could broadcast false safety-critical messages (phantom
 emergency brakes, false intersection signals) to any vehicle in radio range.
 
+## why is this hella bad
+
+V2X messages directly control driver assistance systems and automated vehicles. Forging them is a physical safety attack:
+
+- **Broadcast a fake emergency brake BSM** from a phantom vehicle ahead → every car with forward collision warning brakes simultaneously on a highway → multi-vehicle pile-up
+- **Forge false traffic signal SPaT messages** → tell vehicles the light is green when it's red → T-bone collisions at intersections
+- **Ghost vehicle injection**: insert a fake vehicle into the local awareness map of an autonomous vehicle → cause it to swerve or stop
+- Attack range = radio range (~300m for DSRC, ~1km for C-V2X with roadside units)
+- Pseudonym certificate rotation (every few minutes) does not help — all pseudonym certs chain to the same ECDSA CA
+
 ## Code
 
 `ieee1609_dot2_ecdsa.c` — `ieee1609_sign_bsm()` showing ECDSA-P256 signing of

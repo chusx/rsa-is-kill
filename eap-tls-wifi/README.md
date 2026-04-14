@@ -32,6 +32,16 @@ No single vendor can move without the others. This is the flag day problem
 for enterprise networking. A CRQC forging device certificates allows connecting
 any device to any secured corporate Wi-Fi network.
 
+## why is this hella bad
+
+EAP-TLS is the gatekeeper to enterprise networks. Breaking RSA certificates means:
+
+- **Connect any device to any enterprise Wi-Fi** without a credential, MDM enrollment, or physical access to the device: forge a valid device certificate → 802.1X authenticator accepts it → full network access
+- **Hospital networks**: forge a nurse's workstation certificate → gain access to EHR systems, medical device VLAN
+- **Eduroam**: ~10,000 universities, single global trust federation — forge an institution's RADIUS server certificate → harvest credentials of roaming students from every other institution that connects to yours
+- **Industrial DMZ bypass**: many OT networks use 802.1X on wired ports. Forge a valid certificate → plug into any Ethernet port and receive an authorized IP → pivot to SCADA network
+- Unlike password-based attacks, certificate forgery leaves no failed authentication logs — the forged cert *passes* verification
+
 ## Code
 
 `freeradius_eap_tls.c` — `tls_session_new()` showing `SSL_VERIFY_PEER` for

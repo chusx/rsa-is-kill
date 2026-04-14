@@ -35,6 +35,17 @@ A CRQC targeting industrial infrastructure could:
 2. Decrypt session traffic from historian/SCADA to field devices
 3. Impersonate engineering workstations during configuration
 
+## why is this hella bad
+
+An attacker breaking OPC-UA session authentication on industrial networks can forge authenticated PLC messages. Concrete consequences by sector:
+
+- **Manufacturing**: forge SCADA setpoints → change motor speeds, conveyor timing, robotic arm positions → product defects, equipment crashes
+- **Water treatment**: forge chemical dosing commands → alter chlorine/fluoride levels in municipal water supply
+- **Power substations**: forge breaker control commands → cause protective relay misoperation → localized blackouts
+- **Oil & gas**: forge valve open/close commands on pipeline compressor stations → pressure events, potential rupture
+
+OPC-UA is used for the "last mile" between SCADA servers and physical hardware. Session keys are short-lived but are established via RSA key wrap. Past session traffic (HNDL-captured) can be retroactively decrypted, exposing historical process data and control logic.
+
 ## Code
 
 `securitypolicy_basic128rsa15.c` — Basic128Rsa15 policy implementation showing

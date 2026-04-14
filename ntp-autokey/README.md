@@ -8,7 +8,7 @@
 
 NTP Autokey (RFC 5906) authenticates NTP time servers using RSA certificates and signatures. Every NTP client that uses Autokey verifies the server's RSA signature before accepting time updates.
 
-## why attacking time synchronization is catastrophic
+## why is this hella bad
 
 Time is a dependency of every other security system:
 

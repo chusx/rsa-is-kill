@@ -34,6 +34,16 @@ Tokens with long expiry (common in service-to-service auth) may still be valid
 when a CRQC appears. Any previously issued RS256 JWT can be forged by
 recovering the private key from the public key in `jwks_uri`.
 
+## why is this hella bad
+
+RS256 is the signing algorithm for every OAuth2 access token, OIDC ID token, and Kubernetes ServiceAccount token. Breaking the signing key means:
+
+- **Forge any user's access token** with any claims (admin, superuser, billing:write) → full API access to every service that validates JWTs
+- **Kubernetes**: forge a ServiceAccount token for `cluster-admin` → root access to every pod, secret, and namespace in the cluster
+- **Cloud provider IAM**: AWS Cognito, Azure AD, GCP Identity Platform all issue RS256 JWTs — forge them to access cloud resources without credentials
+- Tokens are often long-lived (service-to-service tokens: hours to days). A captured RS256 JWT + CRQC = indefinite replay of any token ever issued
+- The `jwks_uri` endpoint publishes the public key openly — CRQC input is trivially available
+
 ## Code
 
 `jwt_openssl_sign_verify.c` — `openssl_sign_sha_pem()` showing RS256/RS384/RS512

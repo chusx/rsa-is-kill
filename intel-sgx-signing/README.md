@@ -32,6 +32,15 @@ changed without:
 Intel has not announced a PQC SIGSTRUCT format. Cloud SGX attestation services
 (Azure Confidential Compute, AWS Nitro Enclaves with SGX) have no PQC path.
 
+## why is this hella bad
+
+SGX enclaves are used specifically because their contents are supposed to be secret and their identity trustworthy. Breaking RSA-3072 SIGSTRUCT means:
+
+- **Break remote attestation**: forge any enclave's SIGSTRUCT with arbitrary MRENCLAVE (measurement) and MRSIGNER → convince remote services the enclave is trustworthy when it isn't → bypass all SGX-based attestation checks
+- **Break SGX sealing**: sealed data (passwords, private keys, DRM content) is encrypted to MRSIGNER (SHA-256 of the RSA modulus) → recover RSA signing key → recompute MRSIGNER → unseal any sealed data from any enclave under that signing key
+- **Cloud confidential computing**: Azure Confidential VMs, IBM Cloud use SGX for "data in use" privacy. Forged attestation quotes = arbitrary code running under "trusted enclave" claims
+- Intel's own Quoting Enclave and Provisioning Enclave use Intel's RSA-3072 signing key. Compromising that single key breaks the entire SGX attestation ecosystem globally
+
 ## Code
 
 `sgx_enclave_rsa3072.c` — `sgx_sign_enclave()` showing the `enclave_css_t`

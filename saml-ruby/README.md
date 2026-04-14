@@ -36,6 +36,16 @@ option in XMLDSig — the spec is RSA-only by design.
 A CRQC can forge arbitrary SAML assertions, gaining identity as any user at
 any service provider that trusts the compromised IdP certificate.
 
+## why is this hella bad
+
+SAML assertions are the "proof of identity" exchanged between your employer's IdP and every app you use at work. Forging them means:
+
+- **Forge a SAML assertion as any employee** — including C-suite, sysadmins, finance — to any SP that trusts the IdP
+- **Okta/Azure AD breach without credentials**: the IdP's RSA signing key (often a single key for the entire organization) is the only thing standing between an attacker and every SaaS application in the company
+- No MFA, no password, no session cookie needed — a valid SAML assertion is accepted as-is
+- SAML is used for: corporate SSO, government agency logins, hospital EHR access, bank internal systems
+- The IdP signing certificate is typically published in SAML metadata XML — CRQC input is public
+
 ## Code
 
 `xml_security_rsa.rb` — `sign_document()` and `compute_signature()` showing

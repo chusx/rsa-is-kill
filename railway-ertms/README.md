@@ -42,6 +42,16 @@ underlying ETCS cryptographic specification has not been updated for PQC.
 - **FRMCS** (5G successor to GSM-R): also uses X.509 with RSA, no PQC in
   3GPP TR 22.889 (FRMCS security architecture).
 
+## why is this hella bad
+
+ERTMS Movement Authorities tell trains where they are permitted to go and how fast. Forging authentication means:
+
+- **Issue false MAs**: tell a train it has authority to proceed at 200 km/h through a section where another train is present → head-on collision at combined closing speed of 400 km/h
+- **Deny MAs**: emergency stop every train on a line simultaneously → national rail network paralysis
+- **Forge OBU certificates**: make a fake OBU appear to be a legitimate train → receive real MAs from the signalling system → ghost train in the traffic management system
+- ETCS Level 2/3 removes physical signals entirely — the cryptographically-authenticated radio link IS the signal. There is no fallback "red light" to stop a train if the digital authority is forged
+- Affects 30+ countries, ~100,000 km of railway currently being equipped with ETCS
+
 ## Code
 
 `ertms_x509_certificates.c` — `etcs_obu_rbc_tls_auth()` (mutual TLS with RSA-2048

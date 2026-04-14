@@ -8,7 +8,7 @@
 
 GnuPG's key generation code handles interactive and batch creation of OpenPGP keypairs. Modern GnuPG (2.3+) defaults to Ed25519/Cv25519, but RSA-3072 remains fully supported and is the default in many enterprise and compliance contexts.
 
-## why it's broken
+## why is this hella bad
 
 - RSA-3072 provides ~128 classical security bits and **0 post-quantum bits**. The `get_keysize_range()` function offers RSA-1024 through RSA-4096 — none of which survive Shor's algorithm.
 - Every web-of-trust signature ever made with an RSA key is retroactively forgeable. Identity verification built on RSA GPG keys collapses.

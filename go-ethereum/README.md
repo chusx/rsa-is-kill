@@ -8,7 +8,7 @@
 
 Ethereum's cryptographic identity is built entirely on secp256k1. An Ethereum address is defined as the last 20 bytes of Keccak-256(public key), where the public key is a secp256k1 point. Every transaction, every EIP-712 typed signature, every ERC-20 approval is an ECDSA signature over secp256k1.
 
-## why it's broken
+## why is this hella bad
 
 - `S256()` is the only curve in the codebase. `GenerateKey()` hardwires it. `toECDSA()` hardwires it. `Sign()` delegates to the C secp256k1 library with no abstraction.
 - An Ethereum "address" is cryptographically bound to secp256k1. Changing the signing scheme changes what an address means — this is a protocol-level identity break, not just an algorithm swap.

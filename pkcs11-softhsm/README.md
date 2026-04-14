@@ -43,6 +43,17 @@ Steps 1-4 are not yet started for most vendors. Until CKM_ML_DSA is defined,
 no application using PKCS#11 can sign with ML-DSA regardless of what the
 underlying HSM hardware could theoretically compute.
 
+## why is this hella bad
+
+PKCS#11 is the API that every HSM uses. No PQC mechanism ID means no HSM anywhere can do PQC operations — and HSMs are the hardware root of trust for:
+
+- **Public CAs**: every browser-trusted TLS certificate chains to an RSA root stored in an HSM. When that root's RSA key falls, every certificate issued under it is forgeable
+- **DNSSEC root KSK**: ICANN's DNSSEC root key is HSM-backed RSA. Forge it → poison DNS for any domain
+- **Code signing CAs**: Microsoft, Apple, Google code signing roots are HSM-backed RSA. Forge them → distribute malware with trusted signatures to billions of devices
+- **Payment HSMs**: PCI DSS PIN translation HSMs use RSA for key derivation. Break them → recover PIN blocks for millions of card transactions
+
+The PKCS#11 gap isn't one organization's problem — it's the *infrastructure layer* that everything else depends on.
+
 ## Code
 
 `pkcs11_no_pqc.c` — `sign_with_hsm_rsa()` using `CKM_SHA256_RSA_PKCS` with

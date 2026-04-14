@@ -8,7 +8,7 @@
 
 Every eSIM (embedded SIM) in every phone, tablet, laptop, smartwatch, car, and IoT device uses GSMA's Remote SIM Provisioning architecture. The eSIM chip receives its identity certificate at manufacturing time. Profile downloads from operators (e.g. activating a cellular plan) use RSA/ECDSA mutual authentication between the device and the SM-DP+ server.
 
-## why the hardware lifespan makes this uniquely bad
+## why is this hella bad
 
 - eSIM identity certificates are burned into the secure element at **manufacturing time**. They cannot be updated via OTA. There is no firmware update path for the cryptographic identity.
 - **Automotive eSIMs**: cars manufactured today have a 15-year lifespan. Their RSA eSIM keys will still be in use in 2039+, potentially 7+ years after a CRQC exists.

@@ -8,7 +8,7 @@
 
 strongSwan is the dominant open-source IPsec/IKEv2 VPN implementation on Linux. `issued_by()` verifies that a certificate was signed by a given CA — this is called during IKEv2 AUTH exchange when a VPN peer presents its certificate for authentication.
 
-## why it's broken
+## why is this hella bad
 
 - The signature verification dispatches on an OID parsed from the certificate's `AlgorithmIdentifier`. The default build knows RSA and ECDSA OIDs. PQC OIDs (e.g. ML-DSA's `2.16.840.1.101.3.4.3.17`) are `SIGN_UNKNOWN` unless the `oqs` plugin is loaded.
 - The `oqs` plugin is not packaged by any major Linux distribution. Enterprises using `strongswan` from apt/yum/zypper get RSA-only.

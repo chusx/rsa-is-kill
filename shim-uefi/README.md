@@ -8,7 +8,7 @@
 
 `shim` is the first-stage bootloader loaded by UEFI firmware on every major Linux distribution. It is signed by Microsoft, and it in turn verifies GRUB, which verifies the kernel, which verifies kernel modules. This chain — firmware → shim → GRUB → kernel → modules — is the entire verified boot guarantee that modern systems rely on.
 
-## why it's broken
+## why is this hella bad
 
 - The UEFI specification mandates RSA-2048 for all Secure Boot signatures.
 - shim explicitly rejects RSA-4096 MOK keys — they cause hangs. RSA-2048 is not just the default, it's the maximum.

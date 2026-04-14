@@ -33,6 +33,15 @@ ATECC608 issue: if the authenticator hardware implements RSA in silicon
 (older TPMs, YubiKey 4), the algorithm cannot be changed without replacing
 the physical device.
 
+## why is this hella bad
+
+WebAuthn/passkeys are being rolled out as password replacements. RS256 is a common algorithm for Windows Hello and enterprise authenticators:
+
+- **Forge passkeys for any RS256 credential**: recover RSA private key from credential's public key (stored on the server) → forge any WebAuthn assertion → authenticate as any user without their device
+- **Windows Hello enterprise bypass**: corporate Windows PCs using TPM-backed RS256 passkeys → forge authentication → log into corporate Windows session, then pivot to Kerberos/domain resources
+- **YubiKey 4 attestation forgery**: recover Yubico attestation CA RSA key → forge attestation for any "YubiKey" → register fake hardware tokens that pass enterprise authenticator attestation policies
+- Passkeys were designed to be phishing-resistant because the private key never leaves the device. RSA key recovery via CRQC bypasses this guarantee entirely: you never need the physical device
+
 ## Code
 
 `webauthn_rs256_attestation.rs` — `COSEAlgorithm` enum listing all COSE

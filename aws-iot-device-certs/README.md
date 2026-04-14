@@ -37,6 +37,16 @@ No major IoT cloud platform supports PQC device certificates because:
 Even if libraries added PQC, the network effect problem remains: a device
 can't use PQC until its cloud endpoint accepts it, and vice versa.
 
+## why is this hella bad
+
+IoT devices are embedded everywhere. Forging their identities means:
+
+- **Industrial IoT**: forge a sensor reading device's certificate → inject false temperature/pressure/flow readings → cause automated systems to respond to phantom conditions (e.g., trigger emergency shutdowns or disable alarms)
+- **Smart building**: forge access control panel certificate → send "door unlocked" events to cloud SIEM → defeat physical security audit trail
+- **Medical IoT** (glucose monitors, smart infusion pumps): forge device identity → inject false readings into hospital patient monitoring systems
+- **Fleet tracking**: forge vehicle GPS trackers → falsify location data for entire logistics fleets
+- At IoT scale, HNDL-captured TLS handshakes contain device certificate public keys — a CRQC can batch-process millions of device identities and forge them all simultaneously
+
 ## Code
 
 `aws_iot_rsa_device_cert.c` — Example device certificate metadata (RSA-2048,

@@ -37,6 +37,16 @@ secrets — but **non-repudiation** (proving a bank authorized a payment) is
 based on RSA signatures. A CRQC undermines the legal basis for disputed payment
 disputes.
 
+## why is this hella bad
+
+SWIFT is the authentication layer for the global interbank payment system. Breaking RSA signatures on payment messages means:
+
+- **Forge payment instructions from any bank**: forge a pacs.008 credit transfer appearing to originate from a legitimate BIC (bank identifier code) → unauthorized wire transfer to attacker-controlled accounts
+- **Non-repudiation collapse**: RSA signatures on MX messages are the legal proof that a bank authorized a payment. Forging them destroys the legal foundation for disputed payment resolution
+- **Central bank targeting**: TARGET2 (€400B/day) and Fedwire ($4T/day) use RSA-secured connectivity. A forged payment instruction at this level can move sovereign-scale funds
+- Precedent: the 2016 Bangladesh Bank SWIFT heist stole $81M via social engineering. A CRQC attack would not require social engineering — just the target bank's published RSA certificate
+- Recovery from a large-scale SWIFT authentication compromise has no playbook; correspondent banking relationships would freeze globally until authentication is reestablished
+
 ## Code
 
 `swift_mtngs_rsa_signing.java` — `SWIFTMXMessageSigner.signMXMessage()` using

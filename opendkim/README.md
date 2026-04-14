@@ -8,7 +8,7 @@
 
 DKIM (DomainKeys Identified Mail) authenticates outbound email by signing selected message headers and the body hash with the sending domain's private key. The public key is published in DNS. Every receiving MTA verifies the signature. OpenDKIM is the most widely deployed DKIM implementation.
 
-## why it's broken
+## why is this hella bad
 
 - `dkimf_sign[]` maps human-readable algorithm names to constants — only `rsa-sha1` and `rsa-sha256` exist. There is no PQC entry.
 - The signing algorithm is a global configuration value (`conf_signalg`) assigned to every message. There is no per-recipient or per-domain algorithm agility.

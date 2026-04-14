@@ -8,7 +8,7 @@
 
 Every Tor relay has an RSA identity key. The SHA-1 fingerprint of this key IS the relay's identity — it's how clients recognize relays in the consensus, how circuits are built, and how relays authenticate to directory authorities.
 
-## why it's catastrophic
+## why is this hella bad
 
 - `PK_BYTES = 1024/8` — **RSA-1024**. This is classically broken (NIST deprecated in 2013). Quantumly obliterated.
 - The relay descriptor is signed with this key via `crypto_pk_private_sign_digest()`. Forge the signature → impersonate any relay.

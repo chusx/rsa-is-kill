@@ -33,6 +33,15 @@ USB-C PD authentication (used in every certified USB4/Thunderbolt device)
 hardcodes ECDSA P-256 in the USB PD 3.1 specification. Changing it requires
 a new USB spec revision and hardware redesign across the entire USB ecosystem.
 
+## why is this hella bad
+
+The ATECC608 is the identity chip for IoT devices. Breaking ECDSA P-256 on these chips means:
+
+- **Impersonate any device to AWS IoT / Azure IoT Hub**: forge the device certificate → inject arbitrary telemetry (fake sensor readings, fake safety alerts) into industrial and medical monitoring systems
+- **USB-C PD authentication bypass**: forge any charger or cable as "authenticated USB-IF certified" → accept any charger in enterprise/medical environments that restrict unauthorized accessories
+- **Qi 1.3 wireless charging**: forge a fake Qi charger as a certified product → bypass charging restriction policies
+- At IoT scale (billions of chips), a CRQC can operate a **mass identity forgery factory**: recover private keys from public keys (published in device certificates) without physical access to a single chip
+
 ## Code
 
 `calib_sign_ecdsa.c` — `calib_sign_base()` (I2C opcode to chip, 64-byte R||S
