@@ -8,13 +8,14 @@
 
 OpenVPN uses RSA certificates for mutual TLS authentication between client and server. The code here implements a custom `RSA_METHOD` that hooks into OpenSSL's signing path, allowing OpenVPN to delegate private key operations to an external process (hardware token, management daemon).
 
-## why is this hella bad
+## impact
 
-- RSA key exchange is used in the TLS handshake to authenticate peers. Once RSA is broken, any actor with a CRQC can impersonate any OpenVPN server or client.
-- The `tls_ctx_use_management_external_key()` function dispatches on `EVP_PKEY_RSA` — there is no `EVP_PKEY_PQC` branch. The external key path is entirely RSA-specific.
-- `rsa_priv_enc()` is called by OpenSSL during every TLS handshake to sign the CertificateVerify or ServerKeyExchange message. This is the exact operation Shor's algorithm attacks.
-- OpenVPN has no native PQC support. Compiling against an OQS-patched OpenSSL is possible but unsupported and not done by any major distro package.
+OpenVPN uses X.509 RSA certificates to authenticate peers. the server cert, client cert, and CA cert chain are all RSA in default configurations.
 
+- forge the server certificate and MitM every client connection. clients see a valid certificate, the TLS handshake succeeds, traffic flows through the attacker transparently
+- forge a client certificate and connect as any VPN user without credentials
+- OpenVPN is widely deployed for corporate remote access. MitM the VPN and you're inside the network with full visibility of everything
+- TLS-Auth and TLS-Crypt add a pre-shared key layer but don't fix RSA certificate authentication. the PSK protects against unauthenticated TLS connections but doesn't help if you can forge the RSA cert
 ## migration status
 
 no PQC roadmap published. most enterprise OpenVPN deployments use RSA-2048 certificates from internal CAs.

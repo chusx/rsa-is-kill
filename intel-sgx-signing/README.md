@@ -32,15 +32,14 @@ changed without:
 Intel has not announced a PQC SIGSTRUCT format. Cloud SGX attestation services
 (Azure Confidential Compute, AWS Nitro Enclaves with SGX) have no PQC path.
 
-## why is this hella bad
+## impact
 
-SGX enclaves are used specifically because their contents are supposed to be secret and their identity trustworthy. Breaking RSA-3072 SIGSTRUCT means:
+the whole point of SGX is that enclave contents are secret and the enclave identity is trustworthy. both properties collapse when you can forge RSA-3072 SIGSTRUCT.
 
-- **Break remote attestation**: forge any enclave's SIGSTRUCT with arbitrary MRENCLAVE (measurement) and MRSIGNER → convince remote services the enclave is trustworthy when it isn't → bypass all SGX-based attestation checks
-- **Break SGX sealing**: sealed data (passwords, private keys, DRM content) is encrypted to MRSIGNER (SHA-256 of the RSA modulus) → recover RSA signing key → recompute MRSIGNER → unseal any sealed data from any enclave under that signing key
-- **Cloud confidential computing**: Azure Confidential VMs, IBM Cloud use SGX for "data in use" privacy. Forged attestation quotes = arbitrary code running under "trusted enclave" claims
-- Intel's own Quoting Enclave and Provisioning Enclave use Intel's RSA-3072 signing key. Compromising that single key breaks the entire SGX attestation ecosystem globally
-
+- forge any enclave's SIGSTRUCT with arbitrary MRENCLAVE and MRSIGNER measurements. convince remote attestation services that your enclave is trustworthy when it's running whatever you want. attestation is now theater
+- SGX sealing encrypts data to MRSIGNER, which is SHA-256 of the RSA modulus. recover the signing key, recompute MRSIGNER, unseal any sealed data from any enclave under that key: passwords, private keys, DRM content, all of it
+- Azure Confidential VMs and IBM Cloud use SGX for "data in use" privacy. forged attestation quotes mean arbitrary code gets accepted as a "trusted enclave." the confidentiality guarantee is gone
+- Intel's own Quoting Enclave and Provisioning Enclave use Intel's RSA-3072 signing key. one key, entire global SGX attestation ecosystem
 ## Code
 
 `sgx_enclave_rsa3072.c` — `sgx_sign_enclave()` showing the `enclave_css_t`

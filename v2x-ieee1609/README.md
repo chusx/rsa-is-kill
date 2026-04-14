@@ -35,16 +35,14 @@ it breaks RSA.
 A CRQC forging BSMs could broadcast false safety-critical messages (phantom
 emergency brakes, false intersection signals) to any vehicle in radio range.
 
-## why is this hella bad
+## impact
 
-V2X messages directly control driver assistance systems and automated vehicles. Forging them is a physical safety attack:
+V2X is how connected vehicles communicate safety-critical information to each other and to roadside infrastructure. ECDSA P-256 under Shor's algorithm means an attacker can sign arbitrary V2X messages as any vehicle or RSU.
 
-- **Broadcast a fake emergency brake BSM** from a phantom vehicle ahead → every car with forward collision warning brakes simultaneously on a highway → multi-vehicle pile-up
-- **Forge false traffic signal SPaT messages** → tell vehicles the light is green when it's red → T-bone collisions at intersections
-- **Ghost vehicle injection**: insert a fake vehicle into the local awareness map of an autonomous vehicle → cause it to swerve or stop
-- Attack range = radio range (~300m for DSRC, ~1km for C-V2X with roadside units)
-- Pseudonym certificate rotation (every few minutes) does not help — all pseudonym certs chain to the same ECDSA CA
-
+- forge Basic Safety Messages with false position, speed, and heading. inject phantom vehicles into the cooperative awareness picture of every nearby car. automated emergency braking and intersection collision avoidance systems respond to the fake vehicles
+- forge SPAT messages from a roadside unit telling cars a red light is green. or that a green is red, gridlocking intersections
+- V2X pseudonym certificates rotate weekly to protect privacy but the underlying ECDSA P-256 is the same. Shor's algorithm doesn't care how often you rotate a broken algorithm
+- SCMS (Security Credential Management System) is the V2X PKI. forge the root CA key and issue arbitrary pseudonym certificates for any vehicle
 ## Code
 
 `ieee1609_dot2_ecdsa.c` — `ieee1609_sign_bsm()` showing ECDSA-P256 signing of

@@ -38,17 +38,15 @@ traffic today can later recover Update Keys via CRQC RSA-1024 factoring,
 gaining ability to forge arbitrary SCADA commands (open/close breakers,
 change setpoints, disable protection relays).
 
-## why is this hella bad
+## impact
 
-DNP3 SAv5 protects RTUs at substations, pump stations, and pipeline compressor stations. Breaking authentication means:
+DNP3 SAv5 protects RTUs at substations, pump stations, and pipeline compressor stations. also, the mandated key size is RSA-1024, which is already classically weak. this is not just a future CRQC problem.
 
-- **Open circuit breakers at substations** → targeted power outages (specific neighborhoods, hospitals, data centers)
-- **Forge trip commands to protective relays** → damage transformers by switching them incorrectly → months-long outages (large power transformers have 12-18 month lead times)
-- **Pipeline**: forge compressor setpoints → overpressure events → potential pipeline rupture or explosion
-- **Water**: forge pump enable/disable commands → drain or overpressure distribution systems
-
-RSA-1024 is the key size — already classically broken with sufficient resources. A nation-state adversary with classical compute may not even need a CRQC to attack older SAv5 deployments. Stored HNDL traffic from RSA-1024 sessions is already retroactively attackable today.
-
+- open circuit breakers at substations to cause targeted power outages. specific neighborhoods, hospitals, data centers, whatever you feel like
+- forge trip commands to protective relays and damage transformers by switching them incorrectly. large power transformers have 12-18 month lead times. you can cause multi-month outages
+- pipeline: forge compressor setpoints, create overpressure events, potential pipeline rupture
+- water: forge pump commands, drain or overpressure distribution systems
+- RSA-1024 is already classically broken with sufficient compute. HNDL-captured SAv5 traffic from years ago is retroactively attackable today without any CRQC at all
 ## Code
 
 `dnp3_sav5_rsa_auth.c` — `dnp3_sav5_wrap_update_key()` showing RSAES-OAEP-1024

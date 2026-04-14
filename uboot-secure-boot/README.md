@@ -33,15 +33,14 @@ NXP i.MX 6/8 (automotive head units, industrial HMIs), TI AM335x
 (industrial PLCs, HMIs), Rockchip RK3588 (NAS, AI boxes), Allwinner H616
 (TV boxes), and any ARM board using U-Boot Verified Boot.
 
-## why is this hella bad
+## impact
 
-The bootloader runs before the OS — it is the first layer of trust. Subverting it means:
+U-Boot secure boot is the trust anchor for embedded Linux devices: routers, industrial gateways, automotive head units, medical devices, network appliances. the RSA key is what stands between "known good firmware" and "whatever."
 
-- **Persistent pre-OS rootkit**: forge a malicious kernel or initramfs that passes RSA verification → survives OS reinstalls, disk wipes, and "factory resets"
-- **Bypass all OS security**: SELinux, AppArmor, Secure Boot protections, IMA/EVM integrity measurements — all initialized after U-Boot hands off. A compromised boot stage poisons everything above it
-- On eFUSE-locked industrial devices (PLCs, medical devices, network appliances), the compromised firmware is **physically irremovable** — the only fix is hardware replacement
-- Affects: Raspberry Pi (consumer/industrial), NXP i.MX (automotive infotainment, industrial HMI), Rockchip (AI edge devices), Allwinner (embedded displays)
-
+- forge a firmware image that passes RSA verification in U-Boot. flash it to any device using U-Boot secure boot. persistent compromise that survives factory reset because it runs before everything else
+- the ROTPK hash is burned into OTP. the hardware cannot distinguish a forged firmware from a legitimate one once you have the RSA key
+- industrial devices running U-Boot are often in the field for 10-20 years. devices deployed today will still be running in 2040 with the same RSA key baked into their OTP fuses, and that key cannot be changed
+- routers: forge firmware, own the network gateway. IoT gateways: forge firmware, own the device fleet management plane
 ## Code
 
 `rsa_verify.c` — `rsa_verify_key()` (modular exponentiation + PKCS#1.5 verify

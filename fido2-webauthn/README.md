@@ -33,15 +33,14 @@ ATECC608 issue: if the authenticator hardware implements RSA in silicon
 (older TPMs, YubiKey 4), the algorithm cannot be changed without replacing
 the physical device.
 
-## why is this hella bad
+## impact
 
-WebAuthn/passkeys are being rolled out as password replacements. RS256 is a common algorithm for Windows Hello and enterprise authenticators:
+passkeys are being rolled out as the replacement for passwords. the entire sales pitch is "phishing-resistant because the private key never leaves the device." that pitch assumes RSA is a one-way function. a CRQC means it isn't.
 
-- **Forge passkeys for any RS256 credential**: recover RSA private key from credential's public key (stored on the server) → forge any WebAuthn assertion → authenticate as any user without their device
-- **Windows Hello enterprise bypass**: corporate Windows PCs using TPM-backed RS256 passkeys → forge authentication → log into corporate Windows session, then pivot to Kerberos/domain resources
-- **YubiKey 4 attestation forgery**: recover Yubico attestation CA RSA key → forge attestation for any "YubiKey" → register fake hardware tokens that pass enterprise authenticator attestation policies
-- Passkeys were designed to be phishing-resistant because the private key never leaves the device. RSA key recovery via CRQC bypasses this guarantee entirely: you never need the physical device
-
+- the server stores the credential public key. a CRQC recovers the RSA private key from it. forge WebAuthn assertions for any RS256 credential. authenticate as any user without their device, without any phishing, without anything at all
+- Windows Hello on corporate PCs defaults to TPM-backed RS256. forge the assertion, log into the Windows session, pivot to Kerberos and domain resources from there
+- YubiKey 4 uses RSA for the attestation CA. recover that key, forge attestation certificates for fake hardware tokens that pass enterprise authenticator policies
+- the "phishing-resistant" property is completely gone. you don't need the physical device, you don't need to trick the user. you just need their public key, which is sitting on the server
 ## Code
 
 `webauthn_rs256_attestation.rs` — `COSEAlgorithm` enum listing all COSE

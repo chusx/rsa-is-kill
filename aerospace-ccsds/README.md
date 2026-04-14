@@ -34,17 +34,14 @@ Mission-critical targets: weather satellites (GOES-R, Meteosat), Earth
 observation (Sentinel, Landsat), science missions (James Webb, Hubble servicing
 was RSA-era), ISS commanding infrastructure.
 
-## why is this hella bad
+## impact
 
-Spacecraft are unreachable after launch — there is no "patch Tuesday" in orbit. Compromising telecommand authentication means:
+no patch tuesday in orbit. the spacecraft launched last year with RSA-2048 keys burned into EEPROM will be flying until 2040+, and there is literally no mechanism to update those keys remotely. once you factor the RSA key, you own the uplink.
 
-- **Permanently disable satellites**: forge commands to power off transponders, vent propellant, or enter safe mode → satellite becomes a dead object
-- **Orbital manipulation**: forge attitude control or thruster commands → change satellite orbit → collision risk with other satellites or the ISS
-- **Data falsification**: forge commands to alter instrument calibration or downlink parameters → corrupt scientific data (climate models, GPS corrections, weather forecasting)
-- **Hijack communication payload**: redirect transponder beams, change frequencies, broadcast false signals
-- **Weather and navigation denial**: compromise GOES-R (US weather), Copernicus Sentinel (EU Earth observation), or GPS augmentation signals (WAAS/EGNOS) → aviation and maritime navigation degradation
-- Spacecraft RSA keys are generated pre-launch and cannot be updated without a new key-injection command — which itself requires authenticating with the *current* RSA key
-
+- forge a key transfer packet, get your session key accepted, then send arbitrary telecommands: power off transponders, vent propellant, put the satellite in safe mode permanently. dead satellite, no physical access required
+- forge attitude control or thruster commands and change the orbit. collision risk with other satellites or the ISS, and yes this applies to operational weather and science satellites
+- GOES-R does US weather forecasting. Copernicus Sentinel does EU earth observation. forge commands that corrupt instrument calibration and suddenly the downstream data (climate models, GPS corrections, aviation weather) is quietly wrong in ways nobody notices for a while
+- to update the RSA key you have to authenticate with the current RSA key. so there's no way to patch your way out once the CRQC shows up. it's keys all the way down
 ## Code
 
 `ccsds_sdls_rsa_auth.c` — `ccsds_sdls_wrap_session_key()` showing RSA-OAEP-2048

@@ -38,14 +38,14 @@ any passport from that country. Border control terminals worldwide would accept
 the forgery. A CRQC attacking Active Authentication: clone any passport chip
 by factoring its AA public key from EF.DG15.
 
-## why is this hella bad
+## impact
 
-- **Forge passports from any country**: recover any country's CSCA RSA private key → produce SODs that pass verification at every border worldwide
-- **Clone any passport chip**: the AA public key is on the chip and readable by any NFC reader → CRQC recovers AA private key → chip clone passes active authentication → invisible document fraud
-- Border control systems worldwide pull CSCA keys from the ICAO PKD and trust them completely; there is no behavioral anomaly to detect a forged SOD
-- ~1.2 billion passports in circulation, 10-year validity — chips issued today will still be active in 2035
-- This attack enables **jurisdiction-wide mass identity fraud** (every passport from a compromised country) rather than individual document forgery
+1.2 billion passports in circulation, 10-year validity. chips issued today will still be active in 2035. the whole global border security model sits on RSA being hard to break.
 
+- recover any country's CSCA RSA private key and produce SODs that pass verification at every border in the world. forge passports from any country, at scale
+- the Active Authentication public key is on the chip and readable by any NFC reader. a CRQC recovers the AA private key and the chip clone passes active authentication. the document fraud is completely invisible
+- border control systems pull CSCA keys from the ICAO PKD and trust them unconditionally. a forged SOD looks exactly like a real one because the RSA signature is valid
+- this is jurisdiction-wide mass identity fraud rather than individual forgeries. every passport from a compromised country's CSCA, all at once
 ## Code
 
 `icao_9303_passive_auth.c` — `icao_passive_authentication()` (CMS RSA verify)

@@ -33,15 +33,13 @@ USB-C PD authentication (used in every certified USB4/Thunderbolt device)
 hardcodes ECDSA P-256 in the USB PD 3.1 specification. Changing it requires
 a new USB spec revision and hardware redesign across the entire USB ecosystem.
 
-## why is this hella bad
+## impact
 
-The ATECC608 is the identity chip for IoT devices. Breaking ECDSA P-256 on these chips means:
+the ATECC608 is the identity chip in a huge fraction of deployed IoT devices. the private key never leaves the chip in hardware, which sounds great until you remember that Shor's algorithm works from the public key and never needs to touch the chip at all.
 
-- **Impersonate any device to AWS IoT / Azure IoT Hub**: forge the device certificate → inject arbitrary telemetry (fake sensor readings, fake safety alerts) into industrial and medical monitoring systems
-- **USB-C PD authentication bypass**: forge any charger or cable as "authenticated USB-IF certified" → accept any charger in enterprise/medical environments that restrict unauthorized accessories
-- **Qi 1.3 wireless charging**: forge a fake Qi charger as a certified product → bypass charging restriction policies
-- At IoT scale (billions of chips), a CRQC can operate a **mass identity forgery factory**: recover private keys from public keys (published in device certificates) without physical access to a single chip
-
+- forge any device certificate and impersonate it to AWS IoT Core, Azure IoT Hub, or GCP IoT. inject fake sensor readings, fake safety alerts, fake telemetry into industrial and medical monitoring systems
+- USB-C PD authentication uses these chips to certify chargers and cables. forge a certificate for an uncertified charger and it passes in enterprise or medical environments that restrict accessories
+- at IoT scale, device public keys are published in their certificates. a CRQC can batch-process millions of them and forge every single device identity without touching a single piece of hardware. billions of chips, one algorithm, one problem
 ## Code
 
 `calib_sign_ecdsa.c` — `calib_sign_base()` (I2C opcode to chip, 64-byte R||S

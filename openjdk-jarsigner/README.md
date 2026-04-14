@@ -13,14 +13,14 @@
 - Java EE / Jakarta EE deployment archives
 - Maven Central artifact integrity
 
-## why is this hella bad
+## impact
 
-- `getDefaultSignatureAlgorithm()` delegates to `SignatureUtil.getDefaultSigAlgForKey()`, which returns `SHA384withRSA` for RSA keys and has no PQC branch on JDK < 24.
-- The signature file is named `*.RSA` — the extension is determined by the key algorithm. Every signed JAR in existence has a `.RSA` file whose signature is forgeable by a CRQC.
-- A forged JAR signature enables supply-chain attacks: malicious bytecode in an APK or enterprise middleware that passes `jarsigner -verify`.
-- Android APK v1 signing has no PQC specification. The APK Signature Scheme v3/v4 (used on Android 9+) uses ECDSA but also has no PQC path.
-- Enterprise Java runs predominantly on LTS 11 or 17 (the vast majority of production deployments). JDK 24 added ML-DSA (JEP 497) but LTS 11/17 will never get it.
+JAR signing is how the JVM verifies that bytecode comes from who it says it does. every signed JAR in existence has a .RSA file whose signature is forgeable once you have a CRQC.
 
+- forge a JAR signature for any published artifact and distribute it as the real thing. it passes jarsigner -verify as the original signer. supply chain attack with cryptographic cover
+- Maven Central has millions of artifacts signed with RSA keys. forge signatures for popular libraries and distribute malicious versions that the JVM accepts as authenticated
+- Android APK signing v1 scheme uses JAR signing. RSA-signed APKs from before the v2/v3 migration are vulnerable
+- enterprise Java runs mostly on LTS 11 or 17. JDK 24 added ML-DSA via JEP 497 but LTS 11 and 17 will never get it. the vast majority of production JVMs are permanently RSA-only for JAR signature validation
 ## migration status
 
 JDK 24 (March 2025) added ML-DSA support via JEP 497. Blocked in practice by: Android APK spec has no PQC signing scheme, JVM ecosystem still largely on LTS 11/17, no CA infrastructure for PQC code-signing certificates.

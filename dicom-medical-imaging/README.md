@@ -33,16 +33,14 @@ FDA 21 CFR Part 11 requires authentic electronic signatures on clinical trial
 data. DICOM RSA signatures are used for this purpose. Forged clinical trial
 imaging data undermines drug/device regulatory approvals.
 
-## why is this hella bad
+## impact
 
-DICOM signatures are the legal and clinical attestation that medical images are authentic. Forging them enables:
+DICOM digital signatures are how you prove a medical image hasn't been tampered with. they're used for FDA 21 CFR Part 11 compliance, legal attestation, and clinical trials. the system works on the assumption that RSA is hard to forge.
 
-- **Alter cancer screening results**: modify CT/MRI to remove tumors from images → patient not treated → delayed diagnosis
-- **Insert false findings**: add apparent masses to images → unnecessary surgery on healthy patients
-- **Forge clinical trial imaging data**: DICOM signatures are used for FDA 21 CFR Part 11 compliance on clinical trials. Forged trial data → fraudulent drug/device approval → patient harm at scale
-- **Radiology AI training data poisoning**: DICOM datasets with forged signatures look authentic → poison AI model training sets → compromise future AI diagnostics
-- Attacks are undetectable: the forged RSA signature is mathematically valid; radiologists have no mechanism to distinguish it from an authentic signature
-
+- modify a CT or MRI to remove tumors before a radiologist sees it. the patient doesn't get treated, and nobody detects the tampering because the RSA signature is mathematically valid
+- add apparent masses to images. unnecessary surgery on a healthy patient. again, signature verifies, nothing looks wrong to the system
+- forge clinical trial imaging data. fraudulent drug or device approval, patient harm at scale, all with a passing signature check
+- DICOM datasets with forged signatures look authentic and get used to train radiology AI models. you can poison the training data and compromise future AI diagnostics, quietly
 ## Code
 
 `dcmtk_rsa_signature_profile.cc` — `SiBaseRSAProfile::isAllowableAlgorithmType()`

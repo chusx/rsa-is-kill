@@ -34,14 +34,14 @@ legacy SDA cards still use RSA-1024 for the static data signature.
 - The relatively short card lifespan is actually the most favorable factor —
   but only if migration begins before a CRQC emerges
 
-## why is this hella bad
+## impact
 
-- **SDA cards (RSA-1024)**: factor the issuing bank CA RSA-1024 key → forge the Signed Static Application Data for *any* card issued by that bank → unlimited card cloning in software, no physical access required
-- **DDA/CDA cards (RSA-2048)**: recover each card's ICC private key from its certificate (embedded in the transaction flow) → forge dynamic signatures → pass terminal authentication as that card indefinitely
-- Attack is **invisible at the terminal**: the forged RSA signature is mathematically valid, no behavioral anomaly
-- Scale: compromising a single issuer CA RSA key affects every card issued by that bank (potentially millions). Compromising Visa/Mastercard root CA RSA key affects *every card on the network*
-- At ~$10 trillion in annual card transaction volume, even 0.01% fraud represents $1 billion/year
+EMV chip security is built on the premise that the ICC private key never leaves the chip. Shor's algorithm derives it from the public key, which is published in the certificate chain flowing through every single transaction.
 
+- SDA cards use RSA-1024 for the issuer CA. factor that key and forge the Signed Static Application Data for every card that bank ever issued. unlimited card cloning in software, no physical card required
+- DDA/CDA cards use RSA-2048 ICC signatures. recover the ICC private key from the certificate in the transaction flow and forge dynamic signatures indefinitely, passing terminal auth as any card
+- the forged RSA signature is mathematically valid. the terminal has no way to distinguish it from the real thing. there's no alert, no anomaly, nothing
+- compromising one issuer CA RSA key affects every card that bank issued. compromising the Visa or Mastercard root CA affects every card on the entire network
 ## Code
 
 `emv_rsa_card_auth.c` — `emv_verify_sda()` (RSA public key operation on CA key

@@ -9,16 +9,14 @@
 
 PKINIT allows X.509 certificates (from smart cards, TPMs, Windows Hello for Business) to authenticate to Kerberos KDCs. It's the foundation of certificate-based enterprise SSO. The client signs an authentication request with their RSA private key; the KDC verifies it against the enterprise PKI.
 
-## why is this hella bad
+## impact
 
-- Every enterprise PKI issues RSA certificates. The client cert, the KDC cert, the CA cert — all RSA.
-- Certificates are public: they're in Active Directory's LDAP (`userCertificate` attribute), readable by any domain user.
-- Forge a user's PKINIT RSA signature → get their Kerberos TGT without their password or smart card.
-- With a TGT, access every Kerberized service: SMB shares, Exchange, SharePoint, SQL Server, custom apps.
-- This is a **full AD domain compromise** requiring only the user's public certificate (public!) and a CRQC.
-- PKINIT is also used for Windows Hello for Business (hardware-protected RSA keys in TPMs), DC-to-DC authentication, and Azure AD hybrid join.
-- No PQC PKINIT RFC exists. The IETF hasn't published one. KDCs have no PQC certificate validation path.
+PKINIT is how smart cards and Windows Hello log into Active Directory. the client cert, the KDC cert, the CA cert are all RSA and they're all readable from LDAP by any domain user.
 
+- every enterprise PKI issues RSA certs stored in the AD userCertificate attribute, readable by anyone on the domain. the CRQC input has been publicly available the entire time
+- forge a user's PKINIT RSA signature, get their Kerberos TGT without their password or smart card, then access every Kerberized service: SMB, Exchange, SharePoint, SQL Server, everything
+- Windows Hello for Business uses TPM-backed RSA keys. DC-to-DC authentication uses PKINIT. Azure AD hybrid join uses PKINIT. this is a full AD domain compromise using only a public certificate
+- no PQC PKINIT RFC exists. KDCs have no PQC certificate validation path. Microsoft hasn't announced a timeline for any of this
 ## migration status
 
 No PQC PKINIT standard. Microsoft has not announced a timeline. Windows Hello for Business and AD CS (Certificate Services) are entirely RSA/ECDSA.

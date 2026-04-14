@@ -43,17 +43,15 @@ Steps 1-4 are not yet started for most vendors. Until CKM_ML_DSA is defined,
 no application using PKCS#11 can sign with ML-DSA regardless of what the
 underlying HSM hardware could theoretically compute.
 
-## why is this hella bad
+## impact
 
-PKCS#11 is the API that every HSM uses. No PQC mechanism ID means no HSM anywhere can do PQC operations — and HSMs are the hardware root of trust for:
+PKCS#11 is the API that everything uses to talk to an HSM. HSMs are the hardware root of trust for enterprise PKI, code signing infrastructure, and payment processing. none of them can do PQC because CKM_ML_DSA doesn't exist in the spec.
 
-- **Public CAs**: every browser-trusted TLS certificate chains to an RSA root stored in an HSM. When that root's RSA key falls, every certificate issued under it is forgeable
-- **DNSSEC root KSK**: ICANN's DNSSEC root key is HSM-backed RSA. Forge it → poison DNS for any domain
-- **Code signing CAs**: Microsoft, Apple, Google code signing roots are HSM-backed RSA. Forge them → distribute malware with trusted signatures to billions of devices
-- **Payment HSMs**: PCI DSS PIN translation HSMs use RSA for key derivation. Break them → recover PIN blocks for millions of card transactions
-
-The PKCS#11 gap isn't one organization's problem — it's the *infrastructure layer* that everything else depends on.
-
+- every browser-trusted TLS certificate chains to an RSA root stored in an HSM. forge that root and every certificate under it is forgeable. that's all of HTTPS
+- ICANN's DNSSEC root KSK is HSM-backed RSA. forge it and you can poison DNS for any domain
+- Microsoft, Apple, and Google code-signing roots are HSM-backed RSA. forge them and you can distribute malware with trusted signatures to billions of devices
+- payment HSMs (Thales payShield, Utimaco) use RSA for key derivation in PIN translation. break them and you can recover PIN blocks from card transactions
+- the fix requires PKCS#11 v3.2 with ML-DSA mechanism IDs, HSM firmware updates from every vendor, middleware updates, and re-enrollment of every key. this is years away minimum
 ## Code
 
 `pkcs11_no_pqc.c` — `sign_with_hsm_rsa()` using `CKM_SHA256_RSA_PKCS` with

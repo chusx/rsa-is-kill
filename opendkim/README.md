@@ -8,14 +8,14 @@
 
 DKIM (DomainKeys Identified Mail) authenticates outbound email by signing selected message headers and the body hash with the sending domain's private key. The public key is published in DNS. Every receiving MTA verifies the signature. OpenDKIM is the most widely deployed DKIM implementation.
 
-## why is this hella bad
+## impact
 
-- `dkimf_sign[]` maps human-readable algorithm names to constants — only `rsa-sha1` and `rsa-sha256` exist. There is no PQC entry.
-- The signing algorithm is a global configuration value (`conf_signalg`) assigned to every message. There is no per-recipient or per-domain algorithm agility.
-- Forging a DKIM signature bypasses anti-phishing protections (DMARC). A CRQC can forge the RSA signature on any email, making phishing and spoofing indistinguishable from legitimate mail.
-- The problem is ecosystem-wide: even if OpenDKIM added ML-DSA, every receiving MTA in the world needs to support PQC DKIM verification before a sender can migrate. No PQC DKIM RFC has been published.
-- Billions of DKIM public keys are published in DNS as RSA-2048 TXT records. Rotating all of them requires coordinated action across every email-sending domain.
+DKIM is how receiving mail servers verify that an email actually came from the sending domain. the public key is in DNS, published for anyone to query. the CRQC input is freely available in public DNS.
 
+- forge DKIM signatures for any domain with RSA-1024 or RSA-2048 keys. send email that passes DKIM verification appearing to come from president@whitehouse.gov, ceo@bigbank.com, security-alerts@your-bank.com, whatever
+- DMARC and BIMI both depend on DKIM. forge DKIM, pass DMARC checks, get the little verified brand logo in the recipient's mail client. phishing with full authentication stamps
+- RSA-1024 DKIM keys are still widely deployed and are classically weak. no CRQC needed for those, just compute
+- the receiving server has no way to know the signature is forged. SPF alignment passes. DMARC passes. the email looks completely legitimate at every check
 ## migration status
 
 No PQC DKIM RFC. No IETF working group actively standardizing it as of 2026. OpenDKIM project is in maintenance mode.

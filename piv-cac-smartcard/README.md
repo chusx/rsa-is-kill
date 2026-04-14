@@ -31,16 +31,14 @@ the card and often published in LDAP/AD.
   Microsoft Smart Card Minidriver), macOS CryptoTokenKit — all need PQC updates
 - **FIPS 201-3 (2022)** mentioned PQC in passing but set no deadline
 
-## why is this hella bad
+## impact
 
-PIV/CAC cards are the keys to the US federal government. Breaking RSA-2048 authentication means:
+PIV/CAC is how US federal employees and military personnel authenticate to basically everything. PIV algorithm 0x07 is RSA-2048, and the public key is in the Certificate for PIV Authentication readable over contactless NFC.
 
-- **Forge any federal employee's identity**: PIV slot 9A certificate is in AD LDAP (public) → CRQC recovers private key → get a Kerberos TGT for any federal employee → access every system they have access to
-- **Break Windows Hello for Business**: WHfB uses hardware RSA keys in TPMs for certificate-based auth → same attack chain as PKINIT (see kerberos-pkinit/)
-- **DoD CAC compromise**: ~3.5M military credentials → access to military systems, classified networks (SIPRNet uses CAC for authentication)
-- **Physical access control bypass**: PIV slot 9E (Card Authentication) is used for building access. Forge it → enter any federally-controlled building with a PIV-controlled door
-- 8.5 million compromised credentials spanning all cabinet departments, intelligence agencies, and DoD
-
+- tap the card with any NFC reader, get the public key, run it through a CRQC, get the private key, forge PIV authentication for that person to any PIV-protected federal system. card not required
+- CAC is how the entire US military authenticates. same attack chain. DoD systems, classified networks (SIPRNet), all of it
+- PIV slot 9E (Card Authentication) is also used for physical building access. forge it and walk through any federally-controlled door with a PIV-controlled lock
+- SP 800-73-5 (the PQC PIV interface spec) has not been published. there are millions of RSA-2048 PIV cards in active use right now with no migration path yet
 ## Code
 
 `opensc_piv_rsa.c` — `piv_general_authenticate()` (RSA sign/decrypt via

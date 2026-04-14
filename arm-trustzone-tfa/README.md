@@ -25,16 +25,15 @@ can forge any firmware in the boot chain.
 - **SoC lifecycle**: i.MX 8M processors in 2025 automotive head units will be
   running in 2040 with the same OTP-locked ROTPK
 
-## why is this hella bad
+## impact
 
-TF-A runs at EL3 — the highest privilege level on ARM processors, above the hypervisor (EL2) and OS kernel (EL1). Compromising it means:
+TF-A runs at EL3, the highest privilege level on ARM processors. above the hypervisor, above the kernel, above everything. if you can forge the boot chain here you win the whole system and you win it permanently.
 
-- **Forge any firmware in the BL1→BL2→BL31 chain** → execute arbitrary code in EL3 → full control of the Trusted Execution Environment (TEE), TrustZone secure world
-- **Persistent hypervisor-level rootkit**: malicious BL31 survives OS reinstalls, hypervisor updates, and "secure wipe" operations — it runs before any OS gets control
-- **Break OP-TEE (BL32)**: the secure world TEE runs trusted applications (DRM, mobile payments, biometric processing). A compromised TF-A can inspect or modify all TEE memory
-- **NXP i.MX 8 automotive head units**: TF-A compromise → access to CAN bus routing, ECU communication proxied through the infotainment SoC
-- The ROTPK hash is burned into OTP — the hardware can't tell the difference between a legitimate signed firmware and a forged one with the same RSA key
-
+- forge any image in the BL1 -> BL2 -> BL31 chain and execute arbitrary code at EL3. full control of the TEE and the TrustZone secure world. the OS doesn't get a vote
+- a compromised BL31 survives OS reinstalls, hypervisor updates, and "secure wipe" operations because it runs before any OS touches memory
+- OP-TEE (BL32) runs DRM, mobile payments, and biometric processing in the secure world. a compromised TF-A can read or modify all of it
+- NXP i.MX 8 is common in automotive infotainment. TF-A compromise here gives access to CAN bus routing and ECU communication proxied through the SoC
+- the ROTPK hash is burned into OTP fuses. the hardware literally cannot tell a forged firmware from a real one once you have the RSA key. that's the whole problem
 ## Code
 
 `mbedtls_crypto_verify.c` — `verify_signature()` (mbedTLS-based RSA/ECDSA

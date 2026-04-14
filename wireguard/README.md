@@ -8,13 +8,14 @@
 
 WireGuard implements the Noise_IKpsk2 handshake protocol for key exchange. Every cryptographic operation is hardcoded to a fixed suite: Curve25519 for DH, ChaCha20-Poly1305 for AEAD, BLAKE2s for hashing. This is baked into the protocol name string itself.
 
-## why is this hella bad
+## impact
 
-- Curve25519 is an elliptic curve Diffie-Hellman scheme. While not RSA, it is equally broken by Shor's algorithm — a CRQC recovers the private key from the public key.
-- There is **zero algorithm agility** in WireGuard. The handshake name `"Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s"` is a literal constant. Every DH call is `curve25519()` directly, with no abstraction layer.
-- Key sizes (`NOISE_PUBLIC_KEY_LEN = 32`) are compile-time constants. A lattice-based KEM like ML-KEM requires different key sizes and a different API — you cannot drop it in.
-- The pre-shared-key (`psk`) field provides a classical mitigation (symmetric key can't be broken by Shor's) but the pre-shared key itself must be distributed securely, defeating the purpose of the key exchange.
+WireGuard uses Curve25519 for key exchange. Curve25519 is an elliptic curve, and elliptic curve discrete log is broken by Shor's algorithm. the static public keys are exchanged in handshakes and often stored in peer configs indefinitely.
 
+- derive the static private key from the static public key. impersonate either endpoint to the other. inject into the WireGuard tunnel
+- WireGuard is deployed as corporate VPN, cloud inter-node networking, and Kubernetes CNI overlay. MitM the tunnel and you're inside the network
+- WireGuard static keys are long-lived and rarely rotated. HNDL: capture handshakes now, factor the Curve25519 keys later, retroactively decrypt all historical session traffic
+- there's no PQC mode in the WireGuard protocol spec. adding it requires a protocol version bump and simultaneous update of every peer
 ## migration status
 
 WireGuard upstream has no PQC plan. Some VPN providers (NordVPN, Mullvad) have added PQC by wrapping WireGuard in a separate ML-KEM tunnel — not by changing WireGuard itself.

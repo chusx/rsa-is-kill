@@ -42,16 +42,14 @@ underlying ETCS cryptographic specification has not been updated for PQC.
 - **FRMCS** (5G successor to GSM-R): also uses X.509 with RSA, no PQC in
   3GPP TR 22.889 (FRMCS security architecture).
 
-## why is this hella bad
+## impact
 
-ERTMS Movement Authorities tell trains where they are permitted to go and how fast. Forging authentication means:
+ERTMS Movement Authorities tell trains where they're allowed to go and how fast. ETCS Level 2 and 3 have no fallback physical signaling. the cryptographically-authenticated radio link is the signal.
 
-- **Issue false MAs**: tell a train it has authority to proceed at 200 km/h through a section where another train is present → head-on collision at combined closing speed of 400 km/h
-- **Deny MAs**: emergency stop every train on a line simultaneously → national rail network paralysis
-- **Forge OBU certificates**: make a fake OBU appear to be a legitimate train → receive real MAs from the signalling system → ghost train in the traffic management system
-- ETCS Level 2/3 removes physical signals entirely — the cryptographically-authenticated radio link IS the signal. There is no fallback "red light" to stop a train if the digital authority is forged
-- Affects 30+ countries, ~100,000 km of railway currently being equipped with ETCS
-
+- issue a false MA telling a train it has authority to proceed at 200 km/h through a section where another train is already present. the onboard computer sees a valid RSA signature and follows it. head-on collision
+- issue a fake MA with a zero-speed limit to stop a train in a tunnel or on a bridge with no way to override
+- forge an RBC certificate and you can issue arbitrary movement authorities to any train on the line
+- EURORADIO and ETCS use X.509 RSA-2048 certs with multi-year validity because replacing onboard unit certificates requires taking the train out of service. those certs will be active well into the CRQC timeframe
 ## Code
 
 `ertms_x509_certificates.c` — `etcs_obu_rbc_tls_auth()` (mutual TLS with RSA-2048

@@ -8,16 +8,14 @@
 
 RPKI (Resource Public Key Infrastructure) is the cryptographic layer that secures BGP routing. Route Origin Authorizations (ROAs) are signed certificates that say which AS is allowed to announce which IP prefix. Routinator is the most widely deployed RPKI validator (NLnetLabs, used by major ISPs and IXPs worldwide).
 
-## why is this hella bad
+## impact
 
-This one has a unique property: **breaking it makes the internet less secure than having no security at all.**
+RPKI is BGP route origin validation, the mechanism that prevents BGP hijacking. it's all RSA. when it breaks it doesn't just stop working, it actively makes things worse.
 
-- Every ROA is verified using `RSA_PKCS1_2048_8192_SHA256` — RSA only, hardcoded.
-- A CRQC can forge ROAs — certificates that say "AS666 is authorized to announce 8.8.8.8/24".
-- Route Origin Validation (ROV) will then **actively route traffic to the attacker** because the forged ROA makes the hijacked route look valid and the legitimate route look invalid.
-- Without RPKI, a BGP hijack is detectable as an anomaly. With broken RPKI, it's a cryptographically authenticated reroute that passes every check.
-- The five RIR trust anchors (ARIN, RIPE, APNIC, LACNIC, AFRINIC) are RSA. Forging any of them compromises the entire address space under that RIR.
-
+- forge Route Origin Authorizations for any IP prefix. tell the internet that your ASN is authorized to announce 8.8.8.8/24, or 1.0.0.0/8, or any IP space you want
+- ISPs doing route origin validation will actively prefer your forged route because it has a valid ROA. without RPKI, a BGP hijack is an anomaly. with broken RPKI, it's a cryptographically authenticated reroute that passes every check
+- forge any of the five RIR trust anchors (ARIN, RIPE, APNIC, LACNIC, AFRINIC) and rewrite the entire validated route origin database for that region's address space
+- the whole RPKI manifest and CRL chain is RSA. it all falls together
 ## migration status
 
 No PQC algorithm OID assigned by IANA for RPKI. Migration requires updating all five RIR hierarchies simultaneously. APNIC has published research; no deployment timeline exists.

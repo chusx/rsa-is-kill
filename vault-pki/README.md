@@ -32,15 +32,14 @@ service in the entire Vault PKI hierarchy.
 - Even if Vault added PQC, the receiving mTLS endpoints (Envoy, NGINX, Go services)
   cannot validate PQC certificates
 
-## why is this hella bad
+## impact
 
-Vault PKI is the internal certificate authority for cloud-native infrastructure. When the RSA-2048 root CA key falls:
+Vault PKI is the internal certificate authority for cloud-native infrastructure. default key type is RSA-2048 with a 10-year root CA validity. everything in the cluster chains to that root.
 
-- **Forge TLS certificates for any internal service**: forge a cert for `payments-api.internal` → MitM every microservice-to-microservice payment call in the service mesh
-- **Poison Kubernetes secret delivery**: forge a cert for the Vault agent injector → intercept all secrets being injected into pods (database passwords, API keys, other private keys)
-- **Break service mesh mTLS**: Consul Connect and Istio use Vault-issued certs for mutual TLS between every service. Forge any service's identity → accepted as legitimate by every other service
-- The blast radius is the entire application infrastructure, not a single service. One compromised Vault root CA key gives MitM access to every mTLS-protected API call in the cluster
-
+- forge a TLS certificate for any internal service (payments-api.internal, auth.internal, whatever you want). MitM every microservice-to-microservice call in the service mesh. Istio and Consul Connect mutual TLS is the security boundary and it collapses
+- forge a certificate for the Vault agent injector (the sidecar that delivers secrets to pods). intercept all secrets being injected: database passwords, API keys, other private keys
+- the blast radius is the entire application stack. one compromised Vault root CA key gives MitM access to every mTLS-protected API call in the cluster
+- Go's crypto/x509 has no PQC support. no PQC key_type in the Vault PKI engine. cert-manager has no PQC issuer. the entire ecosystem has to move simultaneously
 ## Code
 
 `vault_pki_rsa_default.go` — `GeneratePrivateKey()` returning `rsa.GenerateKey()`

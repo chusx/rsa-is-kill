@@ -8,13 +8,14 @@
 
 strongSwan is the dominant open-source IPsec/IKEv2 VPN implementation on Linux. `issued_by()` verifies that a certificate was signed by a given CA — this is called during IKEv2 AUTH exchange when a VPN peer presents its certificate for authentication.
 
-## why is this hella bad
+## impact
 
-- The signature verification dispatches on an OID parsed from the certificate's `AlgorithmIdentifier`. The default build knows RSA and ECDSA OIDs. PQC OIDs (e.g. ML-DSA's `2.16.840.1.101.3.4.3.17`) are `SIGN_UNKNOWN` unless the `oqs` plugin is loaded.
-- The `oqs` plugin is not packaged by any major Linux distribution. Enterprises using `strongswan` from apt/yum/zypper get RSA-only.
-- IKEv2 has no standardized PQC authentication method. `draft-ietf-ipsecme-ikev2-pqc-auth` is a draft as of 2026 — not yet an RFC. Even if strongSwan supports it, peers need to support it too.
-- A CRQC can forge the RSA certificate of any VPN gateway, impersonate it, and perform a man-in-the-middle on every corporate VPN connection.
+strongSwan is an IPsec implementation used for site-to-site VPNs, remote access, and as the IKE daemon on a lot of embedded systems and routers.
 
+- forge RSA authentication in IKE_AUTH and impersonate any VPN endpoint. MitM site-to-site tunnels between offices, data centers, or cloud VPCs
+- industrial control systems use strongSwan for IEC 62443 secure remote access. forge the IPsec peer authentication and you're inside the OT network
+- certificate-based IKEv2 is the recommended strong auth configuration. forging the certificate forges the auth. there's no second factor in the protocol
+- RFC 8784 PPK gives PQC key exchange but authentication is still RSA certificates. "quantum-resistant VPN" deployments using only PPK are misleading if authentication isn't also upgraded
 ## migration status
 
 strongSwan has experimental PQC support via the `oqs` plugin (liboqs). Not available in distro packages, not standardized in IKEv2, not deployed in practice.

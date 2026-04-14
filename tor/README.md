@@ -8,14 +8,14 @@
 
 Every Tor relay has an RSA identity key. The SHA-1 fingerprint of this key IS the relay's identity — it's how clients recognize relays in the consensus, how circuits are built, and how relays authenticate to directory authorities.
 
-## why is this hella bad
+## impact
 
-- `PK_BYTES = 1024/8` — **RSA-1024**. This is classically broken (NIST deprecated in 2013). Quantumly obliterated.
-- The relay descriptor is signed with this key via `crypto_pk_private_sign_digest()`. Forge the signature → impersonate any relay.
-- A CRQC operator controlling forged relay identities can run a fully authenticated Sybil attack on Tor: they can be selected as guards, middles, and exits simultaneously, de-anonymizing users without any traffic analysis.
-- Tor added Ed25519 identity keys in 0.2.7 but **RSA-1024 is still mandatory** for backward compatibility with older relays. A relay that drops its RSA-1024 key cannot communicate with ~5% of the network.
-- There are ~7,000 active Tor relays. A CRQC could forge all of their identities simultaneously.
+Tor relay identity keys are RSA-1024, published in the consensus directory. RSA-1024 is already classically weak with sufficient compute, so this is a present-day concern too, not just a future CRQC problem.
 
+- recover any relay's RSA-1024 identity key, impersonate that relay to clients and other relays, inject yourself into circuits as a "known good" node
+- RSA-1024 is classically breakable. nation-state adversaries with serious classical compute may already be attacking individual relay identity keys without any CRQC
+- Tor directory authorities sign the consensus with RSA keys. forge the consensus and you can substitute relays, rewrite the network view, or make malicious relays appear trustworthy
+- v2 hidden service .onion addresses are derived from RSA-1024 public keys. recover the private key and impersonate any v2 hidden service. v3 onion uses Ed25519, which is still ECDL-based and broken by Shor's algorithm on a CRQC anyway
 ## migration status
 
 Ongoing Ed25519 migration. RSA-1024 mandatory until old relay versions die off. No PQC timeline.

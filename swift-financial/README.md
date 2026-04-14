@@ -37,16 +37,14 @@ secrets — but **non-repudiation** (proving a bank authorized a payment) is
 based on RSA signatures. A CRQC undermines the legal basis for disputed payment
 disputes.
 
-## why is this hella bad
+## impact
 
-SWIFT is the authentication layer for the global interbank payment system. Breaking RSA signatures on payment messages means:
+SWIFT processes about 44 million messages per day. trillions of dollars. the 2016 Bangladesh Bank heist stole $81 million via social engineering. a CRQC attack doesn't need social engineering, just the target bank's published RSA certificate.
 
-- **Forge payment instructions from any bank**: forge a pacs.008 credit transfer appearing to originate from a legitimate BIC (bank identifier code) → unauthorized wire transfer to attacker-controlled accounts
-- **Non-repudiation collapse**: RSA signatures on MX messages are the legal proof that a bank authorized a payment. Forging them destroys the legal foundation for disputed payment resolution
-- **Central bank targeting**: TARGET2 (€400B/day) and Fedwire ($4T/day) use RSA-secured connectivity. A forged payment instruction at this level can move sovereign-scale funds
-- Precedent: the 2016 Bangladesh Bank SWIFT heist stole $81M via social engineering. A CRQC attack would not require social engineering — just the target bank's published RSA certificate
-- Recovery from a large-scale SWIFT authentication compromise has no playbook; correspondent banking relationships would freeze globally until authentication is reestablished
-
+- forge a pacs.008 credit transfer appearing to originate from any legitimate bank BIC. unauthorized wire transfer to attacker-controlled accounts, indistinguishable from a real payment instruction
+- RSA signatures on MX messages are the legal proof that a bank authorized a payment. forge them and the non-repudiation basis for disputed payment resolution collapses. "we didn't send that" becomes impossible to prove either way
+- TARGET2 moves 400 billion euros per day. Fedwire moves 4 trillion dollars per day. forged payment instructions at this level can move sovereign-scale funds before anyone in the clearing chain catches it
+- there's no documented playbook for recovering from a mass SWIFT authentication compromise. correspondent banking relationships would freeze globally until authentication could be reestablished
 ## Code
 
 `swift_mtngs_rsa_signing.java` — `SWIFTMXMessageSigner.signMXMessage()` using

@@ -32,16 +32,14 @@ No single vendor can move without the others. This is the flag day problem
 for enterprise networking. A CRQC forging device certificates allows connecting
 any device to any secured corporate Wi-Fi network.
 
-## why is this hella bad
+## impact
 
-EAP-TLS is the gatekeeper to enterprise networks. Breaking RSA certificates means:
+EAP-TLS is the gatekeeper to enterprise networks. the certificate is the credential. forge the certificate and you walk right in, with no failed auth logs, no anomalies, nothing in the SIEM.
 
-- **Connect any device to any enterprise Wi-Fi** without a credential, MDM enrollment, or physical access to the device: forge a valid device certificate → 802.1X authenticator accepts it → full network access
-- **Hospital networks**: forge a nurse's workstation certificate → gain access to EHR systems, medical device VLAN
-- **Eduroam**: ~10,000 universities, single global trust federation — forge an institution's RADIUS server certificate → harvest credentials of roaming students from every other institution that connects to yours
-- **Industrial DMZ bypass**: many OT networks use 802.1X on wired ports. Forge a valid certificate → plug into any Ethernet port and receive an authorized IP → pivot to SCADA network
-- Unlike password-based attacks, certificate forgery leaves no failed authentication logs — the forged cert *passes* verification
-
+- forge any device certificate and connect to enterprise Wi-Fi without credentials, MDM enrollment, or physical device access. the 802.1X authenticator sees a valid cert and waves you through
+- hospital networks: forge a nurse workstation certificate, get onto the EHR VLAN and the medical device VLAN
+- eduroam covers about 10,000 universities in a single global trust federation. forge an institution's RADIUS server certificate and harvest credentials from roaming students connecting from every other member institution
+- many OT networks use 802.1X on wired Ethernet ports. forge a certificate, plug in anywhere, get an authorized IP, and pivot to the SCADA network from there
 ## Code
 
 `freeradius_eap_tls.c` — `tls_session_new()` showing `SSL_VERIFY_PEER` for

@@ -36,15 +36,14 @@ Government classified networks (CNSA 2.0, NSA/CNSS Policy 15) mandate PQC
 for new systems after 2025, but IKEv2 authentication has no standardized
 PQC mechanism to satisfy this mandate.
 
-## why is this hella bad
+## impact
 
-IKEv2 authentication proves *who you're talking to*. Forging RSA auth keys means:
+IKEv2 authentication proves who you're talking to. forge the RSA identity of a VPN endpoint and you can impersonate it to everyone who connects, transparently.
 
-- **MitM classified government traffic**: VPN peer impersonation → intercept and modify traffic on IPsec tunnels used for classified network interconnects (SIPRNet, JWICS gateway connections use IPsec)
-- **Corporate VPN impersonation**: forge the VPN server's RSA identity → redirect all corporate VPN clients to an attacker-controlled gateway → mass credential harvest
-- **BGP peering sessions over IPsec**: many ISPs and CDNs run BGP over IPsec tunnels. Forge the IPsec peer → hijack BGP sessions → route internet traffic
-- RFC 8784 (PQC PPK) protects the *session key* but not *who you're authenticating to* — an attacker can still impersonate a legitimate peer even with PPK deployed, because authentication remains RSA
-
+- MitM classified government traffic: impersonate the far end of an IPsec tunnel used for classified network interconnects (SIPRNet/JWICS gateways use IPsec). intercept and modify everything in transit
+- forge a corporate VPN server's RSA identity and redirect all VPN clients to your gateway. mass credential harvest, and clients see a valid cert so nothing looks wrong at all
+- many ISPs and CDNs run BGP over IPsec tunnels. impersonate the IPsec peer, hijack the BGP session, start rerouting internet traffic
+- RFC 8784 PQC PPK protects the session key but explicitly does not fix authentication. an attacker can still impersonate a legitimate peer even with PPK deployed. the RFC says this itself
 ## Code
 
 `rsasigkey_ikev2.c` — `RSA_pubkey_content_to_ipseckey()` (RFC 3110 DNS format

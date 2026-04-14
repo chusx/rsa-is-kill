@@ -37,15 +37,14 @@ disk is a persistent artifact; any HNDL-captured TPM blob becomes decryptable.
 - **Deployment scale**: ~2 billion TPM 2.0 chips shipped 2016-2024. Enterprise
   device refresh cycles are 4-7 years; PQC TPMs are not yet commercially available.
 
-## why is this hella bad
+## impact
 
-TPM 2.0 is the hardware root of trust for ~2 billion devices. Breaking RSA-2048 SRK means:
+the TPM Endorsement Key is the root identity of the TPM. it's RSA-2048 in every default profile. it seals BitLocker volume master keys, attests platform state, and establishes trust for confidential computing.
 
-- **Decrypt BitLocker drives offline**: SRK public key is always readable from TPM → CRQC factors it → decrypt any sealed VMK from disk → full disk decryption, no PIN, no recovery key, no physical presence
-- **Break remote attestation**: TPM AIK (Attestation Identity Key) is RSA → forge attestation quotes → convince remote services that a compromised machine is healthy → bypass Confidential Computing protections
-- **Unseal any TPM secret**: anything sealed to a PCR policy + RSA SRK (FIDO2 credentials, SSH keys, VPN keys) becomes recoverable
-- **Azure Confidential VM / AWS Nitro**: these use vTPM-backed attestation to prove VM integrity. Forged attestation = arbitrary code running under "trusted" attestation claims
-
+- the TPM is designed around the assumption that the EK private key is physically unextractable. Shor's algorithm doesn't extract it, it derives it from the public EK certificate, which is public by design
+- BitLocker uses the TPM to seal the VMK (Volume Master Key). the VMK is encrypted to the EK. derive the EK private key, decrypt the VMK, unlock the drive without the PIN or the BitLocker recovery key
+- TPM attestation is used by Azure Attestation, AWS Nitro attestation, and enterprise MDM to verify device trustworthiness. forge the TPM identity, pass attestation, get corporate resource access from an untrusted device
+- P_RSA2048SHA256 FAPI profile is the default. keyBits: 2048. every default TPM deployment is the same setup
 ## Code
 
 `tpm2_rsa_endorsement_key.c` — `Esys_RSA_Decrypt()` (the BitLocker key

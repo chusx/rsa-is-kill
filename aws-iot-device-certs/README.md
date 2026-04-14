@@ -37,16 +37,14 @@ No major IoT cloud platform supports PQC device certificates because:
 Even if libraries added PQC, the network effect problem remains: a device
 can't use PQC until its cloud endpoint accepts it, and vice versa.
 
-## why is this hella bad
+## impact
 
-IoT devices are embedded everywhere. Forging their identities means:
+IoT devices are everywhere and their certificates are often 10-year validity. there are a lot of HNDL-captured TLS handshakes out there sitting on disks somewhere, each one containing a device public key.
 
-- **Industrial IoT**: forge a sensor reading device's certificate → inject false temperature/pressure/flow readings → cause automated systems to respond to phantom conditions (e.g., trigger emergency shutdowns or disable alarms)
-- **Smart building**: forge access control panel certificate → send "door unlocked" events to cloud SIEM → defeat physical security audit trail
-- **Medical IoT** (glucose monitors, smart infusion pumps): forge device identity → inject false readings into hospital patient monitoring systems
-- **Fleet tracking**: forge vehicle GPS trackers → falsify location data for entire logistics fleets
-- At IoT scale, HNDL-captured TLS handshakes contain device certificate public keys — a CRQC can batch-process millions of device identities and forge them all simultaneously
-
+- forge an industrial sensor certificate and inject false temperature, pressure, or flow readings. automated systems respond to the phantom data. best case: spurious emergency shutdowns. other cases: less good
+- smart building access panels: forge the certificate, send "door unlocked" events to the SIEM, and the physical security audit trail shows nothing suspicious because the cert verified fine
+- medical IoT (glucose monitors, infusion pumps): forge the device identity and inject false readings into hospital patient monitoring. not a good time
+- fleet GPS trackers: forge device certificates, falsify location data for entire logistics fleets, and break automated routing and supply chain visibility in exciting ways
 ## Code
 
 `aws_iot_rsa_device_cert.c` — Example device certificate metadata (RSA-2048,

@@ -35,17 +35,14 @@ A CRQC targeting industrial infrastructure could:
 2. Decrypt session traffic from historian/SCADA to field devices
 3. Impersonate engineering workstations during configuration
 
-## why is this hella bad
+## impact
 
-An attacker breaking OPC-UA session authentication on industrial networks can forge authenticated PLC messages. Concrete consequences by sector:
+OPC-UA Basic128Rsa15 is still deployed on real industrial control systems. it uses RSA-PKCS1-v1.5, which is classically weak too (Bleichenbacher), and completely dead against a CRQC.
 
-- **Manufacturing**: forge SCADA setpoints → change motor speeds, conveyor timing, robotic arm positions → product defects, equipment crashes
-- **Water treatment**: forge chemical dosing commands → alter chlorine/fluoride levels in municipal water supply
-- **Power substations**: forge breaker control commands → cause protective relay misoperation → localized blackouts
-- **Oil & gas**: forge valve open/close commands on pipeline compressor stations → pressure events, potential rupture
-
-OPC-UA is used for the "last mile" between SCADA servers and physical hardware. Session keys are short-lived but are established via RSA key wrap. Past session traffic (HNDL-captured) can be retroactively decrypted, exposing historical process data and control logic.
-
+- forge OPC-UA session authentication against a PLC or SCADA server and write setpoints, modify process parameters, issue control commands to industrial equipment
+- Basic256Sha256 uses RSA-2048 OAEP, which is better classically, but Shor's algorithm still kills it. session key exchange is RSA-wrapped
+- industrial systems run for 10-20 years. a PLC set up in 2020 with Basic128Rsa15 will still be running in 2035 and there's no hot-patching an ICS for crypto agility
+- certificate management in OT environments is famously bad. self-signed RSA certs with 10-year validity are standard. all those public keys are just sitting there
 ## Code
 
 `securitypolicy_basic128rsa15.c` — Basic128Rsa15 policy implementation showing

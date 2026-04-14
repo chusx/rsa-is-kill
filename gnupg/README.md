@@ -8,14 +8,14 @@
 
 GnuPG's key generation code handles interactive and batch creation of OpenPGP keypairs. Modern GnuPG (2.3+) defaults to Ed25519/Cv25519, but RSA-3072 remains fully supported and is the default in many enterprise and compliance contexts.
 
-## why is this hella bad
+## impact
 
-- RSA-3072 provides ~128 classical security bits and **0 post-quantum bits**. The `get_keysize_range()` function offers RSA-1024 through RSA-4096 — none of which survive Shor's algorithm.
-- Every web-of-trust signature ever made with an RSA key is retroactively forgeable. Identity verification built on RSA GPG keys collapses.
-- No stable GnuPG release supports any NIST PQC finalist. The OpenPGP WG has a draft for hybrid Kyber+Dilithium keys, but it is not merged into GnuPG.
-- Package repository signing (Debian, RPM, Arch) relies on RSA GPG keys. Every system that hasn't rotated to Ed25519 is trusting an RSA root that becomes forgeable.
-- `DEFAULT_STD_KEY_PARAM = "ed25519/cert,sign+cv25519/encr"` shows GnuPG knows better — but this only helps new keys, not the billions of existing RSA keys in the wild.
+GnuPG is the web of trust. every RSA signature on every key, every signed message, every package repository is retroactively forgeable once the key falls.
 
+- RSA-3072 gives about 128 bits of classical security and zero bits of post-quantum security. RSA-1024 through RSA-4096 are all equally dead to Shor's algorithm, the key size just changes the timeline
+- every web-of-trust signature ever made with an RSA key is retroactively forgeable. decades of identity verification built on GPG collapses
+- Debian, RPM, and Arch package repositories use RSA GPG keys for package signing. every system that hasn't rotated to Ed25519 is trusting an RSA root that becomes forgeable
+- no stable GnuPG release supports any NIST PQC algorithm. the OpenPGP PQC hybrid draft exists at IETF but hasn't shipped
 ## migration status
 
 OpenPGP PQC draft (Kyber + Dilithium) exists at IETF but is not finalized. No production GnuPG release includes it.
