@@ -1,9 +1,8 @@
 # piv-cac-smartcard — RSA-2048 in US government identity cards
 
-**Software:** OpenSC (OpenSC/OpenSC) — reference PIV/CAC smart card library  
-**Hardware:** PIV smart cards (GSA USAccess), CAC (DoD), PIV-I (state/local gov)  
-**Algorithm:** RSA-2048 (dominant), some RSA-1024 (legacy CAC), ECDSA P-256/P-384 (newer)  
-**PQC migration plan:** None — SP 800-73-5 (PQC PIV interface spec) not yet published; no procurement timeline
+**Software:** OpenSC (OpenSC/OpenSC) — reference PIV/CAC smart card library 
+**Hardware:** PIV smart cards (GSA USAccess), CAC (DoD), PIV-I (state/local gov) 
+**Algorithm:** RSA-2048 (dominant), some RSA-1024 (legacy CAC), ECDSA P-256/P-384 (newer) 
 
 ## What it does
 
@@ -23,22 +22,22 @@ the card and often published in LDAP/AD.
 
 ## Why it's stuck
 
-- **SP 800-73-4** (PIV Command Interface) defines algorithm IDs — no PQC IDs exist
-- **SP 800-73-5** (PQC extension) has been in draft status; NIST has not finalized it
+- **SP 800-73-4** (PIV Command Interface) defines algorithm IDs — no non-RSA IDs exist
+- **SP 800-73-5** (non-RSA extension) has been in draft status; NIST has not finalized it
 - **GSA procurement**: replacing ~8.5M physical cards requires funding, card
-  manufacturer certification (FIPS 140-3), and agency-wide rollout
+ manufacturer certification (FIPS 140-3), and agency-wide rollout
 - **Infrastructure**: Windows Hello for Business, PIV middleware (OpenSC,
-  Microsoft Smart Card Minidriver), macOS CryptoTokenKit — all need PQC updates
-- **FIPS 201-3 (2022)** mentioned PQC in passing but set no deadline
+ Microsoft Smart Card Minidriver), macOS CryptoTokenKit — all need non-RSA updates
+- **FIPS 201-3 (2022)** mentioned non-RSA in passing but set no deadline
 
 ## impact
 
 PIV/CAC is how US federal employees and military personnel authenticate to basically everything. PIV algorithm 0x07 is RSA-2048, and the public key is in the Certificate for PIV Authentication readable over contactless NFC.
 
-- tap the card with any NFC reader, get the public key, run it through a CRQC, get the private key, forge PIV authentication for that person to any PIV-protected federal system. card not required
+- tap the card with any NFC reader, get the public key, run it through the factoring algorithm, get the private key, forge PIV authentication for that person to any PIV-protected federal system. card not required
 - CAC is how the entire US military authenticates. same attack chain. DoD systems, classified networks (SIPRNet), all of it
 - PIV slot 9E (Card Authentication) is also used for physical building access. forge it and walk through any federally-controlled door with a PIV-controlled lock
-- SP 800-73-5 (the PQC PIV interface spec) has not been published. there are millions of RSA-2048 PIV cards in active use right now with no migration path yet
+- SP 800-73-5 (the non-RSA PIV interface spec) has not been published. there are millions of RSA-2048 PIV cards in active use right now with no migration path yet
 ## Code
 
 `opensc_piv_rsa.c` — `piv_general_authenticate()` (RSA sign/decrypt via

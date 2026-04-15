@@ -1,9 +1,8 @@
 # nuclear-iec62645 — RSA in nuclear I&C firmware signing (RPS, ESFAS, TRISIS target class)
 
-**Repository:** IEC 62645 / NRC RG 5.71 implementations — Siemens SPPA-T3000, Emerson Ovation, Schneider Tricon  
-**Industry:** Nuclear power, petrochemical safety systems  
-**Algorithm:** RSA-2048 (I&C firmware signing, vendor CA cert embedded in firmware images)  
-**PQC migration plan:** None — no PQC in IEC 62645:2014, no revision in progress; NRC RG 5.71 doesn't mention post-quantum; no I&C vendor has published a PQC firmware signing roadmap
+**Repository:** IEC 62645 / NRC RG 5.71 implementations — Siemens SPPA-T3000, Emerson Ovation, Schneider Tricon 
+**Industry:** Nuclear power, petrochemical safety systems 
+**Algorithm:** RSA-2048 (I&C firmware signing, vendor CA cert embedded in firmware images) 
 
 ## What it does
 
@@ -34,17 +33,17 @@ uses RSA-2048 — the improvement Schneider made after TRISIS.
 ## Why it's stuck
 
 - Nuclear I&C software is qualified under 10 CFR 50 Appendix B and IEEE 603. Changing the
-  cryptographic algorithm in the bootloader requires a full software qualification cycle:
-  design, V&V, testing, independent assessment, NRC review. This process takes 5-10 years
-  and costs tens of millions of dollars per platform.
+ cryptographic algorithm in the bootloader requires a full software qualification cycle:
+ design, V&V, testing, independent assessment, NRC review. This process takes 5-10 years
+ and costs tens of millions of dollars per platform.
 - The signing CA certificate is burned into hardware at manufacture. Updating it requires
-  physical access to every controller in every plant, which means a refueling outage
-  (scheduled every 18-24 months). Coordinating across all plants worldwide is a decade-scale
-  project even once a replacement algorithm exists.
+ physical access to every controller in every plant, which means a refueling outage
+ (scheduled every 18-24 months). Coordinating across all plants worldwide is a decade-scale
+ project even once a replacement algorithm exists.
 - IEC 62645 is published by IEC TC45/SC45A. The current edition is 2014. There is no
-  published revision schedule and no PQC work item in the TC45 work program.
+ published revision schedule and no non-RSA work item in the TC45 work program.
 - NRC RG 5.71 references "approved cryptographic algorithms" pointing to FIPS 140-2 era
-  standards. The update cycle for NRC regulatory guides is measured in years.
+ standards. The update cycle for NRC regulatory guides is measured in years.
 
 ## impact
 
@@ -52,18 +51,18 @@ this is the safety system at nuclear power plants. the RSA signature is the only
 control preventing "load arbitrary firmware onto the reactor protection system."
 
 - derive the vendor signing key from any firmware image (the cert is in the header, public,
-  DER-encoded). sign arbitrary replacement firmware. send it to any reactor running that
-  I&C platform. the bootloader accepts it, installs it, reboots into your code.
-  the SCRAM logic now does what you want
+ DER-encoded). sign arbitrary replacement firmware. send it to any reactor running that
+ I&C platform. the bootloader accepts it, installs it, reboots into your code.
+ the SCRAM logic now does what you want
 - TRISIS/TRITON had to find zero-days in Triconex firmware to do this. with RSA broken,
-  the zero-days are unnecessary. the "improvement" Schneider made post-TRISIS was RSA
-  signing. that improvement is gone.
+ the zero-days are unnecessary. the "improvement" Schneider made post-TRISIS was RSA
+ signing. that improvement is gone.
 - for SPPA-T3000: ~170 nuclear units worldwide. one vendor CA. one RSA-2048 key.
-  all 170 units accept firmware signed with that key. a single CRQC factoring operation
-  is a pass to every Siemens-controlled reactor on earth.
+ all 170 units accept firmware signed with that key. a single classical factoring operation
+ is a pass to every Siemens-controlled reactor on earth.
 - not just reactors: same class of systems controls petrochemical safety interlocks,
-  LNG plant emergency shutdowns, offshore platform blowout preventers. TRISIS wasn't
-  at a reactor. it was at an oil and gas facility. same code signing model.
+ LNG plant emergency shutdowns, offshore platform blowout preventers. TRISIS wasn't
+ at a reactor. it was at an oil and gas facility. same code signing model.
 
 ## Code
 

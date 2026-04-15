@@ -1,9 +1,8 @@
 # authenticode-pe — RSA in Windows PE/driver code signing
 
-**Standard:** Microsoft Authenticode (based on PKCS#7 / CMS, RFC 3161 timestamps)  
-**Industry:** Windows OS, enterprise software, kernel drivers  
-**Algorithm:** RSA-2048 / RSA-4096 (SHA-256 digest) — only supported algorithm in Microsoft's root program  
-**PQC migration plan:** None — no PQC OID in Authenticode spec; Microsoft WHCP accepts only RSA
+**Standard:** Microsoft Authenticode (based on PKCS#7 / CMS, RFC 3161 timestamps) 
+**Industry:** Windows OS, enterprise software, kernel drivers 
+**Algorithm:** RSA-2048 / RSA-4096 (SHA-256 digest) — only supported algorithm in Microsoft's root program 
 
 ## What it does
 
@@ -26,22 +25,22 @@ The Windows Hardware Compatibility Program (WHCP) portal accepts RSA submissions
 The Microsoft CA chain for kernel driver signing:
 ```
 Microsoft Root Certificate Authority 2010 (RSA-2048)
-  Microsoft Code Signing PCA 2011 (RSA-2048)
-    Microsoft Windows Hardware Compatibility Publisher (RSA-2048)
-      [driver binary signature]
+ Microsoft Code Signing PCA 2011 (RSA-2048)
+ Microsoft Windows Hardware Compatibility Publisher (RSA-2048)
+ [driver binary signature]
 ```
 
 ## Why it's stuck
 
-- Microsoft has not defined a PQC Authenticode algorithm. The Authenticode specification
-  uses PKCS#7 algorithm OIDs; no ML-DSA or SLH-DSA OID is registered for this use
-- The WHCP (Hardware Dev Center) portal that signs Windows drivers does not accept PQC
-  submissions. There is no API or documentation for submitting PQC-signed drivers
+- Microsoft has not defined a non-RSA Authenticode algorithm. The Authenticode specification
+ uses PKCS#7 algorithm OIDs; no ML-DSA or SLH-DSA OID is registered for this use
+- The WHCP (Hardware Dev Center) portal that signs Windows drivers does not accept non-RSA
+ submissions. There is no API or documentation for submitting non-RSA-signed drivers
 - Windows XP through Windows 11 all validate Authenticode with the same RSA-based
-  path. A PQC algorithm would require OS updates to add a new signature validator
+ path. A non-RSA algorithm would require OS updates to add a new signature validator
 - Code signing certificates have 1-3 year validity but the signed binaries are archived
-  forever. Old installers, games, business software signed with RSA-2048 remain in
-  use for decades
+ forever. Old installers, games, business software signed with RSA-2048 remain in
+ use for decades
 
 ## impact
 
@@ -50,16 +49,16 @@ the Microsoft Code Signing PCA 2011 RSA-2048 key is used to countersign all WHCP
 driver submissions. one key, all Windows kernel driver trust.
 
 - factor the Microsoft Code Signing PCA 2011 RSA-2048 key and you can countersign
-  arbitrary kernel drivers that Windows loads without any warning, UAC prompt, or
-  security popup. persistent kernel-mode code execution with full trust, no driver
-  signing bypass, no SecureBoot workaround needed
+ arbitrary kernel drivers that Windows loads without any warning, UAC prompt, or
+ security popup. persistent kernel-mode code execution with full trust, no driver
+ signing bypass, no SecureBoot workaround needed
 - forge Authenticode signatures for any publisher's certificate. malware that presents
-  as signed by "Microsoft Corporation" or any legitimate ISV. SmartScreen shows a
-  verified publisher, UAC shows the company name, nothing looks wrong
+ as signed by "Microsoft Corporation" or any legitimate ISV. SmartScreen shows a
+ verified publisher, UAC shows the company name, nothing looks wrong
 - Windows Update packages are Authenticode-signed. forge signatures for fake updates
-  and Windows Update infrastructure will serve and install them
+ and Windows Update infrastructure will serve and install them
 - this affects the entire Windows ecosystem going back to XP. any machine that
-  validates Authenticode (all of them) is affected
+ validates Authenticode (all of them) is affected
 
 ## Code
 

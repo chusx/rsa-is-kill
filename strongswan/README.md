@@ -1,7 +1,7 @@
 # strongSwan — RSA X.509 Certificate Verification (IKEv2)
 
-**Source:** https://github.com/strongswan/strongswan  
-**File:** `src/libstrongswan/plugins/x509/x509_cert.c`  
+**Source:** https://github.com/strongswan/strongswan 
+**File:** `src/libstrongswan/plugins/x509/x509_cert.c` 
 **License:** GPLv2
 
 ## what it does
@@ -15,7 +15,4 @@ strongSwan is an IPsec implementation used for site-to-site VPNs, remote access,
 - forge RSA authentication in IKE_AUTH and impersonate any VPN endpoint. MitM site-to-site tunnels between offices, data centers, or cloud VPCs
 - industrial control systems use strongSwan for IEC 62443 secure remote access. forge the IPsec peer authentication and you're inside the OT network
 - certificate-based IKEv2 is the recommended strong auth configuration. forging the certificate forges the auth. there's no second factor in the protocol
-- RFC 8784 PPK gives PQC key exchange but authentication is still RSA certificates. "quantum-resistant VPN" deployments using only PPK are misleading if authentication isn't also upgraded
-## migration status
-
-strongSwan has experimental PQC support via the `oqs` plugin (liboqs). Not available in distro packages, not standardized in IKEv2, not deployed in practice.
+- RFC 8784 PPK gives non-RSA key exchange but authentication is still RSA certificates. "post-quantum VPN" deployments using only PPK are misleading if authentication isn't also upgraded

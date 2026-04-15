@@ -1,9 +1,8 @@
 # arm-trustzone-tfa — RSA in the ARM Trusted Firmware boot chain
 
-**Software:** ARM Trusted Firmware-A (ARM-software/arm-trusted-firmware)  
-**Hardware:** NXP i.MX 8M/93, Rockchip RK3568/3588, STM32MP1, Marvell OCTEON TX2, MediaTek  
-**Algorithm:** RSA-2048 or ECDSA-P256 ROTPK (Root-of-Trust Public Key)  
-**PQC migration plan:** None — TBBR spec (ARM DEN0006) has no PQC ROTPK format; OTP fuses are immutable
+**Software:** ARM Trusted Firmware-A (ARM-software/arm-trusted-firmware) 
+**Hardware:** NXP i.MX 8M/93, Rockchip RK3568/3588, STM32MP1, Marvell OCTEON TX2, MediaTek 
+**Algorithm:** RSA-2048 or ECDSA-P256 ROTPK (Root-of-Trust Public Key) 
 
 ## What it does
 
@@ -19,11 +18,11 @@ can forge any firmware in the boot chain.
 ## Why it's stuck
 
 - **OTP fuses are permanent**: the ROTPK hash cannot be changed after manufacturing
-- **TBBR spec gap**: ARM DEN0006 defines no PQC ROTPK format or OID
+- **TBBR spec gap**: ARM DEN0006 defines no non-RSA ROTPK format or OID
 - **Hardware accelerator gap**: NXP CAAM (used on i.MX) supports RSA-4096 max;
-  ML-DSA is a different operation the hardware cannot perform
+ ML-DSA is a different operation the hardware cannot perform
 - **SoC lifecycle**: i.MX 8M processors in 2025 automotive head units will be
-  running in 2040 with the same OTP-locked ROTPK
+ running in 2040 with the same OTP-locked ROTPK
 
 ## impact
 

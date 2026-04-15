@@ -1,9 +1,8 @@
 # hsm-firmware-signing — RSA in HSM firmware authentication (Thales Luna, Utimaco, nShield)
 
-**Repository:** Thales Luna, Utimaco SecurityServer, Entrust nShield (proprietary)  
-**Industry:** Root CA HSMs, payment HSMs, enterprise key management — the hardware everyone else relies on  
-**Algorithm:** RSA-2048 (firmware signing cert burned into HSM ROM at manufacture)  
-**PQC migration plan:** None — Thales has no published PQC firmware signing roadmap; Utimaco and nShield similarly; the ROM CA cert is burned at manufacture and requires hardware replacement to change
+**Repository:** Thales Luna, Utimaco SecurityServer, Entrust nShield (proprietary) 
+**Industry:** Root CA HSMs, payment HSMs, enterprise key management — the hardware everyone else relies on 
+**Algorithm:** RSA-2048 (firmware signing cert burned into HSM ROM at manufacture) 
 
 ## What it does
 
@@ -31,16 +30,16 @@ Vendors and deployments:
 ## Why it's stuck
 
 - The ROM CA cert is burned at manufacture. Changing it requires hardware replacement —
-  you cannot update the root of trust for firmware authentication without new hardware.
-  For HSMs at Root CAs and payment networks, "replace all HSMs" is a multi-year project.
+ you cannot update the root of trust for firmware authentication without new hardware.
+ For HSMs at Root CAs and payment networks, "replace all HSMs" is a multi-year project.
 - HSM firmware updates are high-risk operations at CA/Browser Forum audited facilities.
-  Change management, dual control, and ceremony procedures apply. A PQC firmware update
-  would require all of this, plus vendor support.
-- Thales, Utimaco, and nShield have not shipped any PQC firmware signing capability.
-  Their HSMs don't support PQC algorithms in the bootloader.
+ Change management, dual control, and ceremony procedures apply. A non-RSA firmware update
+ would require all of this, plus vendor support.
+- Thales, Utimaco, and nShield have not shipped any non-RSA firmware signing capability.
+ Their HSMs don't support non-RSA algorithms in the bootloader.
 - The firmware signing key is distinct from the keys the HSM protects. Even if HSMs get
-  PQC key support (for storing ML-KEM keys), the firmware authentication mechanism itself
-  remains RSA-2048 until the hardware is replaced.
+ non-RSA key support (for storing ML-KEM keys), the firmware authentication mechanism itself
+ remains RSA-2048 until the hardware is replaced.
 
 ## impact
 
@@ -49,21 +48,21 @@ everything else. if you can load arbitrary firmware into an HSM, "protected by H
 means nothing.
 
 - find the Thales Luna RSA-2048 firmware signing cert. it's embedded in every Luna firmware
-  update file (.fuf), which Thales distributes to customers. get one firmware file (published
-  to Thales support portal, obtainable via any customer's support access, or via security
-  research). extract the signing cert DER. factor the RSA-2048 key. derive the private key.
+ update file (.fuf), which Thales distributes to customers. get one firmware file (published
+ to Thales support portal, obtainable via any customer's support access, or via security
+ research). extract the signing cert DER. factor the RSA-2048 key. derive the private key.
 - sign a malicious Luna firmware image. the image runs inside the Luna HSM's secure boundary.
-  it enumerates all key objects, uses the Luna API internally to export key material through
-  a side channel. the Luna is now a key exfiltration device wearing HSM clothes.
+ it enumerates all key objects, uses the Luna API internally to export key material through
+ a side channel. the Luna is now a key exfiltration device wearing HSM clothes.
 - targets: a Root CA HSM containing the CA private key. compromise the firmware, extract the
-  key, issue unlimited certificates. this is the Diginotar scenario (2011, Iran/MitM HTTPS
-  for 300K Iranian Gmail users) but without needing to compromise the CA software — just the
-  HSM firmware. every certificate issued by that CA is now suspect.
+ key, issue unlimited certificates. this is the Diginotar scenario (2011, Iran/MitM HTTPS
+ for 300K Iranian Gmail users) but without needing to compromise the CA software — just the
+ HSM firmware. every certificate issued by that CA is now suspect.
 - payment HSMs: Utimaco/payShield holding zone master keys (ZMK) for interbank PIN encryption.
-  extract ZMK -> decrypt all PIN blocks -> every PIN at every ATM and POS terminal using that
-  HSM for key management. visa/mastercard payment networks are built on this.
+ extract ZMK -> decrypt all PIN blocks -> every PIN at every ATM and POS terminal using that
+ HSM for key management. visa/mastercard payment networks are built on this.
 - the meta-attack: RSA protects HSMs, HSMs protect RSA keys. the recursion bottoms out at the
-  HSM firmware RSA key. crack that, and the entire hardware security model inverts.
+ HSM firmware RSA key. crack that, and the entire hardware security model inverts.
 
 ## Code
 

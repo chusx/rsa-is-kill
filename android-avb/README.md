@@ -1,9 +1,8 @@
 # android-avb — RSA-4096 Android Verified Boot 2.0
 
-**Software:** AOSP libavb (Android Open Source Project)  
-**Industry:** Mobile devices — Android smartphones, tablets, TV boxes, automotive  
-**Algorithm:** RSA-4096 (SHA-256 or SHA-512) — default OEM signing key type  
-**PQC migration plan:** None — AVB2 spec has no PQC algorithm type; no AOSP issue open for PQC
+**Software:** AOSP libavb (Android Open Source Project) 
+**Industry:** Mobile devices — Android smartphones, tablets, TV boxes, automotive 
+**Algorithm:** RSA-4096 (SHA-256 or SHA-512) — default OEM signing key type 
 
 ## What it does
 
@@ -25,15 +24,15 @@ passes, the kernel boots. If not, the device enters fastboot or recovery.
 
 ## Why it's stuck
 
-- The AVB2 algorithm type is a fixed 4-bit field in the vbmeta header. Adding a PQC
-  algorithm type requires a format version bump and bootloader updates across all OEM devices
+- The AVB2 algorithm type is a fixed 4-bit field in the vbmeta header. Adding a non-RSA
+ algorithm type requires a format version bump and bootloader updates across all OEM devices
 - OEM signing keys are generated at device bring-up and cannot be rotated without a
-  factory re-provisioning process (some OEMs use an offline key ceremony)
-- PQC signature sizes (ML-DSA: 2420-4595 bytes) are much larger than RSA-4096 (512 bytes).
-  Bootloader memory budgets for vbmeta parsing are tight, especially on low-end devices
+ factory re-provisioning process (some OEMs use an offline key ceremony)
+- non-RSA signature sizes (ML-DSA: 2420-4595 bytes) are much larger than RSA-4096 (512 bytes).
+ Bootloader memory budgets for vbmeta parsing are tight, especially on low-end devices
 - The vbmeta structure is written to the first 4 KB of the vbmeta partition. ML-DSA-87
-  signature alone (4595 bytes) doesn't fit in the current partition layout
-- Android's CDD (Compatibility Definition Document) doesn't require PQC for AVB
+ signature alone (4595 bytes) doesn't fit in the current partition layout
+- Android's CDD (Compatibility Definition Document) doesn't require non-RSA for AVB
 
 ## impact
 
@@ -43,15 +42,15 @@ are publicly available as OTA packages. the RSA-4096 public key has been out the
 device launch.
 
 - factor the OEM RSA-4096 signing key (public in every distributed OTA package),
-  sign arbitrary boot images with it, the device boots them without warning. no
-  unlocked bootloader warning, no orange state, everything looks green
+ sign arbitrary boot images with it, the device boots them without warning. no
+ unlocked bootloader warning, no orange state, everything looks green
 - this works on locked devices. AVB2 is the entire security guarantee that a locked
-  bootloader provides. it's gone
+ bootloader provides. it's gone
 - forge a malicious system.img or vendor.img that passes AVB2 verification. persistent
-  device compromise that survives factory reset because it runs at verified boot time
-  before Android even starts
+ device compromise that survives factory reset because it runs at verified boot time
+ before Android even starts
 - one compromised OEM RSA-4096 key affects every device of that manufacturer that uses
-  the same key for vbmeta signing. could be tens or hundreds of millions of devices
+ the same key for vbmeta signing. could be tens or hundreds of millions of devices
 
 ## Code
 

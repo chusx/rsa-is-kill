@@ -1,9 +1,8 @@
 # postfix-smtp-tls — RSA in Postfix SMTP TLS (the MTA that handles most of the internet's email)
 
-**Repository:** postfix (postfix.org); http://www.postfix.org/TLS_README.html  
-**Industry:** Internet email delivery — ISPs, universities, government, corporate  
-**Algorithm:** RSA-2048 (default TLS certificate for smtpd STARTTLS; also common for smtp outbound TLS)  
-**PQC migration plan:** None — Postfix TLS uses OpenSSL; no PQC TLS cipher suite in any stable Postfix release; no postfix-users discussion on PQC migration; OpenSSL PQC is experimental
+**Repository:** postfix (postfix.org); http://www.postfix.org/TLS_README.html 
+**Industry:** Internet email delivery — ISPs, universities, government, corporate 
+**Algorithm:** RSA-2048 (default TLS certificate for smtpd STARTTLS; also common for smtp outbound TLS) 
 
 ## What it does
 
@@ -27,15 +26,15 @@ rely on RSA: if you can forge the pinned RSA-2048 cert, you bypass both.
 
 ## Why it's stuck
 
-- Postfix TLS calls OpenSSL. OpenSSL PQC support is experimental and not in any stable
-  release used by any distribution's Postfix package.
-- `smtpd_tls_cert_file` in main.cf expects a PEM certificate. There is no PQC certificate
-  type in any public PKI or in OpenSSL stable APIs.
+- Postfix TLS calls OpenSSL. OpenSSL non-RSA support is experimental and not in any stable
+ release used by any distribution's Postfix package.
+- `smtpd_tls_cert_file` in main.cf expects a PEM certificate. There is no non-RSA certificate
+ type in any public PKI or in OpenSSL stable APIs.
 - Email delivery TLS is opportunistic (STARTTLS "may") for most servers, meaning TLS is
-  attempted but not required. The security baseline is already lower than browser HTTPS.
-- Coordinating a PQC migration for SMTP would require all major MTAs (Postfix, Exim,
-  Exchange, Gmail) to support PQC cipher suites simultaneously for the transition to
-  be meaningful — otherwise downgrade to RSA is trivial.
+ attempted but not required. The security baseline is already lower than browser HTTPS.
+- Coordinating a non-RSA migration for SMTP would require all major MTAs (Postfix, Exim,
+ Exchange, Gmail) to support non-RSA cipher suites simultaneously for the transition to
+ be meaningful — otherwise downgrade to RSA is trivial.
 
 ## impact
 
@@ -43,20 +42,20 @@ SMTP TLS is the encryption layer for email in transit between mail servers. the 
 is what makes that encryption mean anything.
 
 - port 25 is open on every mail server. connect, do STARTTLS, get the RSA-2048 public
-  key from the TLS certificate. no login, no authentication, publicly accessible. factor it.
+ key from the TLS certificate. no login, no authentication, publicly accessible. factor it.
 - MitM SMTP connections to the target mail server. interception is hop-by-hop in email:
-  the next MTA's RSA key is what's protecting delivery from the previous hop. break it and
-  you can read every email delivered to that server before it hits the user's mailbox.
+ the next MTA's RSA key is what's protecting delivery from the previous hop. break it and
+ you can read every email delivered to that server before it hits the user's mailbox.
 - for MTA-STS/DANE-protected domains: these protections exist to prevent STARTTLS
-  downgrade (an attacker strips STARTTLS to force plaintext). they're the "we require
-  TLS and pin the cert" option. if the RSA cert itself is broken, MTA-STS/DANE doesn't
-  help — you have the real cert's private key, your MitM looks identical to the real server.
+ downgrade (an attacker strips STARTTLS to force plaintext). they're the "we require
+ TLS and pin the cert" option. if the RSA cert itself is broken, MTA-STS/DANE doesn't
+ help — you have the real cert's private key, your MitM looks identical to the real server.
 - government MX records: federal agencies (.gov, .mil), EU institutions, national government
-  domains all have Postfix or Exchange MTA RSA-2048 certs visible on port 25. the public
-  key is on Shodan, censys, and similar scan databases — no active scanning needed.
+ domains all have Postfix or Exchange MTA RSA-2048 certs visible on port 25. the public
+ key is on Shodan, censys, and similar scan databases — no active scanning needed.
 - email is used for password resets, MFA codes, wire transfer confirmations, contract
-  delivery. MitM the MTA and you can intercept all of these in transit without touching
-  the endpoint.
+ delivery. MitM the MTA and you can intercept all of these in transit without touching
+ the endpoint.
 
 ## Code
 

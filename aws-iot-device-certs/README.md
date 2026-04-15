@@ -1,10 +1,9 @@
 # aws-iot-device-certs — RSA/ECDSA in ~1 billion IoT devices
 
-**Services:** AWS IoT Core, Azure IoT Hub, Google Cloud IoT, Matter/Thread  
-**Hardware:** ESP32, nRF9160, STM32, i.MX RT, Nordic nRF52  
-**Industry:** Smart home, industrial IoT, agriculture, asset tracking  
-**Algorithm:** RSA-2048 (AWS IoT default), ECDSA P-256 (Matter/Azure IoT)  
-**PQC migration plan:** None — no PQC device cert profile in any major IoT platform
+**Services:** AWS IoT Core, Azure IoT Hub, Google Cloud IoT, Matter/Thread 
+**Hardware:** ESP32, nRF9160, STM32, i.MX RT, Nordic nRF52 
+**Industry:** Smart home, industrial IoT, agriculture, asset tracking 
+**Algorithm:** RSA-2048 (AWS IoT default), ECDSA P-256 (Matter/Azure IoT) 
 
 ## What it does
 
@@ -14,7 +13,11 @@ device's flash memory (or crypto chip). AWS IoT Core documentation recommends
 RSA-2048 as the default. Azure DPS supports RSA and ECDSA. Matter 1.3 uses
 ECDSA P-256 for the Device Attestation Credential (DAC).
 
-All of these break under Shor's algorithm.
+The RSA-2048 paths (AWS IoT default, ESP32/nRF9160/i.MX RT) break under
+the factoring algorithm. The Matter ECDSA P-256 path is unaffected —
+ECDLP is not factoring. Since AWS IoT's default is RSA and a large majority
+of deployed devices chose that default, the practical blast radius is huge
+even though ECDSA-based deployments survive.
 
 ## Hardware specifics
 
@@ -27,15 +30,15 @@ All of these break under Shor's algorithm.
 
 ## Why it's stuck
 
-No major IoT cloud platform supports PQC device certificates because:
+No major IoT cloud platform supports non-RSA device certificates because:
 1. No X.509 profile for ML-DSA/SLH-DSA leaf certificates is standardized
-2. Embedded TLS libraries (mbedTLS, wolfSSL, BearSSL) don't support PQC in
-   ROM-sized builds that fit on constrained MCUs (64-256 KB flash)
-3. AWS IoT Core, Azure IoT Hub, and Matter do not accept PQC certificates
-4. IANA has not assigned OIDs for PQC algorithms in X.509
+2. Embedded TLS libraries (mbedTLS, wolfSSL, BearSSL) don't support non-RSA in
+ ROM-sized builds that fit on constrained MCUs (64-256 KB flash)
+3. AWS IoT Core, Azure IoT Hub, and Matter do not accept non-RSA certificates
+4. IANA has not assigned OIDs for non-RSA algorithms in X.509
 
-Even if libraries added PQC, the network effect problem remains: a device
-can't use PQC until its cloud endpoint accepts it, and vice versa.
+Even if libraries added non-RSA, the network effect problem remains: a device
+can't use non-RSA until its cloud endpoint accepts it, and vice versa.
 
 ## impact
 

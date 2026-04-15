@@ -1,9 +1,8 @@
 # apache-santuario — RSA in XML Digital Signatures (WS-Security, SAML, HL7)
 
-**Repository:** Apache SVN — `svn.apache.org/repos/asf/santuario/xml-security-java/`  
-**Industry:** Enterprise Java, healthcare (HL7), government SOAP, financial SOAP APIs  
-**Algorithm:** RSA-SHA256 / RSA-SHA1 — W3C XMLDSig algorithm URIs  
-**PQC migration plan:** None — W3C XML Digital Signature spec has no ML-DSA URI; no W3C working group item for PQC XMLDSig
+**Repository:** Apache SVN — `svn.apache.org/repos/asf/santuario/xml-security-java/` 
+**Industry:** Enterprise Java, healthcare (HL7), government SOAP, financial SOAP APIs 
+**Algorithm:** RSA-SHA256 / RSA-SHA1 — W3C XMLDSig algorithm URIs 
 
 ## What it does
 
@@ -21,23 +20,23 @@ SOAP stack on the JVM:
 
 The W3C XMLDSig algorithm URIs for RSA are registered. For ML-DSA: nothing is registered.
 The W3C XML Security Working Group closed in 2013. There is no active W3C body working
-on PQC XMLDSig. The existing URI namespace (`http://www.w3.org/2001/04/xmldsig-more#`)
-has not been extended with any PQC algorithm since it was published.
+on non-RSA XMLDSig. The existing URI namespace (`http://www.w3.org/2001/04/xmldsig-more#`)
+has not been extended with any non-RSA algorithm since it was published.
 
 ## Why it's stuck
 
-- The W3C XMLDSig specification defines the algorithm URI namespace. No new PQC URI
-  has been registered or proposed. Until it is, any PQC XMLDSig signature would be
-  non-standard and rejected by conformant validators
+- The W3C XMLDSig specification defines the algorithm URI namespace. No new non-RSA URI
+ has been registered or proposed. Until it is, any non-RSA XMLDSig signature would be
+ non-standard and rejected by conformant validators
 - HL7 v3 and ISO 20022 SOAP profiles explicitly require RSA-SHA256 or RSA-SHA1 algorithm
-  URIs in their message signing specs. Healthcare and financial messaging specs update
-  on decade-long timescales
+ URIs in their message signing specs. Healthcare and financial messaging specs update
+ on decade-long timescales
 - WS-Policy files in deployed SOAP services hardcode `<sp:AlgorithmSuite><sp:Basic256Sha256>`
-  which maps to RSA-SHA256. Changing the algorithm requires WS-Policy renegotiation
-  across all service partners
+ which maps to RSA-SHA256. Changing the algorithm requires WS-Policy renegotiation
+ across all service partners
 - Shibboleth IdP and every SAML implementation using Apache Santuario would need
-  simultaneous updates with the tens of thousands of SP (service provider) federations
-  they serve
+ simultaneous updates with the tens of thousands of SP (service provider) federations
+ they serve
 
 ## impact
 
@@ -45,18 +44,18 @@ XMLDSig is the signature format for enterprise SOAP services, healthcare interop
 and SAML. every RSA-signed SOAP message or SAML assertion in these stacks is forgeable.
 
 - forge a WS-Security signed SOAP message appearing to come from any SOAP client or
-  service with a known certificate. in a banking SOAP API, that's a payment instruction
-  signed by any bank's RSA private key. same impact as swift-financial but hitting the
-  SOAP layer instead of the SWIFT network itself
+ service with a known certificate. in a banking SOAP API, that's a payment instruction
+ signed by any bank's RSA private key. same impact as swift-financial but hitting the
+ SOAP layer instead of the SWIFT network itself
 - HL7 v3 uses WS-Security SOAP for hospital-to-hospital patient data exchange. forge
-  a signed HL7 message, inject false patient records or false lab results into receiving
-  EHR systems. the RSA signature is the authenticity guarantee
+ a signed HL7 message, inject false patient records or false lab results into receiving
+ EHR systems. the RSA signature is the authenticity guarantee
 - Shibboleth IdP signs SAML assertions with RSA. Shibboleth serves ~10,000 universities
-  in the eduroam/InCommon federation. forge a SAML assertion from any university IdP and
-  log in as any student, staff, or administrator at any university that trusts that federation
+ in the eduroam/InCommon federation. forge a SAML assertion from any university IdP and
+ log in as any student, staff, or administrator at any university that trusts that federation
 - SOAP e-Government services in the US, EU, and Australia use RSA XMLDSig for
-  legally-binding agency data exchange. forged signatures undermine the legal validity
-  of the entire XML-based inter-agency communication framework
+ legally-binding agency data exchange. forged signatures undermine the legal validity
+ of the entire XML-based inter-agency communication framework
 
 ## Code
 

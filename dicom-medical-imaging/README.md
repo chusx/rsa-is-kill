@@ -1,9 +1,8 @@
 # dicom-medical-imaging — RSA-only in the global medical imaging standard
 
-**Software:** DCMTK (DCMTK/dcmtk) — reference DICOM implementation  
-**Industry:** Radiology, pathology, oncology — all medical imaging  
-**Algorithm:** RSA (any size) — the ONLY algorithm allowed in DICOM Base RSA Digital Signature Profile  
-**PQC migration plan:** None — DICOM PS 3.15 Annex G has no PQC profile; NEMA has not published plans
+**Software:** DCMTK (DCMTK/dcmtk) — reference DICOM implementation 
+**Industry:** Radiology, pathology, oncology — all medical imaging 
+**Algorithm:** RSA (any size) — the ONLY algorithm allowed in DICOM Base RSA Digital Signature Profile 
 
 ## What it does
 
@@ -14,7 +13,7 @@ device globally speaks DICOM.
 DICOM Digital Signatures (PS 3.15 Annex G) let clinicians or AI systems sign
 imaging datasets to certify authenticity and integrity. The **Base RSA Digital
 Signature Profile** is the only profile defined — it accepts exclusively
-`EKT_RSA` (RSA keys of any size). ECDSA is not in the spec. PQC is not in
+`EKT_RSA` (RSA keys of any size). ECDSA is not in the spec. non-RSA is not in
 the spec.
 
 Signed DICOM data includes:
@@ -25,7 +24,7 @@ Signed DICOM data includes:
 
 ## Impact
 
-A CRQC forging DICOM signatures could alter diagnostic images (remove a tumor,
+A factoring break forging DICOM signatures could alter diagnostic images (remove a tumor,
 change a measurement) without detection. The forged signature would pass
 verification against the embedded RSA certificate.
 

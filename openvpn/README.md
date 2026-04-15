@@ -1,7 +1,7 @@
 # OpenVPN — RSA TLS Authentication
 
-**Source:** https://github.com/OpenVPN/openvpn  
-**File:** `src/openvpn/ssl_openssl.c`  
+**Source:** https://github.com/OpenVPN/openvpn 
+**File:** `src/openvpn/ssl_openssl.c` 
 **License:** GPLv2
 
 ## what it does
@@ -16,6 +16,3 @@ OpenVPN uses X.509 RSA certificates to authenticate peers. the server cert, clie
 - forge a client certificate and connect as any VPN user without credentials
 - OpenVPN is widely deployed for corporate remote access. MitM the VPN and you're inside the network with full visibility of everything
 - TLS-Auth and TLS-Crypt add a pre-shared key layer but don't fix RSA certificate authentication. the PSK protects against unauthenticated TLS connections but doesn't help if you can forge the RSA cert
-## migration status
-
-no PQC roadmap published. most enterprise OpenVPN deployments use RSA-2048 certificates from internal CAs.

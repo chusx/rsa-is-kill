@@ -1,9 +1,8 @@
 # gnupg-openpgp-card — RSA on OpenPGP smartcards (YubiKey, Nitrokey, GNUK)
 
-**Repository:** git.gnupg.org — `scd/app-openpgp.c`  
-**Industry:** Developer security, German government, privacy-focused orgs, security researchers  
-**Algorithm:** RSA-2048 / RSA-4096 on OpenPGP Card v1/v2/v3 smartcards  
-**PQC migration plan:** None — OpenPGP Card specification has no PQC key type; YubiKey OpenPGP applet has no ML-DSA; GnuPG scd has no PQC card support
+**Repository:** git.gnupg.org — `scd/app-openpgp.c` 
+**Industry:** Developer security, German government, privacy-focused orgs, security researchers 
+**Algorithm:** RSA-2048 / RSA-4096 on OpenPGP Card v1/v2/v3 smartcards 
 
 ## What it does
 
@@ -25,20 +24,20 @@ Used by:
 - Organizations using card-based SSH authentication (`gpg-agent --enable-ssh-support`)
 
 GnuPG uploads the RSA public key to keyservers (keys.openpgp.org, keyserver.ubuntu.com)
-automatically. The public key is the CRQC input, and it's been public since the key
+automatically. The public key is the input an attacker needs, and it's been public since the key
 was first generated.
 
 ## Why it's stuck
 
-- OpenPGP Card v1.0 through v2.1 support only RSA. These cards cannot do ECC or PQC
-  at all — the firmware is read-only silicon. They still work; they just can't be upgraded
-- OpenPGP Card v3.0+ (2018) added ECC, but PQC key types are not in v3.4 (the current spec)
+- OpenPGP Card v1.0 through v2.1 support only RSA. These cards cannot do ECC or non-RSA
+ at all — the firmware is read-only silicon. They still work; they just can't be upgraded
+- OpenPGP Card v3.0+ (2018) added ECC, but non-RSA key types are not in v3.4 (the current spec)
 - YubiKey's OpenPGP applet has no ML-DSA key type. Yubico would need a new applet spec
-  and firmware + hardware update
+ and firmware + hardware update
 - The OpenPGP Card spec is maintained by the GNU project / GnuPG developers.
-  There is no PQC working group within the OpenPGP Card effort
+ There is no non-RSA working group within the OpenPGP Card effort
 - GnuPG scd (`scd/app-openpgp.c`) has hardcoded key attribute parsing for RSA and ECC.
-  Adding ML-DSA requires spec changes, card firmware, and scd updates simultaneously
+ Adding ML-DSA requires spec changes, card firmware, and scd updates simultaneously
 
 ## impact
 
@@ -47,18 +46,18 @@ for years or decades. the public key is published on keyservers. this is HNDL at
 the individual level.
 
 - every GPG-encrypted message ever sent to a person with an RSA-2048 OpenPGP card
-  key is retroactively decryptable once the CRQC derives the private key from their
-  public key on the keyserver. all their archived encrypted email, all their encrypted
-  files — gone. the hardware protection was never relevant to this attack
+ key is retroactively decryptable once the factoring break derives the private key from their
+ public key on the keyserver. all their archived encrypted email, all their encrypted
+ files — gone. the hardware protection was never relevant to this attack
 - code signing: developers who sign git commits or packages with OpenPGP card RSA keys.
-  forge their signatures on any commit or package. the hardware card that "protects"
-  the key is irrelevant because the attack uses the public key
+ forge their signatures on any commit or package. the hardware card that "protects"
+ the key is irrelevant because the attack uses the public key
 - Nitrokey in German government: government officials who use Nitrokey for document
-  signing. forge their signatures on government documents. legally binding in Germany
-  (SigG qualified electronic signatures)
+ signing. forge their signatures on government documents. legally binding in Germany
+ (SigG qualified electronic signatures)
 - SSH authentication via gpg-agent: the OpenPGP card auth key RSA public key is
-  in `~/.ssh/authorized_keys` on remote servers. CRQC derives private key, impersonates
-  the user to every server they authenticate to
+ in `~/.ssh/authorized_keys` on remote servers. a factoring break derives private key, impersonates
+ the user to every server they authenticate to
 
 ## Code
 

@@ -1,9 +1,8 @@
 # openssh-host-keys — RSA host key authentication in SSH
 
-**Software:** OpenSSH (openssh/openssh-portable on GitHub)  
-**Industry:** Infrastructure, servers, cloud, network equipment  
-**Algorithm:** RSA-2048 / RSA-3072 host keys (ssh-rsa, rsa-sha2-256, rsa-sha2-512)  
-**PQC migration plan:** None — no PQC host key algorithm in any SSH RFC; OpenSSH has experimental OQS fork but nothing merged
+**Software:** OpenSSH (openssh/openssh-portable on GitHub) 
+**Industry:** Infrastructure, servers, cloud, network equipment 
+**Algorithm:** RSA-2048 / RSA-3072 host keys (ssh-rsa, rsa-sha2-256, rsa-sha2-512) 
 
 ## What it does
 
@@ -26,34 +25,34 @@ seen.
 
 ## Why it's stuck
 
-- No PQC algorithm has been standardized in any SSH RFC. The IETF SSHM working group
-  has drafts for hybrid ML-KEM key exchange but nothing for host key authentication
+- No non-RSA algorithm has been standardized in any SSH RFC. The IETF SSHM working group
+ has drafts for hybrid ML-KEM key exchange but nothing for host key authentication
 - OpenSSH has an experimental OQS (liboqs) fork but it's not in the upstream codebase
 - Rotating host keys requires updating `known_hosts` on every client — for large
-  enterprises with thousands of clients, this is operationally painful and rarely done
+ enterprises with thousands of clients, this is operationally painful and rarely done
 - Network equipment (Cisco IOS, Junos, etc.) has no mechanism to update SSH host key
-  algorithms without firmware updates, and firmware cycles are slow
+ algorithms without firmware updates, and firmware cycles are slow
 
 ## impact
 
 SSH host keys are the mechanism by which your terminal client knows it's connecting
 to the real server and not an impersonator. every RSA host key in every server's
-`/etc/ssh/ssh_host_rsa_key.pub` has been scanned and archived by Shodan. the CRQC
+`/etc/ssh/ssh_host_rsa_key.pub` has been scanned and archived by Shodan. the factoring break
 input is already collected.
 
 - factor any server's RSA host key (publicly available from Shodan/Censys scan history),
-  impersonate that server to any client that has it cached in known_hosts. the client
-  sees a valid signature and connects. transparent MitM of every SSH session to that
-  server
+ impersonate that server to any client that has it cached in known_hosts. the client
+ sees a valid signature and connects. transparent MitM of every SSH session to that
+ server
 - every router and switch with RSA SSH host keys (which is most of them) is
-  impersonatable. SSH into network equipment, reconfigure routing, change ACLs,
-  install backdoors. no client prompts, no verification failures
+ impersonatable. SSH into network equipment, reconfigure routing, change ACLs,
+ install backdoors. no client prompts, no verification failures
 - CI/CD pipelines use SSH host key verification to ensure they're pushing code to
-  the real server. forge the git server's host key and you can MitM deployments,
-  inject malicious code into the build pipeline
+ the real server. forge the git server's host key and you can MitM deployments,
+ inject malicious code into the build pipeline
 - known_hosts files on developer laptops are essentially an archive of every server's
-  public key that developer has connected to, going back years. all of those are
-  CRQC input for impersonating every server in that developer's history
+ public key that developer has connected to, going back years. all of those are
+ input for the attack for impersonating every server in that developer's history
 
 ## Code
 

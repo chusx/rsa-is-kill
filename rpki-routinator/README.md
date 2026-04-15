@@ -1,7 +1,7 @@
 # RPKI / Routinator — RSA BGP Routing Security
 
-**Source:** https://github.com/NLnetLabs/rpki-rs  
-**File:** `src/crypto/keys.rs`  
+**Source:** https://github.com/NLnetLabs/rpki-rs 
+**File:** `src/crypto/keys.rs` 
 **License:** BSD-3-Clause
 
 ## what it does
@@ -16,6 +16,3 @@ RPKI is BGP route origin validation, the mechanism that prevents BGP hijacking. 
 - ISPs doing route origin validation will actively prefer your forged route because it has a valid ROA. without RPKI, a BGP hijack is an anomaly. with broken RPKI, it's a cryptographically authenticated reroute that passes every check
 - forge any of the five RIR trust anchors (ARIN, RIPE, APNIC, LACNIC, AFRINIC) and rewrite the entire validated route origin database for that region's address space
 - the whole RPKI manifest and CRL chain is RSA. it all falls together
-## migration status
-
-No PQC algorithm OID assigned by IANA for RPKI. Migration requires updating all five RIR hierarchies simultaneously. APNIC has published research; no deployment timeline exists.

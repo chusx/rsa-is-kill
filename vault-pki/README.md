@@ -1,9 +1,8 @@
 # vault-pki — RSA-2048 default in cloud-native PKI
 
-**Software:** HashiCorp Vault (hashicorp/vault) PKI secrets engine  
-**Industry:** Cloud-native infrastructure, service mesh mTLS, Kubernetes cert issuance  
-**Algorithm:** RSA-2048 (default key_type and key_bits)  
-**PQC migration plan:** None — Go crypto/x509 has no PQC support; Vault 1.17 has no PQC issuer
+**Software:** HashiCorp Vault (hashicorp/vault) PKI secrets engine 
+**Industry:** Cloud-native infrastructure, service mesh mTLS, Kubernetes cert issuance 
+**Algorithm:** RSA-2048 (default key_type and key_bits) 
 
 ## What it does
 
@@ -20,17 +19,17 @@ Default behavior: `vault write pki/root/generate/internal key_type=rsa key_bits=
 → RSA-2048 root CA with 10-year validity.
 
 Everything issued under that root (intermediates, leaf certs) chains to an RSA
-signing key. A CRQC breaking the root CA key can forge certificates for any
+signing key. A factoring break breaking the root CA key can forge certificates for any
 service in the entire Vault PKI hierarchy.
 
 ## Why it's stuck
 
-- Go's `crypto/x509` has no PQC algorithm support (Go 1.22)
-- No PQC `key_type` is accepted by the Vault PKI engine
-- cert-manager (the Kubernetes cert issuance controller) has no PQC issuer support
-- SPIFFE/SPIRE (service mesh identity) uses X.509 SVIDs — no PQC format defined
-- Even if Vault added PQC, the receiving mTLS endpoints (Envoy, NGINX, Go services)
-  cannot validate PQC certificates
+- Go's `crypto/x509` has no non-RSA algorithm support (Go 1.22)
+- No non-RSA `key_type` is accepted by the Vault PKI engine
+- cert-manager (the Kubernetes cert issuance controller) has no non-RSA issuer support
+- SPIFFE/SPIRE (service mesh identity) uses X.509 SVIDs — no non-RSA format defined
+- Even if Vault added non-RSA, the receiving mTLS endpoints (Envoy, NGINX, Go services)
+ cannot validate non-RSA certificates
 
 ## impact
 
@@ -39,7 +38,7 @@ Vault PKI is the internal certificate authority for cloud-native infrastructure.
 - forge a TLS certificate for any internal service (payments-api.internal, auth.internal, whatever you want). MitM every microservice-to-microservice call in the service mesh. Istio and Consul Connect mutual TLS is the security boundary and it collapses
 - forge a certificate for the Vault agent injector (the sidecar that delivers secrets to pods). intercept all secrets being injected: database passwords, API keys, other private keys
 - the blast radius is the entire application stack. one compromised Vault root CA key gives MitM access to every mTLS-protected API call in the cluster
-- Go's crypto/x509 has no PQC support. no PQC key_type in the Vault PKI engine. cert-manager has no PQC issuer. the entire ecosystem has to move simultaneously
+- Go's crypto/x509 has no non-RSA support. no non-RSA key_type in the Vault PKI engine. cert-manager has no non-RSA issuer. the entire ecosystem has to move simultaneously
 ## Code
 
 `vault_pki_rsa_default.go` — `GeneratePrivateKey()` returning `rsa.GenerateKey()`

@@ -1,9 +1,8 @@
 # mastodon-activitypub — RSA-SHA256 federation signatures
 
-**Software:** Mastodon (mastodon/mastodon)  
-**Industry:** Decentralized social media / fediverse (ActivityPub)  
-**Algorithm:** RSA-2048 / RsaSignature2017  
-**PQC migration plan:** None
+**Software:** Mastodon (mastodon/mastodon) 
+**Industry:** Decentralized social media / fediverse (ActivityPub) 
+**Algorithm:** RSA-2048 / RsaSignature2017 
 
 ## What it does
 
@@ -21,16 +20,16 @@ identity (actor keys) is cached across the network.
 The signature type is hardcoded as `'RsaSignature2017'`. Changing it requires
 a new W3C LD-Signatures algorithm URI, changes to the ActivityPub protocol
 spec, and coordinated upgrades across all ~20,000 fediverse servers. There is
-no PQC algorithm defined in the W3C LD-Signatures or ActivityPub specifications.
+no non-RSA algorithm defined in the W3C LD-Signatures or ActivityPub specifications.
 
-Any CRQC can:
+A factoring break lets an attacker:
 1. Recover any actor's private key from its public key (published in actor JSON)
 2. Forge arbitrary posts, follows, or boosts from any user on any server
 3. Impersonate entire Mastodon instances to other servers
 
 ## impact
 
-every Mastodon actor has an RSA-2048 public key sitting in their JSON-LD profile at /.well-known/ and it's publicly accessible. CRQC input delivered by the protocol spec.
+every Mastodon actor has an RSA-2048 public key sitting in their JSON-LD profile at /.well-known/ and it's publicly accessible. input for the attack delivered by the protocol spec.
 
 - forge posts from any public figure (politicians, journalists, institutions) and they look authentic to all 20,000 servers in the federation. ActivityPub signature verification is what makes posts trusted, and it's all RSA
 - impersonate entire instances: make mastodon.social appear to send announcements, follow/unfollow/block actions, or federation policy changes

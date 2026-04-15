@@ -1,7 +1,7 @@
 # OpenJDK jarsigner — RSA JAR Code Signing
 
-**Source:** https://github.com/openjdk/jdk  
-**File:** `src/jdk.jartool/share/classes/jdk/security/jarsigner/JarSigner.java`  
+**Source:** https://github.com/openjdk/jdk 
+**File:** `src/jdk.jartool/share/classes/jdk/security/jarsigner/JarSigner.java` 
 **License:** GPLv2 with Classpath Exception
 
 ## what it does
@@ -15,12 +15,9 @@
 
 ## impact
 
-JAR signing is how the JVM verifies that bytecode comes from who it says it does. every signed JAR in existence has a .RSA file whose signature is forgeable once you have a CRQC.
+JAR signing is how the JVM verifies that bytecode comes from who it says it does. every signed JAR in existence has a .RSA file whose signature is forgeable once you have a factoring oracle.
 
 - forge a JAR signature for any published artifact and distribute it as the real thing. it passes jarsigner -verify as the original signer. supply chain attack with cryptographic cover
 - Maven Central has millions of artifacts signed with RSA keys. forge signatures for popular libraries and distribute malicious versions that the JVM accepts as authenticated
 - Android APK signing v1 scheme uses JAR signing. RSA-signed APKs from before the v2/v3 migration are vulnerable
 - enterprise Java runs mostly on LTS 11 or 17. JDK 24 added ML-DSA via JEP 497 but LTS 11 and 17 will never get it. the vast majority of production JVMs are permanently RSA-only for JAR signature validation
-## migration status
-
-JDK 24 (March 2025) added ML-DSA support via JEP 497. Blocked in practice by: Android APK spec has no PQC signing scheme, JVM ecosystem still largely on LTS 11/17, no CA infrastructure for PQC code-signing certificates.

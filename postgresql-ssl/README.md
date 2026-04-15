@@ -1,9 +1,8 @@
 # postgresql-ssl — RSA client certificate authentication to databases
 
-**Repository:** git.postgresql.org  
-**Industry:** Financial, healthcare, government — any hardened database deployment  
-**Algorithm:** RSA-2048 server and client certificates  
-**PQC migration plan:** None — PostgreSQL has no PQC cipher suite support; OpenSSL PQC is experimental; no pg_hba.conf PQC auth method
+**Repository:** git.postgresql.org 
+**Industry:** Financial, healthcare, government — any hardened database deployment 
+**Algorithm:** RSA-2048 server and client certificates 
 
 ## What it does
 
@@ -26,15 +25,15 @@ Both sides use the enterprise CA (ADCS, Vault PKI, or cert-manager) for issuance
 ## Why it's stuck
 
 - PostgreSQL uses OpenSSL for TLS. OpenSSL's ML-KEM support (TLSEXT_TYPE_kem_groups)
-  is in 3.2+ but the cipher suite infrastructure for ML-DSA is not yet production-ready
-- No PQC certificate type exists in PostgreSQL's `ssl_cert_file` or client cert
-  handling code. `pg_hba.conf` cert auth extracts the X.509 CN — PQC cert format
-  is not yet standardized
+ is in 3.2+ but the cipher suite infrastructure for ML-DSA is not yet production-ready
+- No non-RSA certificate type exists in PostgreSQL's `ssl_cert_file` or client cert
+ handling code. `pg_hba.conf` cert auth extracts the X.509 CN — non-RSA cert format
+ is not yet standardized
 - Amazon RDS, Azure Database for PostgreSQL, and Google Cloud SQL all use OpenSSL-backed
-  RSA certificates for their "require SSL" configurations. Cloud provider timelines
-  for PQC database TLS have not been announced
+ RSA certificates for their "require SSL" configurations. Cloud provider timelines
+ for non-RSA database TLS have not been announced
 - Database certificate issuance in enterprises goes through ADCS or Vault PKI
-  (see those samples) — neither supports PQC yet
+ (see those samples) — neither supports non-RSA yet
 
 ## impact
 
@@ -42,17 +41,17 @@ the database is where the actual data lives. RSA client certs are the auth mecha
 forge the cert, access the database.
 
 - forge a client certificate with CN=postgres (the superuser), present it to any
-  PostgreSQL server using cert auth. pg_hba.conf matches on the CN, grants superuser
-  access. dump the entire database
+ PostgreSQL server using cert auth. pg_hba.conf matches on the CN, grants superuser
+ access. dump the entire database
 - payment processor databases using PCI-DSS cert auth: forge the application's
-  RSA client cert and you're connecting as the payment application. SELECT on
-  the transactions table, card data, PAN numbers — whatever the app account can access
+ RSA client cert and you're connecting as the payment application. SELECT on
+ the transactions table, card data, PAN numbers — whatever the app account can access
 - healthcare PostgreSQL: forge the EHR application's cert, access patient records.
-  the cert auth was supposed to prevent password-in-config exposure; it trades
-  that risk for RSA-key-on-blockchain-equivalent exposure
+ the cert auth was supposed to prevent password-in-config exposure; it trades
+ that risk for RSA-key-on-blockchain-equivalent exposure
 - Kubernetes service certs: cert-manager issues RSA-2048 certs to every pod that
-  connects to the database. forge any pod's cert, connect to the database as that
-  service account. the Kubernetes network policy trusts any pod with a valid cert
+ connects to the database. forge any pod's cert, connect to the database as that
+ service account. the Kubernetes network policy trusts any pod with a valid cert
 
 ## Code
 

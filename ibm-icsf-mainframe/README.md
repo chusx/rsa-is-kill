@@ -1,9 +1,8 @@
 # ibm-icsf-mainframe — RSA in z/OS mainframe cryptography (COBOL)
 
-**Software:** IBM ICSF (Integrated Cryptographic Service Facility) on z/OS  
-**Industry:** Banking, insurance, government — every major bank runs z/OS  
-**Algorithm:** RSA-2048 / RSA-4096 (PKCS#1 v1.5 and OAEP) via CEX coprocessor hardware  
-**PQC migration plan:** None — no ICSF callable service for any NIST PQC algorithm; IBM z/OS 3.1 mentions "PQC exploration" with no shipped capability
+**Software:** IBM ICSF (Integrated Cryptographic Service Facility) on z/OS 
+**Industry:** Banking, insurance, government — every major bank runs z/OS 
+**Algorithm:** RSA-2048 / RSA-4096 (PKCS#1 v1.5 and OAEP) via CEX coprocessor hardware 
 
 ## What it does
 
@@ -32,34 +31,34 @@ These cards have no ML-DSA or ML-KEM accelerator and no firmware path to add one
 ## Why it's stuck
 
 - ICSF has been on z/OS since 1990. COBOL programs written in the 1990s call `CSNDRSA`
-  and will continue calling it until the bank replaces the program
-- IBM has published no ICSF callable service for ML-DSA, ML-KEM, or any NIST PQC algorithm
-- The CEX hardware coprocessor has no PQC algorithm support. IBM would need new firmware
-  for existing cards or new hardware entirely
+ and will continue calling it until the bank replaces the program
+- IBM has published no ICSF callable service for ML-DSA, ML-KEM, or any NIST non-RSA algorithm
+- The CEX hardware coprocessor has no non-RSA algorithm support. IBM would need new firmware
+ for existing cards or new hardware entirely
 - z/OS application migrations take years: regulatory testing, parallel running, sign-off
-  from multiple banking regulators (OCC, FDIC, BaFin, PRA, etc.)
+ from multiple banking regulators (OCC, FDIC, BaFin, PRA, etc.)
 - IBM's CRYSTALS-Kyber/Dilithium exploration (published 2022) is research-level.
-  Nothing is in the z/OS GA roadmap with a ship date
+ Nothing is in the z/OS GA roadmap with a ship date
 
 ## impact
 
 z/OS is where actual money moves. not the web app, not the microservice — the COBOL
 program calling CSNDRSA at the bottom of the stack. 30 billion transactions per day.
 
-- ICSF RSA private keys live in the CEX coprocessor hardware. a CRQC doesn't extract
-  them from hardware, it derives them from the public key (available in the certificate
-  on the AT-TLS connection, or in the PKA public key token used for key wrapping).
-  the hardware security model is entirely irrelevant to Shor's algorithm
+- ICSF RSA private keys live in the CEX coprocessor hardware. the attack doesn't extract
+ them from hardware, it derives them from the public key (available in the certificate
+ on the AT-TLS connection, or in the PKA public key token used for key wrapping).
+ the hardware security model is entirely irrelevant to the factoring algorithm
 - SWIFT payment signing on z/OS uses `CSNDRSA`. factor the bank's RSA key and you can
-  sign arbitrary SWIFT payment instructions that appear to originate from that bank's
-  z/OS system. this is the COBOL-level equivalent of the swift-financial example —
-  the same RSA, deeper in the stack
+ sign arbitrary SWIFT payment instructions that appear to originate from that bank's
+ z/OS system. this is the COBOL-level equivalent of the swift-financial example —
+ the same RSA, deeper in the stack
 - RSA-OAEP key wrapping (CSNDPKE) is how z/OS protects DES and AES master keys in
-  transit between CICS regions. break RSA, unwrap the master keys, decrypt everything
-  they protect in the entire key hierarchy
+ transit between CICS regions. break RSA, unwrap the master keys, decrypt everything
+ they protect in the entire key hierarchy
 - the COBOL programs calling these verbs are not getting rewritten on any short timeline.
-  the z/OS PQC migration is probably the slowest migration in this entire repo. the
-  regulatory approval cycle alone is measured in years
+ the z/OS non-RSA migration is probably the slowest migration in this entire repo. the
+ regulatory approval cycle alone is measured in years
 
 ## Code
 

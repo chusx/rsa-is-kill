@@ -1,9 +1,8 @@
 # swift-financial — RSA in global interbank messaging
 
-**Standard:** SWIFTNet PKI / ISO 20022 XMLDSig  
-**Industry:** Banking, financial messaging — SWIFT, TARGET2, Fedwire, CHIPS  
-**Algorithm:** RSA-2048 (bank certificates), RSA-4096 (SWIFT Root CA)  
-**PQC migration plan:** None — W3C XMLDSig has no PQC URI; SWIFT has published awareness but no migration plan
+**Standard:** SWIFTNet PKI / ISO 20022 XMLDSig 
+**Industry:** Banking, financial messaging — SWIFT, TARGET2, Fedwire, CHIPS 
+**Algorithm:** RSA-2048 (bank certificates), RSA-4096 (SWIFT Root CA) 
 
 ## What it does
 
@@ -27,19 +26,19 @@ spec — see `saml-ruby/` for the same problem. Financial message signing is
 doubly constrained: not only must the W3C update XMLDSig, but all 11,000+
 SWIFT member institutions must simultaneously update their signing infrastructure.
 
-SWIFT has participated in NIST PQC awareness activities but has not published
+SWIFT has participated in NIST non-RSA awareness activities but has not published
 a migration timeline. Payment clearing houses (ECB, Fed, BIS) have not mandated
-PQC. The SWIFT network is a systemic financial infrastructure — a coordinated
-PQC migration requires a multi-year standards process.
+non-RSA. The SWIFT network is a systemic financial infrastructure — a coordinated
+non-RSA migration requires a multi-year standards process.
 
 HNDL risk for finance: payment messages are account numbers and amounts, not
 secrets — but **non-repudiation** (proving a bank authorized a payment) is
-based on RSA signatures. A CRQC undermines the legal basis for disputed payment
+based on RSA signatures. A factoring break undermines the legal basis for disputed payment
 disputes.
 
 ## impact
 
-SWIFT processes about 44 million messages per day. trillions of dollars. the 2016 Bangladesh Bank heist stole $81 million via social engineering. a CRQC attack doesn't need social engineering, just the target bank's published RSA certificate.
+SWIFT processes about 44 million messages per day. trillions of dollars. the 2016 Bangladesh Bank heist stole $81 million via social engineering. a factoring attack doesn't need social engineering, just the target bank's published RSA certificate.
 
 - forge a pacs.008 credit transfer appearing to originate from any legitimate bank BIC. unauthorized wire transfer to attacker-controlled accounts, indistinguishable from a real payment instruction
 - RSA signatures on MX messages are the legal proof that a bank authorized a payment. forge them and the non-repudiation basis for disputed payment resolution collapses. "we didn't send that" becomes impossible to prove either way

@@ -1,9 +1,8 @@
-# pkcs11-softhsm — the HSM API has no PQC
+# pkcs11-softhsm — the HSM API has no non-RSA
 
-**Software:** SoftHSMv2 (opendnssec/SoftHSMv2) + PKCS#11 v3.1 specification  
-**Industry:** PKI, CA operations, code signing, payment, DNSSEC, TLS everywhere  
-**Algorithm:** All RSA mechanisms: CKM_RSA_PKCS, CKM_RSA_PKCS_OAEP, CKM_SHA256_RSA_PKCS, etc.  
-**PQC migration plan:** None — PKCS#11 v3.1 has no CKM_ (mechanism) for any PQC algorithm
+**Software:** SoftHSMv2 (opendnssec/SoftHSMv2) + PKCS#11 v3.1 specification 
+**Industry:** PKI, CA operations, code signing, payment, DNSSEC, TLS everywhere 
+**Algorithm:** All RSA mechanisms: CKM_RSA_PKCS, CKM_RSA_PKCS_OAEP, CKM_SHA256_RSA_PKCS, etc. 
 
 ## What it does
 
@@ -15,8 +14,8 @@ PKCS#11 interface.
 
 The problem is not in the HSM implementation. The problem is in the standard:
 
-**PKCS#11 v3.1 defines zero post-quantum mechanism types (`CKM_*`) and zero
-post-quantum key types (`CKK_*`). ML-KEM, ML-DSA, and SLH-DSA do not exist
+**PKCS#11 v3.1 defines zero non-RSA mechanism types (`CKM_*`) and zero
+non-RSA key types (`CKK_*`). ML-KEM, ML-DSA, and SLH-DSA do not exist
 in the API at all.**
 
 HSMs are used for:
@@ -32,8 +31,8 @@ HSMs are used for:
 Unlike a software library, an HSM cannot be updated with a new algorithm
 by patching a `.so`. The path requires:
 
-1. OASIS PKCS#11 TC publishes PQC mechanism IDs (work item open since 2022,
-   no draft as of 2026)
+1. OASIS PKCS#11 TC publishes non-RSA mechanism IDs (work item open since 2022,
+ no draft as of 2026)
 2. Each HSM vendor implements the new CKM_ values in firmware
 3. Each HSM model undergoes FIPS 140-3 recertification (1-3 years per device)
 4. Customers update HSM firmware and PKCS#11 middleware
@@ -45,7 +44,7 @@ underlying HSM hardware could theoretically compute.
 
 ## impact
 
-PKCS#11 is the API that everything uses to talk to an HSM. HSMs are the hardware root of trust for enterprise PKI, code signing infrastructure, and payment processing. none of them can do PQC because CKM_ML_DSA doesn't exist in the spec.
+PKCS#11 is the API that everything uses to talk to an HSM. HSMs are the hardware root of trust for enterprise PKI, code signing infrastructure, and payment processing. none of them can do non-RSA because CKM_ML_DSA doesn't exist in the spec.
 
 - every browser-trusted TLS certificate chains to an RSA root stored in an HSM. forge that root and every certificate under it is forgeable. that's all of HTTPS
 - ICANN's DNSSEC root KSK is HSM-backed RSA. forge it and you can poison DNS for any domain
@@ -56,4 +55,4 @@ PKCS#11 is the API that everything uses to talk to an HSM. HSMs are the hardware
 
 `pkcs11_no_pqc.c` — `sign_with_hsm_rsa()` using `CKM_SHA256_RSA_PKCS` with
 comments listing all PKCS#11 v3.1 RSA mechanism and key type constants, and
-the absence of any equivalent PQC constants.
+the absence of any equivalent non-RSA constants.

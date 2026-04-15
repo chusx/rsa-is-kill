@@ -1,16 +1,15 @@
 # emv-payment-cards — RSA in 10 billion payment chips
 
-**Standard:** EMV Book 2 (Security and Key Management) — Visa, Mastercard, Amex, UnionPay  
-**Industry:** Retail payments, ATMs, contactless transit  
-**Algorithm:** RSA-1024 (SDA/legacy), RSA-2048 (DDA/CDA), RSA-1152 (Visa CA keys)  
-**PQC migration plan:** None — no PQC algorithm defined in any EMV specification
+**Standard:** EMV Book 2 (Security and Key Management) — Visa, Mastercard, Amex, UnionPay 
+**Industry:** Retail payments, ATMs, contactless transit 
+**Algorithm:** RSA-1024 (SDA/legacy), RSA-2048 (DDA/CDA), RSA-1152 (Visa CA keys) 
 
 ## What it does
 
 EMV is the global chip payment standard. Every chip-and-PIN and contactless
 payment card implements one of three RSA-based card authentication mechanisms:
 
-| Mechanism | RSA use | Breaks with CRQC |
+| Mechanism | RSA use | Breaks with a factoring break |
 |---|---|---|
 | SDA (Static) | CA signs static card data at issuance | Factor CA key → forge any card |
 | DDA (Dynamic) | Card has RSA keypair; signs terminal challenge | Factor card pubkey → clone card |
@@ -32,11 +31,11 @@ legacy SDA cards still use RSA-1024 for the static data signature.
 - Every payment terminal (10M+ worldwide) must accept the new certificate format
 - Every card personalization bureau HSM must be updated
 - The relatively short card lifespan is actually the most favorable factor —
-  but only if migration begins before a CRQC emerges
+ but only if migration begins before a factoring break emerges
 
 ## impact
 
-EMV chip security is built on the premise that the ICC private key never leaves the chip. Shor's algorithm derives it from the public key, which is published in the certificate chain flowing through every single transaction.
+EMV chip security is built on the premise that the ICC private key never leaves the chip. the factoring algorithm derives it from the public key, which is published in the certificate chain flowing through every single transaction.
 
 - SDA cards use RSA-1024 for the issuer CA. factor that key and forge the Signed Static Application Data for every card that bank ever issued. unlimited card cloning in software, no physical card required
 - DDA/CDA cards use RSA-2048 ICC signatures. recover the ICC private key from the certificate in the transaction flow and forge dynamic signatures indefinitely, passing terminal auth as any card

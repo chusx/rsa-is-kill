@@ -1,9 +1,8 @@
 # xmpp-s2s-tls — RSA in XMPP S2S federation TLS (Jabber, Cisco Jabber, German TI Messenger)
 
-**Repository:** ejabberd (processone/ejabberd), Prosody (prosody.im)  
-**Industry:** Federated messaging — open XMPP network, enterprise IM, German healthcare  
-**Algorithm:** RSA-2048 (XMPP S2S server certificate; SASL EXTERNAL identity via TLS cert)  
-**PQC migration plan:** None — ejabberd and Prosody use OpenSSL/GnuTLS for TLS; no PQC TLS in stable releases; XMPP Standards Foundation (XSF) has no active XEP for PQC
+**Repository:** ejabberd (processone/ejabberd), Prosody (prosody.im) 
+**Industry:** Federated messaging — open XMPP network, enterprise IM, German healthcare 
+**Algorithm:** RSA-2048 (XMPP S2S server certificate; SASL EXTERNAL identity via TLS cert) 
 
 ## What it does
 
@@ -26,14 +25,14 @@ of federated XMPP: the port must be open.
 
 ## Why it's stuck
 
-- ejabberd and Prosody use the system TLS library (OpenSSL or GnuTLS). PQC in those
-  libraries is experimental. No XMPP server is shipping PQC TLS in a stable release.
+- ejabberd and Prosody use the system TLS library (OpenSSL or GnuTLS). non-RSA in those
+ libraries is experimental. No XMPP server is shipping non-RSA TLS in a stable release.
 - XEP-0178 defines SASL EXTERNAL via TLS cert. The cert is X.509. There is no XEP
-  for PQC-based S2S authentication, and no active work item in XSF to create one.
+ for non-RSA-based S2S authentication, and no active work item in XSF to create one.
 - The German TI Messenger uses Gematik-issued certificates from Gematik's PKI.
-  Gematik has not announced PQC plans for TI Messenger certificates.
+ Gematik has not announced non-RSA plans for TI Messenger certificates.
 - Cisco Jabber / CUCM RSA certificates are managed by enterprise PKI (usually ADCS).
-  PQC in ADCS requires Windows Server update + CA template update + cert re-issuance.
+ non-RSA in ADCS requires Windows Server update + CA template update + cert re-issuance.
 
 ## impact
 
@@ -41,23 +40,23 @@ XMPP S2S port 5269 is literally required to be open to the internet for federati
 the RSA cert is on an open port. anyone can grab it.
 
 - connect to port 5269 of any federated XMPP server. do a TLS handshake. get the
-  RSA-2048 public key. no auth. this is how federation is supposed to work.
-  factor the key. derive the private key. impersonate the server to all its XMPP peers.
-  receive messages intended for users on that server.
+ RSA-2048 public key. no auth. this is how federation is supposed to work.
+ factor the key. derive the private key. impersonate the server to all its XMPP peers.
+ receive messages intended for users on that server.
 - for the German TI Messenger: these are healthcare communications — patient referrals,
-  lab results, emergency coordination between hospitals and ambulance services. the TI PKI
-  is Gematik-issued RSA-2048. factor the hospital server's cert, intercept healthcare
-  messages for all patients at that institution.
+ lab results, emergency coordination between hospitals and ambulance services. the TI PKI
+ is Gematik-issued RSA-2048. factor the hospital server's cert, intercept healthcare
+ messages for all patients at that institution.
 - for Cisco Jabber enterprise: XMPP messages between Cisco Jabber users include M&A
-  discussions, legal privileged communication, HR discussions, financial information.
-  the CUCM S2S cert is RSA-2048 from the enterprise CA. impersonating the CUCM server
-  gives you all enterprise IM traffic.
+ discussions, legal privileged communication, HR discussions, financial information.
+ the CUCM S2S cert is RSA-2048 from the enterprise CA. impersonating the CUCM server
+ gives you all enterprise IM traffic.
 - SASL EXTERNAL forgery: an attacker who factors any domain's S2S RSA cert can authenticate
-  as that domain to every federated server. send messages as if from users on that domain.
-  a message appearing to come from @bundeswehr.de or @gematik.de or @bankofamerica.com,
-  signed with the correct server RSA cert, will pass federation authentication.
+ as that domain to every federated server. send messages as if from users on that domain.
+ a message appearing to come from @bundeswehr.de or @gematik.de or @bankofamerica.com,
+ signed with the correct server RSA cert, will pass federation authentication.
 - BwMessenger (Bundeswehr): German military internal messaging. the S2S cert is an RSA-2048
-  cert within the German government PKI. same attack chain.
+ cert within the German government PKI. same attack chain.
 
 ## Code
 

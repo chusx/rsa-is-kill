@@ -1,9 +1,8 @@
 # medical-device-fda — RSA in FDA-cleared medical devices
 
-**Regulation:** FDA 21 CFR Part 820 / 2023 Consolidated Appropriations Act §3305  
-**Industry:** Medical devices — implants, insulin pumps, cardiac devices, ventilators  
-**Algorithm:** RSA-2048 (firmware signing), RSA/ECDSA (TLS update channels)  
-**PQC migration plan:** None — FDA guidance does not reference PQC; 510(k) process impedes change
+**Regulation:** FDA 21 CFR Part 820 / 2023 Consolidated Appropriations Act §3305 
+**Industry:** Medical devices — implants, insulin pumps, cardiac devices, ventilators 
+**Algorithm:** RSA-2048 (firmware signing), RSA/ECDSA (TLS update channels) 
 
 ## What it does
 
@@ -13,13 +12,13 @@ implementation uses RSA-2048 to sign firmware images.
 
 Critical devices with RSA-based firmware authentication:
 - **Insulin pumps / AID systems**: Tandem t:slim X2, Medtronic MiniMed 780G,
-  Insulet OmniPod 5 — all receive OTA updates via Bluetooth + cloud (TLS/RSA)
+ Insulet OmniPod 5 — all receive OTA updates via Bluetooth + cloud (TLS/RSA)
 - **Cardiac implantable devices** (pacemakers, ICDs): remote monitoring via
-  Medtronic CareLink, Abbott Merlin.net — RSA/TLS from programmer to cloud
+ Medtronic CareLink, Abbott Merlin.net — RSA/TLS from programmer to cloud
 - **Hospital infusion pumps**: BD Alaris, Baxter Spectrum — firmware over
-  hospital Wi-Fi, RSA-signed update packages
+ hospital Wi-Fi, RSA-signed update packages
 - **Diagnostic imaging**: CT/MRI/X-ray systems run Windows with Authenticode
-  RSA code signing for device driver and application updates
+ RSA code signing for device driver and application updates
 
 ## Why it's stuck
 
@@ -30,7 +29,7 @@ Manufacturers avoid algorithm changes that trigger new clearances.
 
 **Technical**: Implantable devices (pacemakers, ICDs) communicate over
 proprietary 175 kHz or MICS-band radio with low-bandwidth programmers.
-The communication protocol is frozen by regulatory clearance. Adding PQC
+The communication protocol is frozen by regulatory clearance. Adding non-RSA
 signatures (typically 1-3 KB for ML-DSA) to a protocol designed for
 100-byte packets is not feasible without a complete redesign.
 

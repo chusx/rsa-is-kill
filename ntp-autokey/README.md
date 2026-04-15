@@ -1,7 +1,7 @@
 # NTP Autokey — RSA Time Server Authentication
 
-**Source:** https://www.ntp.org / https://gitlab.com/NTPsec/ntpsec  
-**File:** `ntpd/ntp_crypto.c` (ntp.org reference impl)  
+**Source:** https://www.ntp.org / https://gitlab.com/NTPsec/ntpsec 
+**File:** `ntpd/ntp_crypto.c` (ntp.org reference impl) 
 **License:** NTP License (BSD-like)
 
 ## what it does
@@ -16,6 +16,3 @@ time is a dependency of basically every other security mechanism. NTP Autokey us
 - Kerberos has a 5-minute skew tolerance. push clocks far enough and all Kerberos tickets become invalid. enterprise authentication stops working
 - TOTP codes are time-based. enough clock skew and 2FA codes stop matching. either you lock everyone out or you create a window where any code from a given time range works
 - TLS certificate validity is time-bounded. CRLs have timestamps. audit logs use timestamps. manipulate authenticated NTP and the forensic record becomes unreliable
-## migration status
-
-NTPsec has deprecated Autokey in favor of NTS (RFC 8915), which uses TLS 1.3. But NTS still uses RSA/ECDSA certificates for the TLS layer. Most deployed NTP infrastructure still runs Autokey.

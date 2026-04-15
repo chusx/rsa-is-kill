@@ -1,9 +1,8 @@
 # avionics-arinc665 — RSA in aircraft loadable software signing (ARINC 665 / DO-178C)
 
-**Repository:** ARINC 665-3 specification (AEEC); OEM implementations (Airbus/Boeing, proprietary)  
-**Industry:** Commercial aviation — Airbus, Boeing, every airline globally  
-**Algorithm:** RSA-2048 (aircraft software part signing per ARINC 665-3 Part 7; Jeppesen navigation database)  
-**PQC migration plan:** None — ARINC 665-3 was published in 2016 with no PQC provisions; RTCA DO-200B has no PQC guidance; avionics software certification cycles make this a decade-scale problem even once an algorithm exists
+**Repository:** ARINC 665-3 specification (AEEC); OEM implementations (Airbus/Boeing, proprietary) 
+**Industry:** Commercial aviation — Airbus, Boeing, every airline globally 
+**Algorithm:** RSA-2048 (aircraft software part signing per ARINC 665-3 Part 7; Jeppesen navigation database) 
 
 ## What it does
 
@@ -31,18 +30,18 @@ OEM like Honeywell, Collins Aerospace) is burned into the ADLU at manufacture.
 ## Why it's stuck
 
 - Avionics software follows DO-178C / DO-278A qualification. Any change to the signing
-  algorithm requires re-certification of the loading unit software, the verification logic,
-  and potentially the avionics LRU itself. This is a multi-year, multi-million-dollar process
-  per aircraft type.
+ algorithm requires re-certification of the loading unit software, the verification logic,
+ and potentially the avionics LRU itself. This is a multi-year, multi-million-dollar process
+ per aircraft type.
 - ARINC 665-3 is maintained by AEEC (Airlines Electronic Engineering Committee). Revisions
-  are slow; the 665-3 update took years. A 665-4 with PQC provisions would take another
-  full committee cycle, then implementation, then certification.
+ are slow; the 665-3 update took years. A 665-4 with non-RSA provisions would take another
+ full committee cycle, then implementation, then certification.
 - The OEM CA cert is burned into ADLU hardware at manufacture. Updating it for existing
-  ADLUs requires a hardware modification or replacement, which requires an airworthiness
-  directive (FAA, EASA) for fielded aircraft.
+ ADLUs requires a hardware modification or replacement, which requires an airworthiness
+ directive (FAA, EASA) for fielded aircraft.
 - Jeppesen NavDB is the world's most-deployed avionics database. Changing its signing
-  algorithm requires simultaneous updates to every FMS that verifies NavDB signatures —
-  every aircraft in the fleet, globally, before the transition.
+ algorithm requires simultaneous updates to every FMS that verifies NavDB signatures —
+ every aircraft in the fleet, globally, before the transition.
 
 ## impact
 
@@ -50,22 +49,22 @@ aircraft software signing is the gate between "authorized avionics software" and
 you can get installed on a flight computer." the RSA key is what makes that gate meaningful.
 
 - Jeppesen RSA-2048 signing key: used for NavDB updates installed on every commercial aircraft
-  in the world every 28 days. the OEM public key is in every Jeppesen NavDB update package
-  (embedded in the SWP header) and in every ADLU/PDLU's cert store. factor it. sign a modified
-  NavDB with incorrect waypoints, modified ILS frequencies, or altered approach procedures.
-  any aircraft FMS that accepts Jeppesen NavDB updates (all of them) will accept your data.
+ in the world every 28 days. the OEM public key is in every Jeppesen NavDB update package
+ (embedded in the SWP header) and in every ADLU/PDLU's cert store. factor it. sign a modified
+ NavDB with incorrect waypoints, modified ILS frequencies, or altered approach procedures.
+ any aircraft FMS that accepts Jeppesen NavDB updates (all of them) will accept your data.
 - FADEC software signing: FADEC is the computer that controls engine thrust. it's loaded via
-  ARINC 665. the engine OEM (GE, Rolls-Royce, P&W) signs FADEC software with RSA-2048.
-  factor the OEM signing key. load modified FADEC software that changes engine behavior.
-  this is in the same threat model as Stuxnet for centrifuges — software modification via
-  forged signatures on safety-critical controllers.
+ ARINC 665. the engine OEM (GE, Rolls-Royce, P&W) signs FADEC software with RSA-2048.
+ factor the OEM signing key. load modified FADEC software that changes engine behavior.
+ this is in the same threat model as Stuxnet for centrifuges — software modification via
+ forged signatures on safety-critical controllers.
 - "but there are other safety systems." yes. flight crew, redundant systems, TCAS, QAR.
-  a forged navDB by itself probably doesn't crash a plane. but it contributes to the
-  conditions that make accidents more likely, and it's undetectable because the signature
-  checks pass. the DO-178C certification assumed the signing key was secure.
+ a forged navDB by itself probably doesn't crash a plane. but it contributes to the
+ conditions that make accidents more likely, and it's undetectable because the signature
+ checks pass. the DO-178C certification assumed the signing key was secure.
 - EFB (Electronic Flight Bag) software signing: pilots use EFBs for charts, performance
-  data, aircraft systems manuals. EFB software is ARINC 665-signed. compromised EFB
-  software shows wrong performance data during takeoff calculations.
+ data, aircraft systems manuals. EFB software is ARINC 665-signed. compromised EFB
+ software shows wrong performance data during takeoff calculations.
 
 ## Code
 

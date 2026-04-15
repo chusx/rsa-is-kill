@@ -1,9 +1,8 @@
 # adcs-windows — RSA-2048 defaults in Windows enterprise PKI
 
-**Software:** Microsoft Active Directory Certificate Services (AD CS / ADCS)  
-**Industry:** Enterprise IT, government, healthcare — any Windows Active Directory environment  
-**Algorithm:** RSA-2048 (all built-in certificate templates and CA defaults)  
-**PQC migration plan:** None — Windows Server 2025 has no PQC algorithm support in ADCS; CNG has no ML-DSA provider
+**Software:** Microsoft Active Directory Certificate Services (AD CS / ADCS) 
+**Industry:** Enterprise IT, government, healthcare — any Windows Active Directory environment 
+**Algorithm:** RSA-2048 (all built-in certificate templates and CA defaults) 
 
 ## What it does
 
@@ -31,13 +30,13 @@ validity. Everything issued under it chains to the RSA root.
 ## Why it's stuck
 
 - The Windows CNG (Cryptography Next Generation) API has no ML-DSA or ML-KEM provider.
-  No CNG algorithm ID is defined for any NIST PQC algorithm (as of Windows Server 2025)
+ No CNG algorithm ID is defined for any NIST non-RSA algorithm (as of Windows Server 2025)
 - AD CS certificate templates are stored in Active Directory and replicated across
-  the forest. There is no PQC template type in the schema
-- Certificate autoenrollment (Group Policy) has no mechanism to request PQC key types
-- Microsoft has not announced a timeline or roadmap for PQC support in AD CS
+ the forest. There is no non-RSA template type in the schema
+- Certificate autoenrollment (Group Policy) has no mechanism to request non-RSA key types
+- Microsoft has not announced a timeline or roadmap for non-RSA support in AD CS
 - Enterprise deployments have hundreds or thousands of certificate-dependent applications.
-  Algorithm migration would require testing every dependent system
+ Algorithm migration would require testing every dependent system
 
 ## impact
 
@@ -46,15 +45,15 @@ trust for everything the domain issues. it's in the config partition of Active D
 readable by any authenticated user.
 
 - the AD CS root CA certificate is published in the AIA extension of every issued
-  certificate, in LDAP at CN=Configuration, and is synced to every Windows client's
-  trusted root store. RSA-2048 public key, publicly readable, CRQC input ready
+ certificate, in LDAP at CN=Configuration, and is synced to every Windows client's
+ trusted root store. RSA-2048 public key, publicly readable, input for the attack ready
 - factor the root CA RSA key and issue certificates for any domain user, computer,
-  or service. issue a certificate for any domain admin, do PKINIT, get a TGT, own
-  the domain. no password, no phishing, no exploitation of any software vulnerability
+ or service. issue a certificate for any domain admin, do PKINIT, get a TGT, own
+ the domain. no password, no phishing, no exploitation of any software vulnerability
 - every ADCS-issued certificate is on the table: Wi-Fi certs, VPN certs, code signing
-  certs, S/MIME certs. one root key compromise cascades through the entire PKI hierarchy
+ certs, S/MIME certs. one root key compromise cascades through the entire PKI hierarchy
 - typical Fortune 500 deployment: 50,000-500,000 issued certificates all chaining
-  to the compromised RSA-2048 root
+ to the compromised RSA-2048 root
 
 ## Code
 

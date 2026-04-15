@@ -1,9 +1,8 @@
 # hbci-fints-banking — RSA-2048 in German HBCI/FinTS online banking (80M accounts)
 
-**Repository:** python-fints (raphaelm/python-fints), aqbanking (aquamaniac.de); FinTS 4.1 spec (Deutsche Kreditwirtschaft)  
-**Industry:** German retail and business banking — Sparkassen, Volksbanken, Deutsche Bank, Commerzbank  
-**Algorithm:** RSA-2048 (RDH-10 profile — authentication key and encryption key)  
-**PQC migration plan:** None — FinTS 4.1 was last updated in 2017; ZKA/DK (Deutsche Kreditwirtschaft) has not published a PQC migration for FinTS; the RDH-10 profile is normative with no planned revision
+**Repository:** python-fints (raphaelm/python-fints), aqbanking (aquamaniac.de); FinTS 4.1 spec (Deutsche Kreditwirtschaft) 
+**Industry:** German retail and business banking — Sparkassen, Volksbanken, Deutsche Bank, Commerzbank 
+**Algorithm:** RSA-2048 (RDH-10 profile — authentication key and encryption key) 
 
 ## What it does
 
@@ -27,22 +26,22 @@ Deployed at:
 
 The customer's RSA public key is registered with their bank during initial setup and
 is stored in the bank's backend. It's also in the customer's keyfile (a local binary file).
-The bank's RSA public key is in the customer's keyfile too. Both are available for CRQC.
+The bank's RSA public key is in the customer's keyfile too. Both are available for a factoring attack.
 
 ## Why it's stuck
 
 - FinTS 4.1 is controlled by the Deutsche Kreditwirtschaft (DK), the consortium of
-  German banking associations. Updating the protocol spec requires consensus across
-  all member associations: BdB, DSGV (Sparkassen), BVR (Volksbanken), DZ Bank, etc.
-  This process is measured in years.
+ German banking associations. Updating the protocol spec requires consensus across
+ all member associations: BdB, DSGV (Sparkassen), BVR (Volksbanken), DZ Bank, etc.
+ This process is measured in years.
 - aqbanking and python-fints implement FinTS as specified. Until DK publishes a FinTS 4.2
-  or 5.0 with PQC key types, there's nothing for the libraries to implement.
+ or 5.0 with non-RSA key types, there's nothing for the libraries to implement.
 - Customer keyfiles are in a proprietary binary format (different per banking software).
-  Millions of existing keyfiles contain RSA-2048 keys. Key rollover requires each customer
-  to re-register with their bank using a new key — a manual process many won't do.
+ Millions of existing keyfiles contain RSA-2048 keys. Key rollover requires each customer
+ to re-register with their bank using a new key — a manual process many won't do.
 - The banking servers at every Sparkasse and Volksbank would need to be updated to accept
-  PQC-signed FinTS messages. German banking IT moves slowly; core banking systems at
-  Sparkassen often run decades-old software.
+ non-RSA-signed FinTS messages. German banking IT moves slowly; core banking systems at
+ Sparkassen often run decades-old software.
 
 ## impact
 
@@ -50,21 +49,21 @@ HBCI/FinTS RDH is online banking authentication for German businesses. the RSA s
 is what authorizes wire transfers. no additional factors required.
 
 - factor a customer's RSA-2048 authentication key. it's in their keyfile (often backed up
-  to cloud storage or emailed to themselves), and the public key is registered with the bank.
-  now you can send FinTS HKUEB (wire transfer) messages signed with their key. the bank
-  verifies the RSA signature, sees it's valid, processes the transfer. no OTP. no 2FA.
-  just RSA.
+ to cloud storage or emailed to themselves), and the public key is registered with the bank.
+ now you can send FinTS HKUEB (wire transfer) messages signed with their key. the bank
+ verifies the RSA signature, sees it's valid, processes the transfer. no OTP. no 2FA.
+ just RSA.
 - DATEV integration: tax advisors with HBCI access to client accounts can initiate payroll
-  transfers, book tax payments, check balances. DATEV is used for ~40% of German GDP in
-  payroll processing. the RSA key on a DATEV terminal authenticates all of this.
+ transfers, book tax payments, check balances. DATEV is used for ~40% of German GDP in
+ payroll processing. the RSA key on a DATEV terminal authenticates all of this.
 - harvest now: record FinTS sessions (they use TLS, but the bank's RSA encryption key
-  is in the keyfile). when CRQC arrives, factor the bank's RSA-2048 encryption key,
-  decrypt all recorded sessions. every wire transfer, every balance, every transaction
-  history for every customer you recorded — all of it.
+ is in the keyfile). when a factoring break arrives, factor the bank's RSA-2048 encryption key,
+ decrypt all recorded sessions. every wire transfer, every balance, every transaction
+ history for every customer you recorded — all of it.
 - bank response forgery: factor the bank's RSA auth key. forge bank responses — fake
-  balance confirmations, fake transaction rejection notices (transfer went through but
-  you told the customer it failed). a whole class of fraud that currently requires
-  compromising the bank's systems; with RSA broken, it requires only the bank's public key.
+ balance confirmations, fake transaction rejection notices (transfer went through but
+ you told the customer it failed). a whole class of fraud that currently requires
+ compromising the bank's systems; with RSA broken, it requires only the bank's public key.
 
 ## Code
 

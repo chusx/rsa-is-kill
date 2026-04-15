@@ -1,7 +1,7 @@
 # UEFI Secure Boot / shim — RSA-2048 Boot Chain
 
-**Source:** https://github.com/rhboot/shim  
-**Files:** `shim.c`, `mok.c`  
+**Source:** https://github.com/rhboot/shim 
+**Files:** `shim.c`, `mok.c` 
 **License:** BSD-2-Clause
 
 ## what it does
@@ -16,6 +16,3 @@ shim is the first thing that runs after UEFI hands off to the bootloader on most
 - a malicious shim runs before the kernel and before any OS security mechanism. install a bootkit that survives OS reinstalls and secure wipes because it runs before any of that matters
 - Microsoft's UEFI CA signs shim for Fedora, Ubuntu, Debian, RHEL, and every other major distro that uses shim. one RSA key, all of Linux secure boot
 - Secure Boot is the foundation of measured boot, TPM attestation, and confidential computing root-of-trust chains. it all starts with this RSA signature
-## migration status
-
-No PQC Secure Boot spec from UEFI Forum. Microsoft has not announced a timeline. Even if they did, the firmware update deployment problem makes this a decade-long project.

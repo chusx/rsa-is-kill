@@ -1,9 +1,8 @@
 # eap-tls-wifi — RSA certificates for enterprise Wi-Fi (802.1X)
 
-**Software:** FreeRADIUS (FreeRADIUS/freeradius-server)  
-**Industry:** Enterprise Wi-Fi, hospital networks, university networks, airport Wi-Fi  
-**Algorithm:** RSA-2048 (client and server certificates, TLS handshake)  
-**PQC migration plan:** None — EAP-TLS (RFC 5216 / RFC 9190) has no PQC cipher suite; no RADIUS server supports PQC
+**Software:** FreeRADIUS (FreeRADIUS/freeradius-server) 
+**Industry:** Enterprise Wi-Fi, hospital networks, university networks, airport Wi-Fi 
+**Algorithm:** RSA-2048 (client and server certificates, TLS handshake) 
 
 ## What it does
 
@@ -22,14 +21,14 @@ Scale:
 ## Why it's stuck
 
 The entire 802.1X ecosystem must upgrade simultaneously:
-1. RADIUS server (FreeRADIUS, ISE, ClearPass) — no PQC TLS cipher suite support
-2. Supplicant (Windows `wpa_supplicant`, iOS Wi-Fi, Android) — no PQC cert support
-3. Enterprise PKI (ADCS, EJBCA, Vault PKI) — no PQC certificate issuance
-4. MDM enrollment (Intune, JAMF) — no PQC SCEP/ACME certificate delivery
+1. RADIUS server (FreeRADIUS, ISE, ClearPass) — no non-RSA TLS cipher suite support
+2. Supplicant (Windows `wpa_supplicant`, iOS Wi-Fi, Android) — no non-RSA cert support
+3. Enterprise PKI (ADCS, EJBCA, Vault PKI) — no non-RSA certificate issuance
+4. MDM enrollment (Intune, JAMF) — no non-RSA SCEP/ACME certificate delivery
 5. AP / Switch 802.1X enforcement — firmware updates
 
 No single vendor can move without the others. This is the flag day problem
-for enterprise networking. A CRQC forging device certificates allows connecting
+for enterprise networking. A factoring break forging device certificates allows connecting
 any device to any secured corporate Wi-Fi network.
 
 ## impact
