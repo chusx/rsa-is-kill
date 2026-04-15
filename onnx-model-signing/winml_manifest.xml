@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Example Windows ML Model Catalog manifest for a Copilot+ PC.
+
+  Windows Update distributes NPU models bundled with this manifest.
+  The manifest itself is Microsoft-code-signed (RSA-4096 chain to
+  Microsoft Root CA 2011); each entry references an ONNX file
+  whose own embedded RSA-PSS signature is checked against a
+  Windows ML publisher cert before the model is loaded onto the
+  NPU via DirectML + the platform's NPU EP (Qualcomm QNN, Intel
+  OpenVINO, AMD XRT).
+
+  Schema is illustrative; the production Windows ML catalog format
+  is stored under %WinDir%\System32\WinML\Models and indexed by
+  a signed binary manifest.
+-->
+<ModelCatalog version="1.0"
+              xmlns="urn:microsoft:windowsml:modelcatalog:v1">
+
+  <Publisher>
+    <CommonName>Microsoft Windows ML Publisher</CommonName>
+    <Subject>CN=Microsoft Windows ML Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US</Subject>
+    <CertificateThumbprint>9f8e7d6c5b4a32100123456789abcdef01234567</CertificateThumbprint>
+    <TrustAnchor>Microsoft Root Certificate Authority 2011</TrustAnchor>
+    <SignatureAlgorithm>RSA-PSS-SHA384-MGF1</SignatureAlgorithm>
+    <KeySize>4096</KeySize>
+  </Publisher>
+
+  <Models>
+
+    <!-- Phi-Silica: local SLM behind Copilot on NPU -->
+    <Model id="com.microsoft.phi-silica.int4">
+      <DisplayName>Phi Silica (INT4, NPU-optimized)</DisplayName>
+      <Version>3.2.1</Version>
+      <File>phi-silica-npu-int4.onnx</File>
+      <DigestSHA384>a1b2c3d4e5f6789abcdef0123456789abcdef0123456789abcdef0123456789aabcdef0123456789abcdef0123456789a</DigestSHA384>
+      <SignatureFile>phi-silica-npu-int4.onnx.sig</SignatureFile>
+      <HardwareTarget>NPU</HardwareTarget>
+      <ExecutionProvider>QNN,OpenVINO,XRT</ExecutionProvider>
+      <UsedBy>
+        <Feature>Copilot local reasoning</Feature>
+        <Feature>Recall semantic index</Feature>
+        <Feature>Click-to-Do text actions</Feature>
+      </UsedBy>
+    </Model>
+
+    <!-- Windows Studio Effects: background blur + auto-framing -->
+    <Model id="com.microsoft.winstudio.bg-blur">
+      <DisplayName>Studio Effects Background Segmentation</DisplayName>
+      <Version>2.8.0</Version>
+      <File>winstudio-bgseg.onnx</File>
+      <DigestSHA384>112233445566778899aabbccddeeff00112233445566778899aabbccddeeff001122334455667788 99aabbccddeeff</DigestSHA384>
+      <SignatureFile>winstudio-bgseg.onnx.sig</SignatureFile>
+      <HardwareTarget>NPU</HardwareTarget>
+      <UsedBy>
+        <Feature>Camera background effects (WinRT MediaCapture)</Feature>
+      </UsedBy>
+    </Model>
+
+    <!-- Windows Copilot Voice (on-device STT before cloud invocation) -->
+    <Model id="com.microsoft.voice.stt-en">
+      <DisplayName>Copilot Voice English STT</DisplayName>
+      <Version>1.4.7</Version>
+      <File>voice-stt-en.onnx</File>
+      <DigestSHA384>bbccddeeff00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff0011 2233445566778899aa</DigestSHA384>
+      <SignatureFile>voice-stt-en.onnx.sig</SignatureFile>
+      <HardwareTarget>NPU</HardwareTarget>
+    </Model>
+
+    <!-- Click-to-Do: on-device OCR for semantic screen actions -->
+    <Model id="com.microsoft.ocr.screen">
+      <DisplayName>Click-to-Do Screen OCR</DisplayName>
+      <Version>1.1.3</Version>
+      <File>ocr-screen.onnx</File>
+      <DigestSHA384>f5a6b7c8d9e0112233445566778899aabbccddeeff00f5a6b7c8d9e01122334455667 78899aabbccddeeff00</DigestSHA384>
+      <SignatureFile>ocr-screen.onnx.sig</SignatureFile>
+      <HardwareTarget>NPU</HardwareTarget>
+    </Model>
+
+  </Models>
+
+  <!--
+    Catalog-level signature: signtool-style PKCS#7 over the manifest,
+    applied by Microsoft's Windows ML release pipeline before Windows
+    Update distribution. Pinned to the Microsoft Root Certificate
+    Authority 2011 (RSA-4096) via the Windows cert store.
+
+    A successful factoring attack against any cert in the chain
+    (leaf Windows ML Publisher cert, intermediate Microsoft Code
+    Signing PCA 2011, or Microsoft Root CA 2011) lets an attacker
+    publish an arbitrary ONNX model to any Copilot+ PC's NPU under
+    the authority of Windows Update.
+  -->
+  <Signature>
+    <Algorithm>RSA-PKCS1v1_5-SHA384</Algorithm>
+    <SignerCertificateRef>Microsoft Code Signing PCA 2011</SignerCertificateRef>
+    <SignatureValue>BASE64(... RSA signature over catalog body ...)</SignatureValue>
+    <Timestamp>
+      <TSA>Microsoft RFC3161 Timestamping</TSA>
+      <TimestampValue>BASE64(... RFC 3161 token ...)</TimestampValue>
+    </Timestamp>
+  </Signature>
+
+</ModelCatalog>

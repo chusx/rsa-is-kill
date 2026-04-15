@@ -1,0 +1,77 @@
+{
+  "_comment": "Example C2PA 2.x claim payload as produced by an AI image generator. This is the CBOR-encoded payload over which the RSA-PSS COSE Sign1 signature is computed.",
+  "claim_generator": "OpenAI Image Generator/1.0 (gpt-image-1)",
+  "claim_generator_info": [
+    {
+      "name": "OpenAI Image Generator",
+      "version": "1.0",
+      "icon": "self#jumbf=c2pa.assertions/c2pa.icon"
+    }
+  ],
+  "signature": "self#jumbf=c2pa.signature",
+  "alg": "sha256",
+  "instanceID": "xmp:iid:3f8a2b1e4c5d6e7f8a9b0c1d2e3f4a5b",
+  "assertions": [
+    {
+      "url": "self#jumbf=c2pa.assertions/c2pa.hash.data",
+      "hash": "BASE64(sha256 of JPEG body with JUMBF region excluded)",
+      "alg": "sha256"
+    },
+    {
+      "url": "self#jumbf=c2pa.assertions/c2pa.actions.v2",
+      "hash": "BASE64(sha256 of actions assertion CBOR)",
+      "alg": "sha256"
+    },
+    {
+      "url": "self#jumbf=c2pa.assertions/stds.schema-org.CreativeWork",
+      "hash": "BASE64(...)",
+      "alg": "sha256"
+    }
+  ],
+  "_actions_assertion_inline": {
+    "label": "c2pa.actions.v2",
+    "data": {
+      "actions": [
+        {
+          "action": "c2pa.created",
+          "when": "2026-04-15T12:00:00Z",
+          "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+          "softwareAgent": {
+            "name": "OpenAI Image Generator",
+            "version": "1.0"
+          },
+          "parameters": {
+            "description": "AI-generated image from text prompt",
+            "org.cai.training-mining": "notAllowed"
+          }
+        }
+      ]
+    }
+  },
+  "_creativework_assertion_inline": {
+    "label": "stds.schema-org.CreativeWork",
+    "data": {
+      "@context": "https://schema.org/",
+      "@type": "CreativeWork",
+      "author": [
+        {
+          "@type": "Organization",
+          "name": "OpenAI",
+          "identifier": "https://openai.com"
+        }
+      ],
+      "copyrightNotice": "Generated content; see OpenAI terms"
+    }
+  },
+  "_cose_sign1_envelope": {
+    "protected_header": {
+      "alg": "PS256 (RSA-PSS SHA-256)",
+      "x5chain": [
+        "signing_cert_der (RSA-2048 leaf from e.g. DigiCert C2PA Issuing CA)",
+        "intermediate_ca_der",
+        "c2pa_trust_list_root_der"
+      ]
+    },
+    "_comment": "PS256 is the dominant algorithm used by production C2PA signers (Adobe, OpenAI, Microsoft) because HSM fleets are already provisioned with RSA keys for traditional code signing."
+  }
+}

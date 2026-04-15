@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Example DDS-Security permissions document for a single SROS2 enclave
+  on an autonomous mobile robot. The whole file below (minus the
+  <Signature> element) is what the Permissions CA (RSA-2048) signs as
+  PKCS#7 detached; SROS2 ships the signed output as permissions.xml.p7s.
+
+  This specific enclave is the vision policy node: it publishes object
+  detections from a YOLO-style AI model and subscribes to the camera
+  driver's image topic.
+-->
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="http://www.omg.org/spec/DDS-SECURITY/20170901/omg_shared_ca_permissions.xsd">
+  <permissions>
+    <grant name="/perception/object_detector_grant">
+
+      <subject_name>CN=/perception/object_detector</subject_name>
+
+      <validity>
+        <not_before>2026-04-01T00:00:00</not_before>
+        <not_after>2027-04-01T00:00:00</not_after>
+      </validity>
+
+      <allow_rule>
+        <domains><id>0</id></domains>
+
+        <!-- Allowed to publish detection output topics -->
+        <publish>
+          <topics>
+            <topic>rt/perception/detections</topic>
+            <topic>rt/perception/tracked_objects</topic>
+            <topic>rt/perception/heatmap</topic>
+            <topic>rq/perception/object_detector/set_parameters*</topic>
+            <topic>rr/perception/object_detector/set_parameters*</topic>
+          </topics>
+        </publish>
+
+        <!-- Allowed to subscribe to camera, lidar, and clock -->
+        <subscribe>
+          <topics>
+            <topic>rt/sensors/camera_front/image_raw</topic>
+            <topic>rt/sensors/camera_front/camera_info</topic>
+            <topic>rt/sensors/lidar/points</topic>
+            <topic>rt/clock</topic>
+            <topic>rt/tf</topic>
+            <topic>rt/tf_static</topic>
+          </topics>
+        </subscribe>
+
+        <!-- AI model loading service endpoint (the node subscribes to
+             signed model updates pushed via /fleet/model_update topic,
+             which itself is signed by the fleet's permissions CA) -->
+        <subscribe>
+          <topics>
+            <topic>rt/fleet/model_update</topic>
+          </topics>
+        </subscribe>
+      </allow_rule>
+
+      <!-- Explicit deny: the vision node must never command motion -->
+      <deny_rule>
+        <domains><id>0</id></domains>
+        <publish>
+          <topics>
+            <topic>rt/cmd_vel</topic>
+            <topic>rt/cmd_vel_stamped</topic>
+            <topic>rt/motion/*</topic>
+            <topic>rt/safety/*</topic>
+          </topics>
+        </publish>
+      </deny_rule>
+
+      <default>DENY</default>
+    </grant>
+  </permissions>
+
+  <!--
+    Detached Signature appended on disk as permissions.xml.p7s.
+    Signed by the Permissions CA (RSA-2048) with SHA-256 digest in
+    PKCS#7 detached form. Every DDS-Security participant in the domain
+    verifies this signature on session establishment.
+
+    Forging this signature (via Permissions CA factoring) lets an
+    attacker issue any permissions — including replacing the deny_rule
+    above with an allow_rule granting publish access to /cmd_vel. That
+    single bit-flip in an authenticated way turns a legitimate vision
+    node into a motion-command source on a physical robot.
+  -->
+</dds>

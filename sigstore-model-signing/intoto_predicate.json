@@ -1,0 +1,92 @@
+{
+  "_comment": "Example SLSA v1.0 in-toto predicate for an LLM training run. This is the `predicate` embedded inside the in-toto Statement that is DSSE-signed (RSA-2048 via Fulcio leaf cert) and logged to Rekor.",
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "model-00001-of-00030.safetensors",
+      "digest": {"sha256": "3f8a2b1e4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6789abcdef01"}
+    },
+    {
+      "name": "model-00002-of-00030.safetensors",
+      "digest": {"sha256": "a1b2c3d4e5f6789abcdef0123456789abcdef0123456789abcdef0123456789a"}
+    },
+    {
+      "name": "config.json",
+      "digest": {"sha256": "112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00"}
+    },
+    {
+      "name": "tokenizer.json",
+      "digest": {"sha256": "bbccddeeff00112233445566778899aabbccddeeff00112233445566778899aa"}
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "predicate": {
+    "buildDefinition": {
+      "buildType": "https://slsa-framework.github.io/ml-frameworks/pytorch/v1",
+      "externalParameters": {
+        "modelArchitecture": "llama3.1-70b",
+        "trainingCodeRef": "git+https://github.com/acme-ai/training@v1.7.2",
+        "datasetRef": "gs://acme-ai-datasets/curated-v12@sha256:deadbeef...",
+        "hyperparameters": {
+          "optimizer": "AdamW",
+          "lr": 3e-4,
+          "batch_size": 4096,
+          "context_len": 8192,
+          "total_tokens": "15T"
+        }
+      },
+      "internalParameters": {
+        "torchVersion": "2.5.1",
+        "cudaVersion": "12.4",
+        "flashAttnVersion": "2.5.8"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "https://github.com/pytorch/pytorch",
+          "digest": {"sha256": "a3b4c5d6..."}
+        },
+        {
+          "uri": "oci://docker.io/nvidia/cuda:12.4.0-devel-ubuntu22.04",
+          "digest": {"sha256": "c7d8e9f0..."}
+        }
+      ]
+    },
+    "runDetails": {
+      "builder": {
+        "id": "https://acme-ai.example.com/training-clusters/h100-east-1",
+        "version": {
+          "gpu": "NVIDIA H100 SXM5 80GB",
+          "gpuCount": 4096,
+          "interconnect": "NVLink + NDR InfiniBand",
+          "clusterSerial": "CLUSTER-E1-0042"
+        }
+      },
+      "metadata": {
+        "invocationID": "run-20260310-01",
+        "startedOn": "2026-03-10T04:00:00Z",
+        "finishedOn": "2026-03-31T16:42:11Z"
+      },
+      "byproducts": [
+        {
+          "name": "training-loss-curve",
+          "uri": "gs://acme-ai-runs/20260310-01/loss.tfevents",
+          "digest": {"sha256": "e4f5a6b7..."}
+        },
+        {
+          "name": "eval-report",
+          "uri": "gs://acme-ai-runs/20260310-01/mmlu.json",
+          "digest": {"sha256": "f5a6b7c8..."}
+        }
+      ]
+    }
+  },
+  "_dsse_envelope_notes": {
+    "payloadType": "application/vnd.in-toto+json",
+    "signatures": [{
+      "keyid": "(empty for keyless Fulcio flow)",
+      "sig": "(base64 of RSA-PKCS1v15-SHA256 signature over DSSE PAE)",
+      "cert": "(Fulcio-issued RSA-2048 leaf X.509 with OIDC identity SAN)"
+    }],
+    "comment": "Signature algorithm in the Fulcio leaf is RSA-2048 PKCS#1 v1.5 with SHA-256 (RS256). Fulcio will issue ECDSA-P256 leaves on request, but the majority of production signers default to RSA because existing HSM fleets (and GitHub Actions OIDC + cosign defaults) are RSA-backed."
+  }
+}

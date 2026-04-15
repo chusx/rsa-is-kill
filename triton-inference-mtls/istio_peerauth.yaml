@@ -1,0 +1,85 @@
+# Istio PeerAuthentication + DestinationRule pinning mTLS for a Triton
+# inference service. In a typical production AI mesh, every pod running
+# a Triton sidecar gets an RSA-2048 workload cert issued by istiod /
+# Citadel; this config enforces that no plaintext traffic ever reaches
+# the Triton pod.
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: triton-strict-mtls
+  namespace: ml-serving
+spec:
+  selector:
+    matchLabels:
+      app: triton-inference
+  mtls:
+    mode: STRICT
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: triton-dr
+  namespace: ml-serving
+spec:
+  host: triton-inference.ml-serving.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL       # SPIFFE-style RSA mTLS between mesh workloads
+    connectionPool:
+      http:
+        h2UpgradePolicy: UPGRADE
+        maxRequestsPerConnection: 10000
+---
+# Authorization: which workloads may call which Triton models.
+# The principal comes from the SPIFFE ID in the RSA workload cert
+# (`spiffe://cluster.local/ns/<ns>/sa/<sa>`), which is the identity
+# claim that would be impersonable under an Istio root CA compromise.
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: triton-model-allowlist
+  namespace: ml-serving
+spec:
+  selector:
+    matchLabels:
+      app: triton-inference
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/ranking/sa/ranking-service
+      to:
+        - operation:
+            paths:
+              - /inference.GRPCInferenceService/ModelInfer
+            methods: ["POST"]
+      when:
+        - key: request.headers[triton-model]
+          values: ["ranking-dlrm", "ranking-twohead"]
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/search/sa/search-service
+      to:
+        - operation:
+            paths:
+              - /inference.GRPCInferenceService/ModelInfer
+      when:
+        - key: request.headers[triton-model]
+          values: ["query-embed-v3", "doc-embed-v3"]
+---
+# Workload cert rotation — Istio defaults to 24h cert lifetime, RSA-2048.
+# If the Istio root CA is ever factored, every mesh cert is simultaneously
+# forgeable and every Triton AuthorizationPolicy principal is impersonable.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-ca-config
+  namespace: istio-system
+data:
+  CA_CERT_ALG: "RSA"
+  CA_KEY_SIZE: "4096"           # root
+  WORKLOAD_KEY_SIZE: "2048"     # leaves
+  WORKLOAD_CERT_TTL: "24h"
