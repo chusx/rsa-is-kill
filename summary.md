@@ -1154,3 +1154,481 @@
 **Ranking**: Criticality=5, Exploitability=3, BlastRadius=4, Stealth=5, Recoverability=1.
 
 ### illumina-sequencer
+**Context**: Illumina NovaSeq/NextSeq sequencer reagent authentication + run signing under RSA-2048; >80% of global NGS capacity. Also used in dx-approved (IVD) platforms.
+**Red team (attack)**: Factor Illumina signing key; forge reagent auth (clone cartridges), or — worse — push malicious instrument FW that subtly alters base-calls in cancer dx / newborn screening. Clinical-result integrity collapses.
+**Blue team (defense/recovery)**: FDA-cleared IVD re-cert; firmware push via Illumina Connected Analytics.
+**Impact**:
+- $: Billions
+- Lives: Direct (dx errors)
+- Environment: None direct
+- Geopolitical: US-Illumina dominance; BGI/MGI (CN) gains
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### dscsa-pharma-serialization
+**Context**: DSCSA (US), EU FMD, China NMPA serialization; RSA-2048 in ATP EPCIS + GS1 signed events for unit-level pharmaceutical traceability. Operational since 2023-2024.
+**Red team (attack)**: Factor manufacturer/3PL signing key; forge serialization records enabling counterfeit distribution at wholesale — opioid fentanyl diversion or oncology-drug counterfeit at scale.
+**Blue team (defense/recovery)**: FDA + GS1 governance; CA rotation possible, trading-partner onboarding slow.
+**Impact**:
+- $: Low billions
+- Lives: Direct (counterfeit/adulterated drugs)
+- Environment: None direct
+- Geopolitical: Global pharma supply
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### hl7-direct-fhir
+**Context**: HL7 Direct Project + FHIR Bulk Data uses S/MIME (RSA-2048) for clinical-document exchange between EHRs/HIEs; ONC DirectTrust anchors. ~90% US hospitals.
+**Red team (attack)**: Factor DirectTrust bundle or HIE CA; forge C-CDA/FHIR messages — alter lab results, prescriptions at scale. Patient-safety events.
+**Blue team (defense/recovery)**: ONC rule for PQ; DirectTrust roots rotatable. Multi-year industry project.
+**Impact**:
+- $: Low billions
+- Lives: Direct (wrong meds/dx)
+- Environment: None direct
+- Geopolitical: US healthcare
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### dicom-medical-imaging
+**Context**: DICOM structured-report signing + TLS for PACS/VNA uses RSA-2048 (GE, Philips, Siemens Healthineers, Canon Medical, Fujifilm); every hospital radiology.
+**Red team (attack)**: Factor hospital/vendor CA; tamper radiology reports or images — missed tumors or false positives at scale.
+**Blue team (defense/recovery)**: DICOM WG-14 PQ profile; hospital-by-hospital.
+**Impact**:
+- $: Low billions
+- Lives: Direct (missed dx)
+- Environment: None direct
+- Geopolitical: Global
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### vaccine-coldchain-iot
+**Context**: WHO + CDC + Sanofi/Pfizer cold-chain IoT sensors (Sensitech, Elpro) sign temperature logs with RSA-2048; vaccine integrity evidence.
+**Red team (attack)**: Factor sensor-vendor CA; forge temperature logs, conceal excursions — release spoiled vaccine doses.
+**Blue team (defense/recovery)**: Sensor fleet upgrade possible. WHO/CDC oversight.
+**Impact**:
+- $: Low billions
+- Lives: Direct (spoiled vaccines → outbreak)
+- Environment: None direct
+- Geopolitical: Global health
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### bloodbank-iso-udi
+**Context**: ISBT 128 blood-unit + ISO UDI with RSA-2048 signing for donor/component traceability at AABB member blood banks; global.
+**Red team (attack)**: Factor signing authority; forge donor screening records or divert contaminated units. Transfusion-transmitted infection events.
+**Blue team (defense/recovery)**: AABB + ICCBBA; slow but possible.
+**Impact**:
+- $: Low billions
+- Lives: Direct (transfusion infections)
+- Environment: None direct
+- Geopolitical: Global
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### thermofisher-massspec
+**Context**: Thermo Fisher, Agilent, Waters, Shimadzu mass-spec + chromatography instruments sign methods + audit trails under RSA-2048 for GxP (21 CFR Part 11) regulated labs.
+**Red team (attack)**: Factor instrument FW key; tamper QC/raw data, defeat 21 CFR Part 11 compliance at pharma/biotech.
+**Blue team (defense/recovery)**: FDA reauthorization; fleet upgrade.
+**Impact**:
+- $: Low billions
+- Lives: Indirect (drug QA)
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=4, Recoverability=3.
+
+### breathalyzer-dui
+**Context**: Intoxilyzer/Draeger evidentiary breathalyzers sign result records with RSA-2048 for court-admissible chain of custody.
+**Red team (attack)**: Factor vendor key; forge/invalidate DUI test records — defense attorneys can challenge every conviction.
+**Blue team (defense/recovery)**: Vendor key rotation; state-by-state re-certification.
+**Impact**:
+- $: Low millions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=1, Exploitability=3, BlastRadius=1, Stealth=2, Recoverability=4.
+
+### hid-osdp-seos
+**Context**: HID SEOS credentials + OSDP v2 (physical-access control) use RSA-2048 (with ECC option) for credential PKI; hundreds of millions of credentials at enterprise/gov/military sites.
+**Red team (attack)**: Factor HID/integrator CA; clone credentials for any building's access control — physical access to datacenters, labs, military bases.
+**Blue team (defense/recovery)**: HID SEOS roadmap; credential reissuance ~3yr cycle.
+**Impact**:
+- $: Low billions
+- Lives: Indirect (physical intrusion)
+- Environment: None direct
+- Geopolitical: Espionage capability
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### assa-abloy-hotel
+**Context**: ASSA ABLOY/VingCard + dormakaba/Saflok hotel mobile-key + mobile-issuance uses RSA-2048 in authorization tokens; millions of hotel rooms (2024 Saflok/Dormakaba unsaflok CVE fresh memory).
+**Red team (attack)**: Factor property CA; master-key any chain-wide lock set.
+**Blue team (defense/recovery)**: OEM keyset update; door-by-door FW. Known to be slow (unsaflok still running).
+**Impact**:
+- $: Low billions
+- Lives: Indirect (room intrusions)
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### axon-bodycam-evidence
+**Context**: Axon Body-Worn Cameras + Evidence.com + Motorola WatchGuard sign video evidence with RSA-2048 for court chain-of-custody. US LE dominant.
+**Red team (attack)**: Factor evidence-signing key; alter or forge bodycam evidence, compromise prosecutions.
+**Blue team (defense/recovery)**: Axon controls SaaS key; rotation fast but historic evidence at risk.
+**Impact**:
+- $: Low billions (litigation + case challenges)
+- Lives: Indirect (justice system)
+- Environment: None direct
+- Geopolitical: US LE credibility
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=3.
+
+### voting-machine-signing
+**Context**: ES&S, Dominion, Hart InterCivic voting systems sign ballot definitions + result cartridges with RSA-2048 under EAC/VVSG. ~175M US registered voters.
+**Red team (attack)**: Factor vendor/county CA; forge result cartridges — but post-2020 risk-limiting audits + paper-ballot reconciliation mitigate substantially. Still: public trust in elections.
+**Blue team (defense/recovery)**: EAC + CISA coordination; hand-count backstop.
+**Impact**:
+- $: Low billions
+- Lives: Indirect (civic)
+- Environment: None direct
+- Geopolitical: US election legitimacy
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### gaming-gli33
+**Context**: GLI-33 compliance for online gaming (sportsbook/casino) requires signed RNG outcomes + jackpot integrity under RSA-2048; DraftKings, FanDuel, BetMGM, EU Tipico.
+**Red team (attack)**: Factor operator signing; forge jackpot events or manipulate bet-slip records.
+**Blue team (defense/recovery)**: Gaming regulator re-cert; operator rotation.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### lottery-terminal
+**Context**: IGT/Scientific Games/Intralot lottery terminals sign wager transactions + jackpot claims under RSA-2048; multi-state US + global.
+**Red team (attack)**: Factor vendor/state CA; forge jackpot claims. Hot Lotto-style fraud reborn.
+**Blue team (defense/recovery)**: State lottery commissions; vendor rotation.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### c2pa-content-credentials
+**Context**: C2PA Content Credentials (Adobe, Microsoft, BBC, Sony, Canon, Nikon) sign media provenance with RSA-2048/ECDSA; post-2024 push against deepfakes.
+**Red team (attack)**: Factor camera-OEM or C2PA CA; forge "authentic" provenance on deepfake media. Informational-integrity crisis.
+**Blue team (defense/recovery)**: C2PA is designed for rotating trust lists; rollout still early so ecosystem can pivot.
+**Impact**:
+- $: Low billions
+- Lives: Indirect (disinformation-incited)
+- Environment: None direct
+- Geopolitical: Information-war sovereignty
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=4.
+
+### axis-onvif-video
+**Context**: ONVIF Profile-T + Axis/Bosch/Hikvision/Dahua cameras use RSA-2048 for device certs + firmware signing; ~1B IP cameras globally.
+**Red team (attack)**: Factor OEM CA; impersonate cameras in VMS, suppress evidence, or push malicious FW for botnets (Mirai-class but signed).
+**Blue team (defense/recovery)**: ONVIF WG PQ; fleet FW update possible.
+**Impact**:
+- $: Low billions
+- Lives: Indirect
+- Environment: None direct
+- Geopolitical: CN camera vendors (Hikvision/Dahua) banned in US/UK
+**Ranking**: Criticality=3, Exploitability=4, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### digital-cinema-dci
+**Context**: DCI Digital Cinema KDMs (Key Delivery Messages) use RSA-2048 to deliver CPL keys to cinema projectors (Christie, Barco, NEC); every commercial-release film.
+**Red team (attack)**: Factor studio or projector CA; mint KDMs to decrypt pre-release content → mass piracy of tentpole releases.
+**Blue team (defense/recovery)**: SMPTE + DCI updating specs; projector fleet update possible.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Hollywood piracy
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### smpte-dcp-kdm
+**Context**: Same scope as above; DCP packaging + KDM distribution via Deluxe, Technicolor.
+**Ranking**: Same as dci.
+
+### hdcp-2x-display
+**Context**: HDCP 2.x uses RSA-3072 for LLC authentication; every 4K/8K HDMI-protected display, game console, streaming device.
+**Red team (attack)**: Factor DCP LLC RSA root — arbitrary receiver cert generation, universal HDCP bypass. Mass piracy of premium streaming, Netflix/Disney+/Apple TV+ 4K content.
+**Blue team (defense/recovery)**: DCP LLC cannot rotate silicon root easily; HDCP 3 PQ in discussion.
+**Impact**:
+- $: Tens of billions (streaming piracy)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Hollywood/streaming
+**Ranking**: Criticality=3, Exploitability=4, BlastRadius=4, Stealth=3, Recoverability=2.
+
+### iata-bcbp-boarding
+**Context**: IATA BCBP 3.0 boarding-pass signatures use RSA-2048 under IATA/airline CA; ~5B passengers/year.
+**Red team (attack)**: Factor airline key; forge boarding passes evading TSA/airport security.
+**Blue team (defense/recovery)**: IATA rotates, but airlines drag. TSA mitigates with additional factors.
+**Impact**:
+- $: Low billions
+- Lives: Indirect (security circumvention)
+- Environment: None direct
+- Geopolitical: Global aviation
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### epassport-icao
+**Context**: ICAO Doc 9303 ePassport Document Signer Certificates (CSCA/DSC) with RSA-2048/3072 for every passport issued post-2006. ~1B active passports.
+**Red team (attack)**: Factor country CSCA (PKD-published); forge authentic ePassport chips for any identity, defeat border eMRTD verification. Espionage + mass immigration fraud.
+**Blue team (defense/recovery)**: ICAO NTWG has PQ in 9303 v9 draft; CSCA rotation + re-issuance of 1B passports 10yr cycle.
+**Impact**:
+- $: Tens of billions
+- Lives: Indirect (border-security, terrorism)
+- Environment: None direct
+- Geopolitical: Border-control sovereignty; state actors gain clandestine travel
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=4, Stealth=5, Recoverability=2.
+
+### icao-epassport-ds
+**Context**: Companion example to above — document-signer issuance path.
+**Ranking**: Same as above.
+
+### eap-tls-wifi
+**Context**: Enterprise Wi-Fi 802.1X EAP-TLS uses RSA-2048 server + client certs via FreeRADIUS/Cisco ISE/Aruba ClearPass; every enterprise + university.
+**Red team (attack)**: Factor enterprise CA; impersonate Wi-Fi infrastructure or issue client certs — device onboarding and MitM.
+**Blue team (defense/recovery)**: Enterprise CA rotation (ADCS dependency per above); client re-enroll.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=3, Exploitability=4, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### ipsec-ikev2-libreswan
+**Context**: IPsec IKEv2 with RSA-signed auth via Libreswan/strongSwan/Cisco ASA/Fortinet/Palo Alto — every enterprise site-to-site VPN, mobile VPN, cloud VPN gateway.
+**Red team (attack)**: Factor VPN CA; impersonate VPN peer, decrypt mass site-to-site traffic via active MitM.
+**Blue team (defense/recovery)**: IPsec PQ RFCs (9242 hybrid, ML-KEM in progress); gateway fleet update multi-year.
+**Impact**:
+- $: Tens of billions (enterprise data)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: VPN-based sovereign communications
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=5, Recoverability=3.
+
+### strongswan
+**Context**: strongSwan reference IPsec stack; identical threat surface to libreswan, plus used in many embedded/OT gateways.
+**Ranking**: Same as ipsec-ikev2-libreswan.
+
+### openvpn
+**Context**: OpenVPN TLS handshake with RSA-2048/4096; ~50M users + thousands of enterprise installs.
+**Red team (attack)**: Factor VPN CA; MitM or impersonate server, decrypt historical captures (no PFS in default configs pre-TLS 1.3).
+**Blue team (defense/recovery)**: OpenVPN 2.7 + hybrid PQ in tree; admin reissue.
+**Impact**:
+- $: Low billions
+- Lives: Indirect (activists, journalists)
+- Environment: None direct
+- Geopolitical: VPN-circumvention tooling
+**Ranking**: Criticality=3, Exploitability=4, BlastRadius=3, Stealth=5, Recoverability=3.
+
+### tor
+**Context**: Tor uses RSA-1024 legacy relay ID keys (v2 — deprecated) + Ed25519 (v3) for onion services; current mainline is Ed25519 so RSA is legacy risk only.
+**Red team (attack)**: Factor old v2 hidden-service keys → retroactive deanonymization of historic v2 services. v3 unaffected.
+**Blue team (defense/recovery)**: v2 already disabled (2021); residual risk only.
+**Impact**:
+- $: None direct
+- Lives: Direct (dissidents, sources deanonymized retroactively)
+- Environment: None direct
+- Geopolitical: Authoritarian-regime activism
+**Ranking**: Criticality=2, Exploitability=4, BlastRadius=2, Stealth=5, Recoverability=5.
+
+### apache-santuario
+**Context**: Apache Santuario = the Java/C++ XMLDSig/XMLEnc library under nearly every SAML IdP/SP, government e-filing, and ebXML/HL7 CDA signing. RSA-2048 dominant.
+**Red team (attack)**: XMLDSig + factored key = forge any signed XML (tax returns, customs declarations, SAML, ebXML invoices). Government document-integrity collapse.
+**Blue team (defense/recovery)**: Library supports ML-DSA once signatures of XMLDSig 2.0 are ratified; integrator rollout slow.
+**Impact**:
+- $: Tens of billions (government revenue fraud)
+- Lives: Indirect
+- Environment: None direct
+- Geopolitical: Every digital-government program affected
+**Ranking**: Criticality=4, Exploitability=5, BlastRadius=4, Stealth=4, Recoverability=3.
+
+### pdf-itext
+**Context**: iText + Adobe PDF SDK sign PDFs (CAdES, PAdES, EUTL); legal/contract/government docs. RSA-2048/3072 dominant.
+**Red team (attack)**: Factor signer CA; forge signed contracts, invoices, qualified electronic signatures (eIDAS). Legal-evidentiary chaos.
+**Blue team (defense/recovery)**: EU QTSPs + eIDAS 2.0 PQ; Adobe/iText roadmap.
+**Impact**:
+- $: Tens of billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: EU digital-identity (EUDI Wallet) sovereignty
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=3.
+
+### xmlsec1-xmldsig
+**Context**: xmlsec1 (C library) underlies many OSS SAML/XMLDSig tools including Shibboleth, SimpleSAMLphp, eHerkenning (NL).
+**Ranking**: Same severity as apache-santuario.
+
+### ipaws-cap-alerts
+**Context**: FEMA IPAWS / CAP 1.2 uses RSA-2048 for Wireless Emergency Alerts + EAS authority signing; all US emergency alerts.
+**Red team (attack)**: Factor IPAWS signing CA; push forged EAS (e.g., ballistic missile — Hawaii 2018 but adversarial) to millions of phones/TVs.
+**Blue team (defense/recovery)**: FEMA rotate; broadcaster/carrier update. Incident-level remediation.
+**Impact**:
+- $: Low billions
+- Lives: Direct (panic casualties)
+- Environment: None direct
+- Geopolitical: US civil-defense credibility
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### weather-nws-nexrad
+**Context**: NWS NEXRAD + NOAA data signing uses RSA-2048 for AWIPS/IRIS products; aviation/emergency depend on signed forecasts.
+**Red team (attack)**: Factor NOAA CA; forge weather products — false tornado warnings, or worse, suppress real ones.
+**Blue team (defense/recovery)**: NOAA PKI rotation; consumer update.
+**Impact**:
+- $: Low billions
+- Lives: Direct (severe-weather deaths)
+- Environment: None direct
+- Geopolitical: NOAA credibility
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=4.
+
+### mastodon-activitypub
+**Context**: Mastodon/Fediverse HTTP-Signatures over RSA-2048; ~10M fediverse users + hundreds of instances.
+**Red team (attack)**: Factor instance actor keys; impersonate moderators, inject bogus federated content; trust is per-instance so blast radius is contained.
+**Blue team (defense/recovery)**: Admins rotate keys; users re-federate.
+**Impact**:
+- $: Negligible
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Minor
+**Ranking**: Criticality=2, Exploitability=5, BlastRadius=2, Stealth=2, Recoverability=5.
+
+### libgcrypt
+**Context**: libgcrypt is the GnuPG-foundation crypto library used by GnuPG, GNOME Keyring, libreswan, APT, many Linux daemons; RSA-2048/4096 heavily relied upon.
+**Red team (attack)**: Library break = library-wide factoring oracle; every library client inherits the break. Not a crypto-key compromise per se but an ecosystem dependency signal.
+**Blue team (defense/recovery)**: GnuPG team ships ML-KEM/ML-DSA; Linux distros roll out.
+**Impact**:
+- $: Tens of billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Linux/OSS commons
+**Ranking**: Criticality=3, Exploitability=5, BlastRadius=4, Stealth=3, Recoverability=3.
+
+### libp2p-peer-id
+**Context**: libp2p peer-id can be RSA-2048-derived; IPFS, Filecoin, Ethereum execution-layer light clients. Modern peers default Ed25519 but many historical peers RSA.
+**Red team (attack)**: Factor peer-id RSA key; impersonate peer, Sybil attacks, content-provider spoofing on IPFS.
+**Blue team (defense/recovery)**: libp2p moved Ed25519 default; migrate incentivized.
+**Impact**:
+- $: Low billions (web3 ecosystem)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Low
+**Ranking**: Criticality=2, Exploitability=4, BlastRadius=2, Stealth=3, Recoverability=5.
+
+### cisco-ios-pki
+**Context**: Cisco IOS/IOS-XE/NX-OS internal PKI for certificate-based device auth, EEM, MACsec, SSH with RSA-2048 host keys; billions of enterprise/carrier ports.
+**Red team (attack)**: Factor Cisco PKI CA + host keys; impersonate devices in routing trust, decrypt historic SSH/MACsec captures.
+**Blue team (defense/recovery)**: IOS-XE 17+ supports ECDSA/Ed25519; fleet SSH-key rotation feasible but manual.
+**Impact**:
+- $: Tens of billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: US-Cisco infrastructure dominance
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=5, Recoverability=3.
+
+### postgresql-ssl
+**Context**: PostgreSQL TLS client/server auth with RSA-2048; ~millions of production databases including many banks, healthcare, SaaS.
+**Red team (attack)**: Factor DB CA; impersonate DB server, MitM credentials/data.
+**Blue team (defense/recovery)**: Postgres 17+ ECC default; rotate.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=3, Exploitability=4, BlastRadius=3, Stealth=4, Recoverability=4.
+
+### ntp-autokey
+**Context**: NTP Autokey (RFC 5906) used RSA-1024/2048; largely deprecated in favor of NTS. Residual deployments in OT.
+**Red team (attack)**: Factor keys; time-shift victims triggering TOTP/HSTS/certificate-validation edge cases.
+**Blue team (defense/recovery)**: NTS migration; Autokey sunset.
+**Impact**:
+- $: Negligible
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=1, Exploitability=4, BlastRadius=1, Stealth=3, Recoverability=5.
+
+### flexlm-license
+**Context**: FlexNet/FlexLM license managers for EDA (Cadence, Synopsys, Ansys, MathWorks MATLAB), CAD (Autodesk) use RSA-2048 for license-file signing.
+**Red team (attack)**: Factor publisher key; mint unlimited licenses → massive piracy wave across semiconductor/engineering.
+**Blue team (defense/recovery)**: Flexera + publishers rotate keys; customer re-licensing. Commercial impact high.
+**Impact**:
+- $: Tens of billions (publisher revenue)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: CN design ecosystem already under US EDA export controls — would benefit
+**Ranking**: Criticality=2, Exploitability=4, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### asml-reticle-fab
+**Context**: ASML EUV reticle-authentication + tool-recipe signing under RSA-2048 inside wafer-fab lithography; TSMC, Samsung, Intel; strategic-export-controlled.
+**Red team (attack)**: Factor ASML signing key; push malicious tool recipes subtly degrading yield at fab scale; or unlock export-restricted capability on sanctioned-customer tools. State-level strategic payoff.
+**Blue team (defense/recovery)**: ASML + customer re-cert slow; export-control wrappers are external.
+**Impact**:
+- $: Tens of billions (fab yield)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Sanctions-evasion + semiconductor-war geometry (NL-ASML, US, TW, KR, CN)
+**Ranking**: Criticality=4, Exploitability=2, BlastRadius=4, Stealth=5, Recoverability=2.
+
+### fuel-forecourt-epp
+**Context**: EPS/Gilbarco/Wayne fuel forecourt protocols (IFSF, EPP) use RSA-2048 in card-reader key-loading + dispenser authentication; ~1M US dispensers + global.
+**Red team (attack)**: Factor vendor key; clone dispenser creds, harvest skimmed card PANs, or override price/inventory.
+**Blue team (defense/recovery)**: PCI + vendor rotation; dispenser visits.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: Fuel-theft enablement
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### racing-chip-timing
+**Context**: RFID race-timing (MYLAPS, ChronoTrack) signs race results with RSA; triathlon/marathon/motorsport podium integrity.
+**Red team (attack)**: Factor timing-vendor key; forge results, alter placings.
+**Blue team (defense/recovery)**: Vendor rotation.
+**Impact**:
+- $: Negligible
+- Lives: None
+- Environment: None
+- Geopolitical: None
+**Ranking**: Criticality=1, Exploitability=3, BlastRadius=1, Stealth=2, Recoverability=5.
+
+### themepark-ride-safety
+**Context**: Disney/Universal/Six Flags PLC + ride-control FW signing under RSA-2048 per ASTM F24 + TÜV.
+**Red team (attack)**: Factor OEM FW key; subtly alter brake-zone logic on coasters — ride fatality.
+**Blue team (defense/recovery)**: TÜV/ASTM re-cert; ride downtime during FW rotation.
+**Impact**:
+- $: Low billions (park shutdown)
+- Lives: Direct (ride fatalities)
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=3, Exploitability=2, BlastRadius=2, Stealth=3, Recoverability=3.
+
+### triton-inference-mtls
+**Context**: NVIDIA Triton Inference + cloud model-serving mTLS with RSA-2048; enterprise AI serving.
+**Red team (attack)**: Factor model-serving CA; exfiltrate inputs/outputs or replace model with adversarial.
+**Blue team (defense/recovery)**: Ops-team rotate.
+**Impact**:
+- $: Low billions
+- Lives: Indirect (clinical-AI)
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=4, BlastRadius=2, Stealth=4, Recoverability=4.
+
+### onnx-model-signing
+**Context**: ONNX model artifact signing via RSA-2048 for ML supply-chain; Microsoft/Meta/Nvidia toolchains.
+**Red team (attack)**: Factor publisher key; push backdoored models into enterprise inference — silent prediction manipulation.
+**Blue team (defense/recovery)**: sigstore migration underway.
+**Impact**:
+- $: Low billions
+- Lives: Indirect
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=4, Recoverability=4.
+
+### xmpp-s2s-tls
+**Context**: XMPP s2s federation TLS with RSA-2048; enterprise messaging (Cisco Jabber, historical Google Talk), WhatsApp infra partially.
+**Red team (attack)**: Factor server CA; decrypt federated traffic.
+**Blue team (defense/recovery)**: Operators rotate; ecosystem small.
+**Impact**:
+- $: Negligible
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Minor
+**Ranking**: Criticality=1, Exploitability=4, BlastRadius=1, Stealth=4, Recoverability=5.
+
+
