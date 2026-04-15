@@ -1632,3 +1632,69 @@
 **Ranking**: Criticality=1, Exploitability=4, BlastRadius=1, Stealth=4, Recoverability=5.
 
 
+---
+
+## Aggregate ranking
+
+Composite = Criticality + Exploitability + BlastRadius + Stealth + (6 − Recoverability).
+The Recoverability term is inverted so all five axes read "5 = worst" on the composite (since in the per-entry blocks I scored Recoverability as "5 = easy, 1 = impossible").  Max composite = 25.
+
+### Tier S — civilization-level (composite 24–25)
+
+| System | C | E | B | S | R | Composite |
+|---|---|---|---|---|---|---|
+| arm-trustzone-tfa | 5 | 5 | 5 | 5 | 1 | 25 |
+| android-avb | 5 | 5 | 5 | 5 | 1 | 25 |
+| hsm-firmware-signing | 5 | 5 | 5 | 5 | 1 | 25 |
+| adcs-windows | 5 | 5 | 5 | 5 | 1 | 25 |
+| autosar-ecu-hsm | 5 | 4 | 5 | 5 | 1 | 24 |
+| iec62443-dtls-ot | 5 | 4 | 5 | 5 | 1 | 24 |
+| siemens-s7-tia | 5 | 4 | 5 | 5 | 1 | 24 |
+| iec62351-substation | 5 | 4 | 5 | 5 | 1 | 24 |
+| ami-dlms-cosem | 5 | 4 | 5 | 4 | 1 | 23 |
+| refinery-sis-iec61511 | 5 | 3 | 4 | 5 | 1 | 22 |
+
+### Tier A — severe multi-sector (composite 21–23)
+
+nuclear-iec61513 (23) · oilrig-bop-mux (23) · medical-device-fda (23) · avionics-arinc665 (23) · pipeline-api1164 (23) · shim-uefi (23) · authenticode-pe (23) · dnp3-scada (22) · swift-financial (22) · medtronic-cied (22) · submarine-cable-slte (22) · aerospace-ccsds (22) · piv-cac-smartcard (22) · iso15118-ev-charging (22) · evse-iso15118-pnc (22) · john-deere-agtech (21) · hydrodam-scada (21) · iaea-safeguards (21) · acars-cpdlc-datalink (21) · water-wima-scada (21) · emv-payment-cards (21) · sap-netweaver-sso (22) · ibm-icsf-mainframe (22) · windows-dpapi (23) · kubernetes-kubeadm (22) · aws-iot-device-certs (22) · esim-gsma (22) · pkcs11-softhsm (22) · tpm2-rsa-ek (22) · ipsec-ikev2-libreswan (20) · strongswan (20)
+
+### Tier B — broad but less existential (composite 18–20)
+
+apache-santuario (19) · pdf-itext (19) · xmlsec1-xmldsig (19) · cisco-ios-pki (19) · rpm-gpg-signing (22) · debian-apt-signing (22) · gnupg (22) · openssh-host-keys (20) · git-signed-commits (20) · openjdk-jarsigner (20) · uboot-secure-boot (22) · vestas-wind-turbine (20) · fanuc-robot (19) · railway-ertms (19) · us-ptc-railway (19) · cbtc-subway (19) · p25-otar-radio (18) · link16-mids (17) · gmdss-inmarsat (19) · iho-s63-ecdis (18) · epassport-icao (21) · icao-epassport-ds (21) · fido2-webauthn (20) · scep-mdm (21) · vault-pki (20) · nss-firefox (20) · acme-lets-encrypt (19) · rpki-routinator (20) · dnssec-bind9 (19) · kerberos-pkinit (20) · saml-ruby (19) · jwt-libjwt (19) · samba-netlogon (21) · opc-ua (18) · dicom-medical-imaging (18) · illumina-sequencer (18) · dscsa-pharma-serialization (18) · hl7-direct-fhir (17) · vaccine-coldchain-iot (17) · bloodbank-iso-udi (17) · hid-osdp-seos (18) · assa-abloy-hotel (16) · otis-elevator (18) · spacex-autonomous-fts (18) · ski-lift-doppelmayr (15) · themepark-ride-safety (16) · nvidia-gpu-attestation (19) · intel-sgx-signing (19) · intel-tdx-quote (19) · coco-attestation (17) · azure-attestation-jwt (22) · asml-reticle-fab (18) · hdcp-2x-display (19) · dvb-ci-pay-tv (14) · digital-cinema-dci (14) · smpte-dcp-kdm (14) · ipaws-cap-alerts (17) · weather-nws-nexrad (16) · atsc3-broadcast (16) · faa-remote-id (14) · iata-bcbp-boarding (17) · galileo-osnma (15) · digital-tachograph-eu (16) · eu-tachograph-dtco (16) · insurance-telematics-ubi (13) · komatsu-autonomous-mining (16) · axis-onvif-video (17) · cyrus-imap (18) · openldap-tls (18) · postfix-smtp-tls (19) · opendkim (18) · smime-email (19) · fix-cme-exchange (21) · pos-pci-pts (19) · hbci-fints-banking (16) · atm-xfs-firmware (20) · docsis-bpi-cable (15) · cbrs-sas-spectrum (15) · etc-tolling (14) · libgcrypt (20) · eap-tls-wifi (18) · postgresql-ssl (17) · rfc3161-tsa-timestamp (20) · gaming-gli33 (13) · voting-machine-signing (16) · docker-notary-tuf (19) · huggingface-commit-signing (18) · sigstore-model-signing (14) · openvpn (18) · gnupg-openpgp-card (19) · fuel-forecourt-epp (13) · thermofisher-massspec (13) · nuclear-iec62645 (15) · c2pa-content-credentials (15) · triton-inference-mtls (13) · onnx-model-signing (13) · ros2-sros2-dds (15) · osisoft-pi-historian (16) · flexlm-license (15) · axon-bodycam-evidence (13) · breathalyzer-dui (10) · lottery-terminal (13)
+
+### Tier C — low or bounded (composite ≤13)
+
+tor (8 — v3 unaffected; v2 legacy only) · ntp-autokey (8 — deprecated) · mastodon-activitypub (9) · xmpp-s2s-tls (8) · libp2p-peer-id (10) · racing-chip-timing (8)
+
+---
+
+## Top-5 prose synthesis
+
+### 1. ARM Trusted Firmware-A + Android Verified Boot + HSM-vendor firmware signing + ADCS (Tier S)
+These four are tied at composite 25 and share one pathology: **the public verification key is fused into ROM or baked into trust anchors that cannot be rotated without physical replacement**. ARM TF-A determines what every Cortex-A SoC will boot; AVB gates every Android userspace; HSM firmware roots define what the enterprise crypto fabric will load; ADCS is the default enterprise PKI inside every Windows domain. A polynomial factoring algorithm is not just a key-theft event but a *silicon-refresh and PKI-rebuild event* on a multi-year, multi-trillion-dollar timescale. AWS Graviton fleets, every Pixel/Samsung/Xiaomi user, every bank with a Thales/Entrust/Utimaco HSM, and every AD-joined enterprise are forced into a simultaneous hardware-refresh cycle. Adversary doesn't need insider access — the public keys are literally published in chip datasheets, device teardowns, Microsoft's TechNet, and HSM vendor Firmware Update Bulletins. Stealth is maximal because the break forges valid signatures indistinguishable from legitimate ones; detection requires out-of-band attestation which itself relies on the broken crypto.
+
+### 2. AUTOSAR ECU HSM + IEC 62443 OT + Siemens S7 + IEC 62351 substation (Tier S, 24)
+All four are the **cryptographic gate on safety-affecting OT**: ~100M new vehicles per year with signed ECU firmware, process-plant DCS/SIS signatures at every Fortune 500 industrial site, S7-1500 PLCs controlling everything from pharma-line sterilization to municipal water, and IEC 61850 GOOSE/SV messages trip-coordinating every transmission substation. The red-team payoff is not fraud but **controllable unsafe behavior** at civilian-casualty scale: Stuxnet generalized to every Siemens PLC, brake/steering manipulation across a manufacturer's fleet, Ukraine-grid-attack 2015 across every transmission grid. Recoverability=1 because device firmware ROM keys are unrotatable and IEC/ISO safety re-certification cycles measured in years apply; a polynomial factoring announcement triggers *regulatory-shutdown* conditions (BSEE, NRC, PHMSA, FMCSA, CAA-EASA) before replacement silicon exists. This is the cluster most likely to produce *kinetic mass-casualty* events if not preempted.
+
+### 3. Nuclear I&C (IEC 61513), oil-rig BOP/MUX, medical-device FDA, airframe ARINC 665, pipeline API 1164 (Tier A, 23)
+The "strategic safety-critical signing" group: each combines **regulator-approved cryptographic assurance as license basis** with **mass-casualty consequences on failure**. Red-team attack is harder (Exploitability=3: it requires the factored key to be plausibly distributable to the compromised facility, and regulatory airgaps add friction), but the impact is asymmetric — a single successful attack is Macondo, Bhopal, Lion Air, Northstar 1, or a regulator-forced fleet shutdown. Each sector has already begun PQ roadmap scoping (BSEE 30 CFR 250.734, FAA DO-326A/356A, FDA 524B, PHMSA SD-02C, NRC RG 1.152 Rev 4) but **license-basis cryptographic changes are measured in years per plant / type / field**. The polynomial-factoring scenario collapses all these timelines into a simultaneous emergency; the realistic defensive posture is *operating restriction + manual reverification*, which in aggregate is measured in tens of billions of dollars of lost operating days.
+
+### 4. Microsoft Authenticode + Shim UEFI + Windows DPAPI (Tier A, 23)
+The **Windows endpoint chain of trust**: driver-loading, Secure Boot, and stored-credential protection. A polynomial factoring algorithm yields kernel-level persistence (Authenticode), pre-OS persistence (shim), and retroactive decryption of every BitLocker recovery key, browser password, and DPAPI-protected credential ever sealed against a factored DPAPI backup key. Stealth=5 because Microsoft's telemetry itself trusts the broken crypto; Exploitability=5 because the verification roots are on every Windows box by design. Microsoft has a PQ roadmap (SymCrypt ML-DSA/ML-KEM) but legacy-signed driver ecosystem inertia makes revocation a CRL-distribution problem at planetary scale. This is the practical "every Windows machine is now hostile" scenario.
+
+### 5. SWIFT + IBM ICSF + EMV + SAP NetWeaver + ADCS (Tier A, 21-23, financial-system cluster)
+The **financial-system-of-record cluster**: SWIFT messages ~$150T/year; IBM Crypto Express wraps 80% of global-bank core keys; EMV mints ~5B payment cards; SAP is the system of record for most Fortune-500 revenue and most G20 ministries. A polynomial factoring algorithm does not collapse fraud-detection (operational controls persist), but it does collapse the **authenticity-of-record** property on which the entire interbank/ledger/invoicing/payroll fabric is premised. Blue-team recovery is a rail-by-rail, HSM-by-HSM, card-by-card reissuance measured in tens of billions of dollars of industry spend and years of elevated fraud. Geopolitically, sanctioned actors (RU/IR/DPRK) and peer-competitor blocs (CN) are the disproportionate beneficiaries because the incumbent US/EU-dominated rails are the ones with the most exposed RSA dependency.
+
+---
+
+## Cross-cutting observations
+
+1. **Recoverability, not Exploitability, is the dominant axis.** Many systems have Exploitability=5 (public key, trivially broken) but Recoverability=4-5 (fix is a config rotation). The civilization-scale risks concentrate where Recoverability=1 — ROM fuses, regulator-approved license basis, physical replacement of implanted devices, multi-trillion-dollar HSM refresh.
+
+2. **"Classical-only" narrows the blast radius from the Shor scenario but does not make it small.** Because this threat model preserves ECDSA/Ed25519/ECDH, systems that had already migrated (modern TLS with ECDHE, mTLS with Ed25519, FIDO2 attestation in per-credential keys, PQ-ready mesh) survive. The exposure is overwhelmingly concentrated in *administrative signing* paths: regulator-mandated signed artefacts, firmware chains of trust, enterprise PKI roots, and silicon-fused device-identity roots — paths that moved slowest because of compliance gravity.
+
+3. **Harvest-now-decrypt-now (HNDN) is not the primary concern** for this threat model. Because ECDH is intact in modern handshakes, most modern TLS traffic is confidentiality-forward-secure against this adversary. The painful HNDN cases are the ones still using RSA key-transport (TLS 1.2 non-ECDHE, legacy S/MIME, historical OpenVPN, EMV offline auth, static-RSA smartcard readers) and the forgery-of-history cases (Tor v2 descriptors, evidence chains with historic RSA timestamps, archived RSA-signed legal documents).
+
+4. **The worst-case attacker is not the ransomware crew.** The attacker-value gradient runs: ransomware (pick off ATMs, lottery, hotel locks) → organized fraud (SWIFT, EMV, tax/customs e-filing) → state SIGINT (ePassport, PIV/CAC, PKI roots, VPN CAs) → strategic state actor (safety-I&C, BOP, SIS, avionics, grid). Tier-S/A systems are strategic-state-actor-grade targets, consistent with the observed investment in long-term cryptanalysis by the same actors.
+
+5. **PQ migration completion rate is the single best predictor of recovery posture.** Every system with PQ-capable silicon already shipping (AWS Nitro, Azure MAA, iOS Secure Enclave 2024+, Pixel 9+, Chrome TLS hybrid, Signal PQXDH) degrades gracefully. Every system on ROM-fused RSA silicon in long-life infrastructure (older TPMs, EV/auto ECUs, industrial PLCs with 20-year life, submarine-cable SLTE, legacy BOP pods) *cannot* degrade gracefully; polynomial-factoring day is replacement-cycle day.
