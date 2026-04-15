@@ -1,0 +1,144 @@
+# cisco_ios_rsa.txt
+# Cisco IOS PKI — RSA key pairs for TLS, IPsec IKEv2, SSH, and certificate-based auth.
+# Source: Cisco IOS/IOS-XE documentation; crypto pki command reference
+#
+# Cisco IOS uses RSA keypairs for:
+#   - HTTPS management interface (HTTPS server for WebUI/RESTCONF/NETCONF)
+#   - SSH host key (RSA-2048 default, RSA-4096 optional)
+#   - IPsec IKEv2 certificate-based authentication
+#   - TLS client certificate authentication for AAA/RADIUS
+#   - Certificate-based device identity (SCEP enrollment with Cisco CA)
+#
+# Deployed everywhere: enterprise routers, campus switches, data center aggregation,
+# SP edge, WAN aggregation. Every managed Cisco device generates an RSA keypair.
+#
+# ============================================================
+# GENERATING RSA KEYS ON CISCO IOS
+# ============================================================
+
+# Standard RSA-2048 keypair generation (IOS default)
+# The IOS "crypto key generate rsa" command generates an RSA keypair
+# stored in NVRAM (router flash). The public key is extractable.
+
+! IOS CLI:
+Router(config)# crypto key generate rsa modulus 2048 label MGMT-KEY
+! Output:
+! % Generating 2048 bit RSA keys, keys will be non-exportable...
+! [OK] (elapsed time was 3 seconds)
+
+! For certificate enrollment (SCEP to a CA):
+Router(config)# crypto pki trustpoint MY-TRUSTPOINT
+Router(ca-trustpoint)# enrollment url http://ca.corp.example.com/certsrv/mscep/mscep.dll
+Router(ca-trustpoint)# subject-name CN=router1.corp.example.com,O=Corp,C=US
+Router(ca-trustpoint)# rsakeypair MGMT-KEY 2048
+Router(ca-trustpoint)# revocation-check crl
+Router(ca-trustpoint)# exit
+
+! Enroll the device (generates CSR, submits to CA, receives RSA-2048 cert)
+Router(config)# crypto pki enroll MY-TRUSTPOINT
+
+! Verify the enrolled certificate
+Router# show crypto pki certificates MY-TRUSTPOINT
+! Status: Available
+! Certificate:
+!   Subject: CN=router1.corp.example.com
+!   Issuer: CN=Corp-CA
+!   Validity Date: start date: 00:00:00 UTC Jan 1 2024
+!              end   date: 00:00:00 UTC Jan 1 2026
+!   Associated Trustpoints: MY-TRUSTPOINT
+!
+! The certificate's RSA-2048 public key is visible to anyone who can TLS-connect
+! to the router's HTTPS management interface on port 443 or 8443.
+
+# ============================================================
+# RSA SSH HOST KEY
+# ============================================================
+
+! Cisco IOS SSH uses the "crypto key generate rsa" key as the SSH host key
+! RSA-2048 is the default; older IOS versions used RSA-1024
+
+Router(config)# ip ssh version 2
+Router(config)# ip ssh rsa keypair-name MGMT-KEY
+
+! Show SSH host key fingerprint:
+Router# show ip ssh
+! SSH Enabled - version 2.0
+! Authentication timeout: 120 secs; Authentication retries: 3
+! Minimum expected Diffie Hellman key size : 2048 bits
+! IOS Keys in SECSH format(ssh-rsa, base64 encoded):
+! ssh-rsa AAAAB3NzaC1yc2EAAA... (RSA-2048 public key, 308 bytes base64)
+
+# ============================================================
+# SHOW RSA PUBLIC KEY (CRQC INPUT)
+# ============================================================
+
+! The RSA public key is visible via multiple show commands:
+
+Router# show crypto key mypubkey rsa MGMT-KEY
+! % Key pair was generated at: 00:01:00 UTC Jan 1 2024
+! Key name: MGMT-KEY
+! Key type: RSA KEYS
+! Storage Device: not specified
+! Usage: General Purpose Key
+! Key is not exportable. Key version is 1
+! Key Data:
+!   30820122 300D0609 2A864886 F70D0101 01050003 82010F00 30820102
+!   [... RSA-2048 public key DER encoded, 294 bytes ...]
+!
+! This is the modulus n and exponent e of the RSA-2048 key.
+! It's available from any device that has network reachability to the router's
+! SSH or HTTPS management interface.
+
+! For HTTPS/TLS: the cert (including RSA public key) is in the TLS ServerHello.
+! For SSH: the host key is sent in the SSH_MSG_KEXINIT.
+! For SNMP with cert auth: the public key is in SNMP v3 key distribution.
+
+# ============================================================
+# CISCO PKI (SCEP ENROLLMENT AT SCALE)
+# ============================================================
+
+! Enterprise environments use Cisco CA Server or Microsoft ADCS for SCEP enrollment.
+! Every router and switch enrolls an RSA-2048 certificate.
+! A typical enterprise network: 500-5000 Cisco devices, each with an RSA-2048 cert.
+!
+! Cisco IOS XE on Catalyst 9000 series (enterprise campus switches):
+!   Default key type: RSA-2048
+!   Generated during initial setup via Day-0 config or Cisco DNA Center
+!   Certificate enrolled via SCEP to the enterprise CA (typically ADCS)
+!
+! Cisco ISR/ASR routers (WAN edge):
+!   RSA-2048 for IKEv2 certificate-based VPN authentication
+!   The peer certificate is verified via PKIX chain to the enterprise CA
+!   Cert subject is used for crypto map matching in site-to-site VPNs
+
+# ============================================================
+# CISCO IOS ATTACK SURFACE
+# ============================================================
+
+! An attacker with network access to the management plane can capture the
+! RSA-2048 public key from:
+!   - The TLS certificate (HTTPS management interface)
+!   - The SSH host key (SSH management)
+!   - IKEv2 certificate exchange (if IPsec VPN is enabled)
+!
+! Factor the RSA-2048 modulus -> derive private key -> impersonate the router:
+!   - HTTPS: forge TLS responses from the "router" to the NMS
+!   - SSH: full MitM of SSH management sessions (recover admin passwords)
+!   - IKEv2: forge VPN authentication, establish unauthorized tunnels
+!   - NETCONF/RESTCONF: accept and forge management API calls
+
+# ============================================================
+# NO PQC IN CISCO IOS
+# ============================================================
+
+! As of IOS-XE 17.x (2024), there is no PQC key type available:
+!
+! Router(config)# crypto key generate ?
+!   ec      Generate EC key
+!   rsa     Generate RSA key
+!
+! There is no "ml-dsa" or "kyber" option. The IETF PQC-in-IKEv2 drafts are not
+! implemented in any shipping IOS-XE release.
+!
+! Cisco has mentioned PQC in roadmap discussions but has not shipped any PQC
+! crypto in IOS-XE as of 2024.
