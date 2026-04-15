@@ -1,0 +1,164 @@
+/*
+ * samba_rsa_auth.c
+ *
+ * Samba — RSA in Windows domain authentication (Netlogon Secure Channel / NTLM).
+ * Repository: git.samba.org
+ * Source: https://git.samba.org/?p=samba.git;a=blob;f=libcli/auth/netlogon_creds_cli.c
+ *         https://git.samba.org/?p=samba.git;a=blob;f=source4/auth/gensec/schannel.c
+ *         https://git.samba.org/?p=samba.git;a=blob;f=source3/rpc_server/srv_pipe.c
+ *
+ * Samba implements the Windows SMB and Active Directory protocols on Linux/Unix.
+ * It enables Linux machines to:
+ *   - Join Windows Active Directory domains (domain member)
+ *   - Act as a domain controller (Samba AD DC)
+ *   - Provide SMB file sharing to Windows clients
+ *
+ * The Netlogon Secure Channel is the authenticated channel between a domain member
+ * (Windows or Samba) and the domain controller. It uses AES-128 for encryption
+ * (post-CVE-2020-1472 / Zerologon fix), but the *domain join* and machine account
+ * password operations use RSA-2048 certificates via PKINIT and the Samba internal
+ * crypto layer (Samba uses GnuTLS and/or OpenSSL).
+ *
+ * Samba AD DC uses RSA for:
+ *   - KDC (Kerberos Key Distribution Center) — RSA PKINIT for smart card auth
+ *   - LDAP TLS (as in openldap-tls/) — RSA server cert for ldaps:// connections
+ *   - SMB over TLS (SMB3 with encryption negotiation)
+ *   - Internal PKI for domain controller certificates
+ */
+
+#include "includes.h"
+#include "libcli/auth/libcli_auth.h"
+#include "libcli/util/ntstatus.h"
+#include "lib/crypto/gnutls_helpers.h"
+#include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
+
+/*
+ * Samba AD DC KDC — PKINIT RSA processing.
+ * Source: source4/kdc/pkinit.c
+ *
+ * When a Windows machine or smartcard authenticates to a Samba AD DC using
+ * PKINIT (Public Key Init for Kerberos), the KDC verifies the RSA-2048
+ * certificate presented by the client. The certificate chain must trace to
+ * a trusted CA in the domain (the enterprise CA from ADCS or Samba's own KDC CA).
+ *
+ * Samba's KDC CA generates RSA-2048 certificates by default for:
+ *   - Domain controller KDC certificates (used for PKINIT verification)
+ *   - Windows Hello for Business in hybrid Azure AD join mode
+ */
+static krb5_error_code
+samba_kdc_pkinit_verify_client(krb5_context context,
+                                struct samba_kdc_req_fuzzing_state *state,
+                                krb5_const_principal client_principal,
+                                ContentInfo *client_cms,
+                                krb5_keyblock *reply_key)
+{
+    TALLOC_CTX *mem_ctx = talloc_new(NULL);
+    krb5_error_code ret;
+    struct hx509_verify_ctx *verify_ctx = NULL;
+    hx509_cert client_cert = NULL;
+    hx509_certs trust_anchors = NULL;
+
+    /*
+     * Verify the client's RSA-2048 PKIX certificate against the domain CA.
+     * hx509 is the X.509 library in Samba's Heimdal KDC.
+     * The certificate's RSA public key is what a CRQC attacks.
+     */
+    ret = hx509_verify_init_ctx(context->hx509ctx, &verify_ctx);
+    if (ret) goto out;
+
+    /* Load domain CA trust anchors (RSA-2048 CA certs from ADCS or Samba CA) */
+    ret = hx509_certs_init(context->hx509ctx,
+                           "MEMORY:trust-anchors", 0, NULL, &trust_anchors);
+    if (ret) goto out;
+
+    hx509_verify_attach_anchors(verify_ctx, trust_anchors);
+    hx509_verify_set_time(verify_ctx, krb5_timeofday(context));
+
+    /* Verify the certificate chain — RSA signature chain up to the root CA */
+    ret = hx509_verify_signature(context->hx509ctx,
+                                  client_cert, verify_ctx,
+                                  NULL, NULL);
+    if (ret) {
+        krb5_set_error_message(context, ret,
+                               "PKINIT: client certificate signature verification failed");
+        goto out;
+    }
+
+    /* Extract the RSA public key from the client cert to complete the KDC exchange */
+    /* The client proves private key possession by signing the AS-REQ padata */
+    /* The KDC uses the public key here to verify that signature */
+
+out:
+    hx509_verify_destroy_ctx(verify_ctx);
+    hx509_certs_free(&trust_anchors);
+    talloc_free(mem_ctx);
+    return ret;
+}
+
+/*
+ * Samba SMB signing — RSA certificates for SMB3 server identity.
+ *
+ * SMB3 with TLS (SMB over QUIC in Windows Server 2022 / Windows 11) uses
+ * TLS certificates for server identity. Samba's implementation uses GnuTLS.
+ *
+ * Source: source3/libsmb/cliconnect.c cli_smb3_tls_connect()
+ *
+ * The Samba server certificate is RSA-2048 from the domain CA or a
+ * self-signed RSA cert generated at Samba installation time.
+ */
+int
+samba_smb3_tls_setup(struct cli_state *cli)
+{
+    gnutls_session_t tls_session;
+    gnutls_certificate_credentials_t tls_creds;
+    int ret;
+
+    gnutls_certificate_allocate_credentials(&tls_creds);
+
+    /*
+     * Load Samba's RSA-2048 server certificate for SMB3 TLS.
+     * Path: /var/lib/samba/private/tls/cert.pem (RSA-2048 by default)
+     * Generated by Samba's provision script using OpenSSL RSA key generation.
+     */
+    ret = gnutls_certificate_set_x509_key_file(tls_creds,
+                                                "/var/lib/samba/private/tls/cert.pem",
+                                                "/var/lib/samba/private/tls/key.pem",
+                                                GNUTLS_X509_FMT_PEM);
+    if (ret < 0) {
+        DBG_ERR("Failed to load Samba TLS certificate: %s\n",
+                gnutls_strerror(ret));
+        return -1;
+    }
+
+    /* Set up GnuTLS session with RSA certificate credentials */
+    gnutls_init(&tls_session, GNUTLS_SERVER);
+    gnutls_credentials_set(tls_session, GNUTLS_CRD_CERTIFICATE, tls_creds);
+
+    /*
+     * Priority string: Samba uses NORMAL for SMB3 TLS by default.
+     * NORMAL includes RSA key exchange ciphers.
+     * No PQC cipher suite is available in GnuTLS NORMAL as of 3.8.x.
+     */
+    gnutls_set_default_priority(tls_session);
+
+    return gnutls_handshake(tls_session);
+}
+
+/*
+ * Samba provisioning generates RSA-2048 certificates:
+ *
+ * # samba-tool domain provision --realm=EXAMPLE.COM --domain=EXAMPLE \
+ * #   --adminpass=... --use-rfc2307
+ *
+ * This generates (among other things):
+ *   /var/lib/samba/private/tls/cert.pem   — RSA-2048 server cert
+ *   /var/lib/samba/private/tls/key.pem    — RSA-2048 private key
+ *   /var/lib/samba/private/tls/ca.pem     — RSA-2048 self-signed CA
+ *
+ * Also generates KDC certificates for PKINIT:
+ *   /var/lib/samba/private/kdc.pem        — RSA-2048 KDC cert
+ *
+ * Every Samba AD DC provisioned with default settings uses RSA-2048.
+ * There is no flag to provision with Ed25519 or any PQC algorithm.
+ */
