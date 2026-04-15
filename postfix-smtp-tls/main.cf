@@ -1,0 +1,92 @@
+# main.cf — Postfix SMTP daemon config wiring up TLS on submission,
+# smtpd, and outbound smtp client.  Uses the RSA cert primitives
+# invoked from `postfix_rsa_tls.sh`.
+#
+# Postfix is the dominant Linux MTA: default on Debian/Ubuntu mail
+# rollouts, a large fraction of cPanel/Plesk shared-hosting SMTP,
+# every GitHub / GitLab / Jira-in-a-box outbound notifier, and a
+# substantial share of corporate outbound relay. Roughly a third of
+# all SMTP traffic on the public internet terminates in Postfix
+# somewhere along the route.
+
+# ---- Listener identity ----
+myhostname      = mx1.corp.example.com
+mydomain        = corp.example.com
+myorigin        = $mydomain
+
+# ---- Smtpd server TLS (inbound TCP/25 STARTTLS + TCP/587 submission) ----
+#
+# Cert chain is a Let's Encrypt wildcard or the enterprise Issuing CA
+# leaf — either way the server key is RSA-2048.  Auto-renewed by
+# certbot / cert-manager / step-ca, HUP'd via postfix reload.
+smtpd_tls_chain_files =
+    /etc/postfix/tls/mx1-fullchain.pem,
+    /etc/postfix/tls/mx1-privkey.pem        # RSA-2048
+smtpd_tls_CAfile            = /etc/ssl/certs/ca-bundle.crt
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtpd_tls_security_level    = may
+smtpd_tls_received_header   = yes
+smtpd_tls_loglevel          = 1
+smtpd_tls_ask_ccert         = yes           # opportunistic client cert
+smtpd_tls_exclude_ciphers   = aNULL, RC4, EXPORT, LOW
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtpd_tls_protocols           = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+
+# ---- Submission port 587 ----
+#
+# Submission forces STARTTLS + SASL for authenticated send. Employee
+# MUAs (Outlook, Thunderbird, Apple Mail) connect here with SASL
+# plaintext ONLY after TLS is up.
+submission_tls_security_level = encrypt
+submission_tls_auth_only      = yes
+
+# ---- Smtp client TLS (outbound relay) ----
+#
+# Opportunistic TLS to every next-hop MTA that advertises STARTTLS.
+# DANE (RFC 7672) preferred; falls back to PKIX + WebPKI chain
+# validation.
+smtp_tls_security_level   = dane
+smtp_tls_CAfile           = /etc/ssl/certs/ca-bundle.crt
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+smtp_dns_support_level    = dnssec
+smtp_tls_loglevel         = 1
+
+# ---- MTA-STS (RFC 8461) ----
+#
+# Policy push from gmail.com, outlook.com, etc. Postfix parses their
+# published MTA-STS policies and upgrades `smtp_tls_security_level`
+# to `secure` for hosts that publish enforcement.
+smtp_tls_policy_maps      = socketmap:unix:/var/run/smtp-mtasts-resolver.sock:postfix
+
+# ---- SASL (via Dovecot auth or Cyrus SASL) ----
+smtpd_sasl_type           = dovecot
+smtpd_sasl_path           = private/auth
+smtpd_sasl_auth_enable    = yes
+smtpd_recipient_restrictions =
+    permit_sasl_authenticated,
+    permit_mynetworks,
+    reject_unauth_destination,
+    reject_rbl_client zen.spamhaus.org
+
+# ---- DKIM + DMARC ----
+#
+# `opendkim/` sibling directory handles the RSA-signing side; Postfix
+# just routes the milter here.
+milter_default_action     = accept
+smtpd_milters             = inet:localhost:12301, inet:localhost:8893
+non_smtpd_milters         = $smtpd_milters
+
+# ---- Breakage ----
+#
+# Every enterprise MX's RSA-2048 server cert is a separate trust
+# decision for every neighbor MTA that DANE-validates or MTA-STS-
+# enforces.  A factoring attack on an MX cert allows an on-path
+# attacker to:
+#   - Accept inbound mail under that MX identity and silently
+#     quarantine / rewrite / forge responses.
+#   - Strip outbound TLS and downgrade to cleartext (depending on
+#     the peer's strict-transport posture).
+# A factoring attack on the Let's Encrypt intermediate CA (RSA-2048)
+# takes out essentially every public MX that uses Let's Encrypt for
+# TLS material — enabling DANE-less MTA-STS bypass at internet scale
+# until CRL propagation catches up.

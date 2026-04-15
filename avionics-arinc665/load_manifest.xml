@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ARINC 665 Loadable Software Airborne Part (LSAP) manifest — the XML
+  that accompanies an avionics software load (engine control firmware,
+  FMS updates, HUD software revisions, EFB data). Signed by the airframe
+  OEM's (or Tier-1's) RSA-2048 signing key; verified by the Dataloader
+  tool at the gate before flash to the target LRU (Line-Replaceable
+  Unit).
+
+  Signing primitives are in `arinc665_verify.c`. This manifest is the
+  input the cryptography is applied to, and the structure Dataloader
+  tools parse when staff plug into the ARINC 615A / 665-5 maintenance
+  port.
+-->
+<ARINC665LoadableMedium xmlns="http://www.arinc.net/A665/2019">
+
+  <MediaInfo>
+    <PartNumber>A350-FCU-SW-REV-12.4.2</PartNumber>
+    <PartType>LSAP</PartType>
+    <MediaSetPN>A350-ECU-QUARTERLY-2026Q2</MediaSetPN>
+    <MediaSequence>1 of 3</MediaSequence>
+    <MediaCreator>
+      <Organization>Airbus Commercial Aircraft</Organization>
+      <SignerCertificateSubject>
+        CN=Airbus LSP Signer 2026, O=Airbus SAS, C=FR
+      </SignerCertificateSubject>
+      <SignerCertificateIssuer>
+        CN=Airbus Type Certificate CA, O=Airbus SAS, C=FR
+      </SignerCertificateIssuer>
+      <SignerCertificateSerial>03:4A:BC:DE:12:34:56:78</SignerCertificateSerial>
+      <SignerKeyAlgorithm>RSA</SignerKeyAlgorithm>
+      <SignerKeySize>2048</SignerKeySize>
+    </MediaCreator>
+  </MediaInfo>
+
+  <TargetLRUs>
+    <LRU>
+      <PartNumber>A350-FCU-3845-A001-07</PartNumber>
+      <HardwareType>FCU (Flight Control Unit)</HardwareType>
+      <Vendor>Thales Avionics</Vendor>
+      <CompatibleAC>
+        <ACType>A350-941</ACType>
+        <ACType>A350-1041</ACType>
+      </CompatibleAC>
+    </LRU>
+  </TargetLRUs>
+
+  <LoadableFiles>
+    <File>
+      <Path>/FCU_APP.bin</Path>
+      <Size>12845056</Size>
+      <DigestAlgorithm>SHA-256</DigestAlgorithm>
+      <Digest>a1b2c3d4e5f6789abcdef0123456789abcdef0123456789abcdef0123456789a</Digest>
+    </File>
+    <File>
+      <Path>/FCU_PARAMS.dat</Path>
+      <Size>65536</Size>
+      <DigestAlgorithm>SHA-256</DigestAlgorithm>
+      <Digest>3f8a2b1e4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6789abcdef01</Digest>
+    </File>
+    <File>
+      <Path>/NAV_DB_DELTA_2026-04.bin</Path>
+      <Size>8388608</Size>
+      <DigestAlgorithm>SHA-256</DigestAlgorithm>
+      <Digest>bbccddeeff00112233445566778899aabbccddeeff00112233445566778899aa</Digest>
+    </File>
+  </LoadableFiles>
+
+  <TypeCertificateData>
+    <EASA_TC>EASA.A.151</EASA_TC>
+    <FAA_TC>A00007IB</FAA_TC>
+    <SoftwareCertificationLevel>DO-178C Level A</SoftwareCertificationLevel>
+    <SecurityLevel>DO-326A / ED-202A Assurance Level D</SecurityLevel>
+  </TypeCertificateData>
+
+  <!--
+    The entire manifest body above (minus the <Signature> element) is
+    canonicalized (ExcC14N) and signed with RSA-2048 PKCS#1 v1.5
+    under the SignerCertificateSerial key. Dataloader tools verify
+    this before permitting a flash; if the signature fails, the
+    load is rejected at the aircraft door, preventing the mechanic
+    from installing software that does not chain to the airframe
+    OEM's type-certificate-scoped signing authority.
+
+    A successful factoring attack against the Type Certificate CA
+    lets attackers forge loads under arbitrary OEM identity, deliver
+    them via a compromised EFB or a dataloader USB stick, and flash
+    arbitrary code into flight-critical LRUs.
+  -->
+  <Signature>
+    <Algorithm>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</Algorithm>
+    <CanonicalizationMethod>http://www.w3.org/2001/10/xml-exc-c14n#</CanonicalizationMethod>
+    <SignatureValue>BASE64(... 256-byte RSA-2048 signature ...)</SignatureValue>
+    <X509Certificate>BASE64(... DER of Airbus LSP Signer cert ...)</X509Certificate>
+  </Signature>
+
+</ARINC665LoadableMedium>

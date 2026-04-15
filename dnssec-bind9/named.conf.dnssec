@@ -1,0 +1,83 @@
+// named.conf.dnssec — BIND 9 DNSSEC signing + KSK/ZSK key management
+// stanza for an authoritative-signing nameserver. This is what operators
+// at root/TLD/enterprise-authoritative scale actually deploy on top of
+// the opensslrsa_link.c RSA primitives next door.
+//
+// Deployed at (among others):
+//   - Every ccTLD and gTLD operator — Verisign (.com/.net), Afilias/
+//     Identity Digital, PIR (.org), Nominet (.uk), DENIC (.de), SIDN
+//     (.nl), CIRA (.ca), .gov (Cloudflare), .edu (Educause)
+//   - Root zone signers (Verisign primary, ICANN KSK)
+//   - Enterprise DNS providers — Cloudflare authoritative, AWS Route 53
+//     DNSSEC, Google Cloud DNS DNSSEC, Akamai Edge DNS, NS1
+
+options {
+    directory "/var/named";
+
+    // Automatic zone maintenance — KASP-style inline signing. Replaces
+    // the old cron-driven `dnssec-signzone` workflow.
+    dnssec-policy "enterprise-rsa";
+    inline-signing yes;
+    auto-dnssec    maintain;
+
+    // Server-side RSA cranks — re-signing millions of RRSIGs/day on a
+    // busy TLD benefits from OpenSSL ENGINE offload (nCipher, Thales
+    // Luna PCIe, YubiHSM2 for smaller operators).
+    key-directory  "/var/named/keys";
+};
+
+// ---- Key & Signing Policy.  All new zones issued under this policy
+//      get RSASHA256 KSK-2048 + ZSK-1024 with 90d ZSK rollovers and
+//      2y KSK rollovers.  RFC 8624 compliant. ----
+dnssec-policy "enterprise-rsa" {
+    keys {
+        ksk key-directory lifetime P2Y    algorithm rsasha256 2048;
+        zsk key-directory lifetime P90D   algorithm rsasha256 1024;
+    };
+    dnskey-ttl        PT1H;
+    signatures-validity          P14D;
+    signatures-validity-dnskey   P14D;
+    signatures-refresh            P5D;
+    max-zone-ttl                 PT1D;
+    parent-ds-ttl                PT1H;
+    parent-propagation-delay     PT1H;
+    nsec3param iterations 0 optout no salt-length 0;
+};
+
+// ---- Zones ----
+zone "example.com" {
+    type primary;
+    file "primary/example.com.db";
+    dnssec-policy "enterprise-rsa";
+    allow-transfer { key xfer-key; };   // TSIG-authenticated AXFR
+    notify explicit;
+    also-notify { 192.0.2.53; 192.0.2.54; };
+};
+
+zone "203.0.113.in-addr.arpa" {
+    type primary;
+    file "primary/203.0.113.rev";
+    dnssec-policy "enterprise-rsa";
+};
+
+// ---- TSIG for secondary transfers + update ----
+key "xfer-key" {
+    algorithm hmac-sha256;
+    secret    "redacted-base64-256-bit";
+};
+
+// ---- Scheduled rollover choreography ----
+//
+// BIND drives KSK rollovers through the double-KSK method:
+//   t+0     publish new KSK alongside old, sign DNSKEY RRset with both
+//   t+TTL   submit new DS to the parent (.com registry EPP)
+//   t+2TTL  retire old KSK once parent DS has propagated
+//
+// This entire dance rests on the parent zone verifying RSA signatures
+// on the child's DNSKEY RRset. Factor the child's KSK RSA modulus and
+// you mint RRSIGs that validate against the DS chained from the root,
+// silently redirecting every DNSSEC-validating resolver on Earth
+// (every major recursive operator: Google 8.8.8.8, Cloudflare 1.1.1.1,
+// Quad9 9.9.9.9, OpenDNS, ISP recursives) to attacker-controlled
+// records. The root zone uses the same RSA algorithm family; a root
+// KSK factorization is the internet-scale nightmare end of the spectrum.

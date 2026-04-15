@@ -1,0 +1,93 @@
+# sshd_config — OpenSSH server config tied to the RSA host-key
+# primitive in `openssh_rsa_hostkey.c`.
+#
+# OpenSSH is the administrative-access backbone of essentially every
+# Unix system in the world.  This exact configuration shape is what
+# runs on:
+#   - AWS EC2 / Azure VM / GCP Compute default Linux images
+#   - Every bastion host / jump box in enterprise VPCs
+#   - GitHub, GitLab, Bitbucket SSH git transport backends
+#   - Network equipment management planes (Cisco IOS XE, Juniper
+#     Junos, Arista EOS, Nokia SR Linux, Cumulus/NVIDIA SONiC — all
+#     embed an OpenSSH-compatible server)
+#   - Every Kubernetes node via ssh to kubelet host
+#   - Hypervisor management (VMware ESXi shell, Proxmox, XenServer)
+
+# ---- Host keys ----
+#
+# ssh-keygen-provisioned at first boot. Ed25519 is preferred when
+# both sides support it; RSA-4096 host keys remain for backward
+# compat with legacy clients (old Puttys, Cisco IOS XE pre-17.4,
+# Java SSH clients built on JSch pre-0.1.61).
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_rsa_key
+
+# ---- Host-key algorithms offered ----
+HostKeyAlgorithms ssh-ed25519,ecdsa-sha2-nistp256,rsa-sha2-512,rsa-sha2-256
+
+# ---- Signing algorithms for pubkey user auth ----
+PubkeyAcceptedAlgorithms ssh-ed25519,ecdsa-sha2-nistp256,rsa-sha2-512,rsa-sha2-256
+# rsa-sha2-* is how modern OpenSSH signs with RSA user keys; the old
+# ssh-rsa (SHA-1) algorithm is deprecated and disabled since
+# OpenSSH 8.8.
+
+# ---- KEX / Cipher / MAC ----
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,sntrup761x25519-sha512@openssh.com
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+
+# ---- AuthN policy ----
+PermitRootLogin prohibit-password
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+MaxAuthTries 3
+AuthenticationMethods publickey
+AuthorizedKeysFile .ssh/authorized_keys
+# Enterprise fleets route through certificate-based auth rather
+# than per-user authorized_keys — TrustedUserCAKeys pins the org's
+# short-lived SSH CA (Teleport, Smallstep, HashiCorp Vault SSH
+# secrets engine, BastionZero).
+TrustedUserCAKeys /etc/ssh/corp-ssh-ca.pub
+RevokedKeys /etc/ssh/corp-ssh-revoked
+
+# ---- Session hardening ----
+ClientAliveInterval 60
+ClientAliveCountMax 3
+LoginGraceTime 20
+MaxSessions 4
+MaxStartups 10:30:60
+LogLevel VERBOSE
+UsePAM yes
+
+# ---- Forwarding ----
+AllowAgentForwarding no
+AllowTcpForwarding no
+X11Forwarding no
+PermitTunnel no
+
+# ---- Breakage ----
+#
+# Two separate failure modes under a factoring attack:
+#
+# 1. Host key factoring — lets an attacker impersonate the target
+#    host to every incoming client that pinned the RSA host key.
+#    `known_hosts` continues to accept the forged server; MITM +
+#    session hijack becomes possible.  Historically this mostly
+#    mattered on first-connect (TOFU), but SSH certs with
+#    trusted-host-CA inversion put the same risk on the CA.
+#
+# 2. User key factoring — every RSA user key in every
+#    authorized_keys file across the org becomes impersonable.
+#    Because OpenSSH user auth transmits the user's public key
+#    over the wire during publickey auth, harvesting these from
+#    passive captures is trivial. Attackers authenticate as the
+#    user to every server that trusts that key.
+#
+# Short-lived SSH cert authorities (Teleport, Vault SSH, step-ca)
+# raise the blast radius: factor ONE CA key and mint certs valid
+# for any principal on any host that trusts that CA. Corporate
+# jumpbox-perimeter + SSH-CA fleets are among the most concentrated
+# RSA risks in operational IT.
