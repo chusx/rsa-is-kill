@@ -513,3 +513,644 @@
 **Ranking**: Criticality=4, Exploitability=5, BlastRadius=4, Stealth=4, Recoverability=3.
 
 ### swift-financial
+**Context**: SWIFT FIN/MX messaging uses RSA (in LAU, RMA, and SWIFT PKI) — the messaging rail for ~$150T/year of interbank transfers across 11,000+ institutions. HSMs sign/verify message authentication and counterparty-relationship establishment.
+**Red team (attack)**: Factor the SWIFT root CA or a member-bank's HSM key; forge MT103/MT202 (Bangladesh Bank-style) at will across the network, bypassing RMA because counterparty trust is cryptographic. $1B-scale heists per incident, repeated.
+**Blue team (defense/recovery)**: SWIFT is piloting PQ (ML-KEM/ML-DSA) in CSP 2024-2026; rekey is mandatory across members. Incident response involves literal cable bank-to-bank contact verifications.
+**Impact**:
+- $: Trillions (rail failure, not per-fraud)
+- Lives: Foreign-aid payment chains
+- Environment: None direct
+- Geopolitical: Belgian-hosted but US-policy-pressured; sanctioned nations (RU/IR) would exploit instantly
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=5, Stealth=5, Recoverability=2. The top global-finance rail.
+
+### fix-cme-exchange
+**Context**: CME, ICE, Eurex, CBOE FIX gateway mTLS over RSA-2048; ~$6T daily notional on CME Group alone. Market-maker firms authenticate with member certs.
+**Red team (attack)**: Factor exchange-issued member certs; impersonate member, submit/cancel orders ahead of NBBO or spoof to trigger stop cascades. "Flash-crash weaponized."
+**Blue team (defense/recovery)**: Exchanges issue new certs on ECDSA; members must re-provision. Trading halts during migration.
+**Impact**:
+- $: Trillions (market integrity)
+- Lives: Pension funds
+- Environment: None direct
+- Geopolitical: US-exchange dominance; CN/EU exchanges would pivot
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=3.
+
+### emv-payment-cards
+**Context**: EMV chip-and-PIN cards use RSA-1024/2048 for offline data authentication (SDA/DDA/CDA) and RSA-2048 for issuer-ICC CA; Visa/Mastercard/AmEx scheme roots sign issuer CAs for ~5B cards.
+**Red team (attack)**: Factor scheme root or issuer CA; mint counterfeit chip cards that authenticate offline (airlines, transit, rural POS). Fraud limited at online-auth terminals but catastrophic for offline/hybrid.
+**Blue team (defense/recovery)**: EMVCo has a PQ roadmap (ML-DSA, late-2020s); card reissuance cycles are 3-4 years. Scheme CA rotation is an EMVCo-coordinated protocol change.
+**Impact**:
+- $: Hundreds of billions (fraud surge + reissuance)
+- Lives: Indirect
+- Environment: Card-plastic waste
+- Geopolitical: Visa/MC (US), UnionPay (CN), JCB (JP)
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=5, Stealth=3, Recoverability=2.
+
+### pos-pci-pts
+**Context**: PCI PIN Transaction Security (PTS) POS terminals (Ingenico, Verifone, PAX) use RSA remote key-loading (RKL) for DUKPT/3DES key injection; PCI-PIN Security Requirements mandate RSA ≥2048 for the scheme.
+**Red team (attack)**: Factor terminal-vendor RKL CA or acquirer injection key; inject chosen DUKPT base keys into terminals, harvest plaintext PINs from every swipe/dip. Millions of PINs across retailers.
+**Blue team (defense/recovery)**: PCI SSC has ML-KEM scope for next-gen; terminal fleet re-injection is physical per-device. Industry-wide 3-year project.
+**Impact**:
+- $: Tens of billions (PIN exposure + fraud)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: US card schemes dominant
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=4, Stealth=4, Recoverability=3.
+
+### hbci-fints-banking
+**Context**: German/Austrian HBCI/FinTS retail banking protocol uses RSA-2048 for client-bank signing (HBCI-DDV/RDH cards); ~40M users across Sparkassen, Volksbanken, Commerzbank.
+**Red team (attack)**: Factor bank-issuer or root keys; forge SEPA transfers from customer accounts. Less catastrophic than SWIFT but touches retail accounts directly.
+**Blue team (defense/recovery)**: ZKA pushes updates; card reissuance ~5yr cycle. German BaFin oversight drives slow migration.
+**Impact**:
+- $: Billions (retail-fraud sized)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: DE/AT banking sovereignty
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### atm-xfs-firmware
+**Context**: CEN/XFS ATM firmware and remote-key-download (NDC/DDC) uses RSA-2048 for NCR/Diebold/Hyosung cash handlers; ~1M ATMs worldwide.
+**Red team (attack)**: Factor vendor firmware-signing key; push malicious FW to ATMs enabling "jackpotting" (cash-out) at scale, or RKD-hijack to harvest PINs. Carbanak / Cobalt Group wet dream.
+**Blue team (defense/recovery)**: Vendors rotate keys + ship new FW via certified-engineer visits (slow); fleet migration is 18-24 months.
+**Impact**:
+- $: Tens of billions (cash losses + remediation)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Ransomware-regime actors (RU, DPRK) benefit directly
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=3.
+
+### ibm-icsf-mainframe
+**Context**: IBM z/OS ICSF Integrated Cryptographic Service Facility (CCA + PKCS#11) wraps every large-bank core banking key; RSA-2048/4096 for PKA keys. 80% of global-bank core banking + many insurers.
+**Red team (attack)**: Factor master keys issued from the Crypto Express HSM; forge signatures on any bank-authority workflow — GL tampering, signed fund transfers. Requires privileged logical access first, but crypto breaks the last barrier.
+**Blue team (defense/recovery)**: IBM has Crypto Express 8S with ML-DSA/ML-KEM; mainframe migration requires z/OS 3.1+ and tenant re-keying. Multi-year bank-IT project.
+**Impact**:
+- $: Trillions (core banking ledger integrity)
+- Lives: Indirect via payroll/benefits
+- Environment: None direct
+- Geopolitical: IBM-US concentration of financial-system crypto
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=5, Stealth=5, Recoverability=2.
+
+### windows-dpapi
+**Context**: Windows Data Protection API derives per-user/machine master keys wrapped under RSA-2048 key pairs held in LSASS/DC; protects browser passwords, VPN creds, BitLocker recovery keys, EFS, DPAPI-NG. Every Windows endpoint + every AD backup key.
+**Red team (attack)**: Factor the domain DPAPI backup key held by DCs (recovered via dpapi::backupkey DCSync-class tooling + the published RSA-2048 cert); decrypt every user's DPAPI blobs across history. Browser-password exfil at fleet scale.
+**Blue team (defense/recovery)**: Microsoft ML-DSA/ML-KEM for DPAPI roadmapped in Windows Server 2025+; backup-key rotation is done but historic blobs stay vulnerable.
+**Impact**:
+- $: Hundreds of billions (every credentialed user in every AD)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: Microsoft-US endpoint credential monoculture
+**Ranking**: Criticality=5, Exploitability=5, BlastRadius=5, Stealth=5, Recoverability=2.
+
+### usps-imi-indicia
+**Context**: USPS Information-Based Indicia Program uses RSA-1024 (yes, still) for postage-meter indicia signatures; ~$14B/year of metered postage. Also UPU global postage frameworks.
+**Red team (attack)**: Factor USPS or meter-vendor key; print unlimited fraudulent prepaid indicia at scale. USPS revenue loss directly.
+**Blue team (defense/recovery)**: USPS IBIP 2.0 roadmap to PQ; meter fleet replacement 5+yr cycle.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: Paper waste
+- Geopolitical: USPS only; UPU follows
+**Ranking**: Criticality=2, Exploitability=5, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### rfc3161-tsa-timestamp
+**Context**: RFC 3161 Time-Stamp Authorities (DigiCert, GlobalSign, Sectigo, FreeTSA, Microsoft, Apple, Adobe) sign timestamps under RSA-2048/3072 for code-signing (Authenticode countersignatures), PDF/A-3 long-term signatures, eIDAS qualified timestamps.
+**Red team (attack)**: Factor TSA signing key; backdate malicious signed binaries to pre-revocation ("evasion of revocation"), invalidate long-term-validation chains on PDF signatures. Legal-evidentiary chaos.
+**Blue team (defense/recovery)**: eIDAS regulation already pushes PQ timestamps; CA/B forum follows. Replace TSA keys and re-issue archived timestamps where possible. Historical is lost.
+**Impact**:
+- $: Tens of billions (legal/contract archives)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: EU Trust Service Providers sovereignty
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=3.
+
+### esim-gsma
+**Context**: GSMA eSIM SGP.22 uses RSA + ECDSA in the CI/SM-DP+/SM-DS chain; GSMA CI root signs operator SM-DP+ certs for eSIM profile download to billions of consumer + industrial (eUICC IoT) devices.
+**Red team (attack)**: Factor a CI-chain cert; mint rogue SM-DP+ and push malicious operator profiles to eSIMs — arbitrary IMSI/Ki injection, surveillance at scale. iPhone/Pixel eSIM fleets impacted.
+**Blue team (defense/recovery)**: GSMA SGP.32 IoT variant and CI migration to ECDSA/ML-DSA (in flight); OS updates for device side. Trust-anchor refresh in device-ROM is the tail.
+**Impact**:
+- $: Tens of billions
+- Lives: Connected medical, auto telematics
+- Environment: Connected-vehicle and industrial IoT
+- Geopolitical: GSMA is a global cartel; CN telecoms gain leverage via domestic eSIM CI
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=5, Stealth=4, Recoverability=2.
+
+### docsis-bpi-cable
+**Context**: CableLabs DOCSIS 3.1/4.0 BPI+ uses RSA-1024/2048 for cable-modem certs (CM-CA/CVC-CA); ~100M residential cable modems in North America + global deployments (Comcast, Charter, Cox, Rogers, Vodafone cable).
+**Red team (attack)**: Factor DOCSIS Root CA (CableLabs); clone cable-modem certs, evade class-of-service limits, join any MSO's DOCSIS backhaul. Throughput theft is commercial; network-probe is the real risk.
+**Blue team (defense/recovery)**: DOCSIS 4.0 PQ extensions in CableLabs roadmap; MSO gradually replaces modems (5+yr cycle).
+**Impact**:
+- $: Low billions (MSO revenue impact)
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: US cable MSO dominance; Vodafone/Liberty in EU
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=4.
+
+### cbrs-sas-spectrum
+**Context**: FCC CBRS (3.55-3.7 GHz) SAS operators (Google, CommScope, Federated Wireless, Sony) authenticate CBSDs with RSA-2048 device certs; millions of small-cell / private-5G / fixed-wireless endpoints.
+**Red team (attack)**: Factor SAS-issuer CA; forge CBSD certs, inject spectrum interference or false measurement data to mis-coordinate the dynamic sharing with DoD Navy radar. Navy-radar-coordination failure is the sting.
+**Blue team (defense/recovery)**: SAS operators rotate; fleet update over FWA cadence. WInnForum spec update required for PQ.
+**Impact**:
+- $: Low billions
+- Lives: Naval radar coordination edge case
+- Environment: RF interference
+- Geopolitical: DoD-CBRS sharing is a US-specific regulatory success; failure embarrasses FCC/NTIA
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=4.
+
+### dvb-ci-pay-tv
+**Context**: DVB-CI+ CAMs (Nagra, Conax, Irdeto, Verimatrix, NDS/Synamedia) use RSA-2048 for host-CAM authentication and content-key distribution; ~1B pay-TV subscribers worldwide.
+**Red team (attack)**: Factor CAM-vendor RSA key; mass piracy, operator revenue loss in the $B/year. Pay-TV operators (Sky, DirecTV, Canal+) incensed.
+**Blue team (defense/recovery)**: DVB-PQ extension in discussion; STB fleets replaced over 7-10yr cycles.
+**Impact**:
+- $: Tens of billions (lost subscriber revenue)
+- Lives: None direct
+- Environment: STB e-waste
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### atsc3-broadcast
+**Context**: ATSC 3.0 (NextGen TV) uses RSA-2048 for Broadcast-PKI signing of emergency-alert ARWARN overrides, OTA interactive-app signing, and content-signing. FCC + broadcasters deploying widely.
+**Red team (attack)**: Factor an ATSC 3 signing key; push forged EAS-equivalent emergency overrides to millions of TVs (panic, false evacuation), or push malicious HTML apps into receiver's broadcast-web runtime.
+**Blue team (defense/recovery)**: ATSC is iterating on PQ profiles; receiver-FW update OTA possible.
+**Impact**:
+- $: Billions (recall + broadcaster remediation)
+- Lives: Potential panic/evacuation casualties from forged EAS
+- Environment: None direct
+- Geopolitical: US + KR broadcast sovereignty
+**Ranking**: Criticality=3, Exploitability=4, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### iec62443-dtls-ot
+**Context**: IEC 62443-4-2 OT zone boundaries use RSA-2048 certs in DTLS/TLS between PLCs, HMIs, engineering workstations; Rockwell, Siemens, Schneider, ABB, Honeywell, Emerson all default RSA today.
+**Red team (attack)**: Factor a plant's engineering-workstation CA or vendor device CA; forge PLC-vendor engineering creds, push logic changes, cause controlled unsafe state. Triton/Trisis pattern but via crypto break.
+**Blue team (defense/recovery)**: IEC 62443 PQ profile in draft; plant certs rotatable, device ROM keys not. Ten-year OT upgrade cycles.
+**Impact**:
+- $: Tens of billions (downtime + remediation)
+- Lives: Direct — plant safety
+- Environment: Chemical / energy releases
+- Geopolitical: Global vendor mix
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=5, Stealth=5, Recoverability=1.
+
+### dnp3-scada
+**Context**: IEEE 1815 DNP3 Secure Authentication v5/v6 uses RSA-2048 for update-key distribution to substations, water, gas SCADA; NERC CIP-005 / CIP-007 leverage it. ~10,000 US utility SCADA systems.
+**Red team (attack)**: Factor a utility's DNP3-SA key distribution authority; inject malicious SCADA commands (open breakers, trip units) bypassing challenge-response. Regional blackout scenario.
+**Blue team (defense/recovery)**: IEC 62351 PQ direction; RTU firmware upgrades are slow (7-10 yr). NERC has PQ roadmap in draft.
+**Impact**:
+- $: Tens of billions (outage + damage)
+- Lives: Hospital/cold-chain outage casualties
+- Environment: Cascade failure
+- Geopolitical: US/CA grid sovereignty vs state actors
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=5, Stealth=4, Recoverability=2.
+
+### iec62351-substation
+**Context**: IEC 62351 secures IEC 61850 GOOSE/SV/MMS with RSA-2048 certs for transmission-substation automation; every transmission utility worldwide.
+**Red team (attack)**: Factor substation-vendor (Siemens SICAM, GE Multilin, ABB, SEL) or utility CA; inject GOOSE/SV to trip protection relays — Ukraine-grid-attack class.
+**Blue team (defense/recovery)**: IEC TC57 WG15 drafting PQ profile; retrofit is substation-by-substation.
+**Impact**:
+- $: Tens of billions
+- Lives: Grid-outage casualties
+- Environment: Cascade effects
+- Geopolitical: High (CN/RU state-actor interest in transmission)
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=5, Stealth=5, Recoverability=1.
+
+### hydrodam-scada
+**Context**: USBR, USACE, BPA, TVA, Hydro-Québec, EDF use RSA-2048 in signed SCADA for spillway/turbine/gate control; ~5000 large dams.
+**Red team (attack)**: Factor utility/integrator CA; override spillway/gate commands — uncontrolled release causing downstream flooding, or turbine over-speed destruction. Oroville-class potential.
+**Blue team (defense/recovery)**: Same as substation; retrofit per-dam.
+**Impact**:
+- $: Low billions (damage)
+- Lives: Mass-casualty flood scenario
+- Environment: Downstream ecological catastrophe
+- Geopolitical: High-value infrastructure
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=4, Stealth=4, Recoverability=2.
+
+### siemens-s7-tia
+**Context**: Siemens TIA Portal + S7-1500/1200 PLCs use RSA-2048 for "Know-how protection" + firmware + access-protection signatures; thousands of plants worldwide including many Stuxnet-era targets (Natanz, pharma, auto).
+**Red team (attack)**: Factor Siemens firmware signing root (published in TIA DLLs) or project-signing keys; push malicious S7 logic to every S7-1500, repeat Stuxnet against modern centrifuges/lines.
+**Blue team (defense/recovery)**: Siemens has PQ in S7-1500 V4 roadmap; fleet upgrade 5+yr. CERT@VDE + BSI coordinated advisory.
+**Impact**:
+- $: Tens of billions
+- Lives: Pharma/water/chemical safety
+- Environment: Process-safety releases
+- Geopolitical: Siemens-DE global PLC dominance; state-actor kinetic-equivalent
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=5, Stealth=5, Recoverability=1.
+
+### opcua-open62541
+**Context**: OPC UA (IEC 62541) uses RSA-2048 for client-server mutual auth across every modern plant floor; open62541, Prosys, Unified Automation stacks. Factories, smart buildings, edge-analytics.
+**Red team (attack)**: Factor plant/vendor CA; impersonate controller or SCADA client, inject setpoints.
+**Blue team (defense/recovery)**: OPC Foundation PQ extensions in v1.05+; gradual rollout.
+**Impact**:
+- $: Tens of billions
+- Lives: ICS safety
+- Environment: Plant releases
+- Geopolitical: EU/US industrial
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=2.
+
+### ros2-sros2-dds
+**Context**: ROS 2 SROS2 uses RSA-2048 in DDS-Security for robot-system auth; widely deployed in research, autonomous trucks, warehouse robots, some DoD programs.
+**Red team (attack)**: Factor fleet CA; inject commands, steer autonomous platforms.
+**Blue team (defense/recovery)**: DDS-Security PQ TC underway; fleet software update feasible.
+**Impact**:
+- $: Billions
+- Lives: Direct (autonomous robot collisions)
+- Environment: None direct
+- Geopolitical: US DoD Roboteam interest
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=4.
+
+### refinery-sis-iec61511
+**Context**: Safety Instrumented Systems (Triconex, HIMA, Yokogawa ProSafe-RS, Emerson DeltaV-SIS) under IEC 61511 sign SIL-rated logic and PST results with RSA-2048.
+**Red team (attack)**: Factor vendor or plant SIS CA; push logic bypassing safety trips — Texas City, Buncefield-class events at scale.
+**Blue team (defense/recovery)**: Vendor PQ slow (SIL re-certification); plant-by-plant.
+**Impact**:
+- $: Billions (per plant)
+- Lives: Direct mass-casualty (refinery fires/explosions)
+- Environment: Major releases (benzene, HF, sour gas)
+- Geopolitical: Operators global; sabotage attribution difficult
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=4, Stealth=5, Recoverability=1.
+
+### pipeline-api1164
+**Context**: API 1164 signed leak-detection and pipeline SCADA signing; Colonial Pipeline, Enbridge, Kinder Morgan; TSA Security Directive 2 post-Colonial.
+**Red team (attack)**: Factor operator CA; disable/mask leak-detection, override SCADA to pressurize segments — spill + rupture. Colonial v2 by state actor.
+**Blue team (defense/recovery)**: TSA pushing PQ in SD-2 revisions; field RTU upgrades slow.
+**Impact**:
+- $: Tens of billions
+- Lives: Direct (rupture casualties)
+- Environment: Major spills
+- Geopolitical: US/CA pipeline security
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=5, Stealth=4, Recoverability=1.
+
+### oilrig-bop-mux
+**Context**: BOP stacks, subsea MUX control pods, shear-ram command signing under RSA-2048/3072 (Cameron/SLB, NOV, Aker, TechnipFMC). Signed pod firmware, OIM+company-man two-person auth, RTM uplink; Macondo-post regulatory regime.
+**Red team (attack)**: Factor BOP OEM FW root → malicious pod FW silently disables last-line barrier (Macondo-class blowout without insider); factor rig-contractor OIM root → spurious shear-ram destroys pipe/well ($100M event); factor company-man root → forged co-sig bypasses two-person.
+**Blue team (defense/recovery)**: BSEE must pre-approve FW changes (30 CFR 250.734); re-cert is years. PQ migration requires MUX vendor + rig operator + regulator alignment.
+**Impact**:
+- $: Tens of billions (blowout + fleet drilling restrictions)
+- Lives: Direct rig-worker + downstream
+- Environment: Catastrophic (Macondo-class spill)
+- Geopolitical: BSEE/PSA/ANP/NOPSEMA sovereignty over national OCS
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=5, Stealth=5, Recoverability=1.
+
+### water-wima-scada
+**Context**: AWWA G430/G440 secure SCADA for water/wastewater utilities, WIMA/WaterISAC; RSA-2048 in most SCADA vendor stacks (Schneider, Rockwell, Emerson).
+**Red team (attack)**: Factor utility/vendor CA; override chlorination/fluoride dosing or flood-control gate logic — Oldsmar-style but fleet-wide. Public-health emergency.
+**Blue team (defense/recovery)**: AWWA + CISA guidance for PQ; small-utility IT maturity is low.
+**Impact**:
+- $: Billions
+- Lives: Direct (waterborne illness mass-exposure)
+- Environment: Watershed contamination
+- Geopolitical: Small utilities are soft targets
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=2.
+
+### ami-dlms-cosem
+**Context**: Smart-meter AMI under IEC 62056 DLMS/COSEM with RSA-2048 in many European/LatAm/AU deployments (Iskraemeco, Landis+Gyr, Itron, Kaifa); ~1B meters globally.
+**Red team (attack)**: Factor utility meter CA; send mass disconnect commands, create sudden load imbalance (grid-frequency event), or manipulate billing data.
+**Blue team (defense/recovery)**: DLMS-UA ML-DSA profile in flight; meter fleets replaced 15-20yr.
+**Impact**:
+- $: Tens of billions
+- Lives: Indirect (outage)
+- Environment: Grid disturbance
+- Geopolitical: Global AMI rollouts; Aurora-style attack possible
+**Ranking**: Criticality=5, Exploitability=4, BlastRadius=5, Stealth=4, Recoverability=1.
+
+### vestas-wind-turbine
+**Context**: Vestas, GE, Siemens-Gamesa, Goldwind, Envision wind-turbine SCADA + OTA firmware signing under RSA-2048. ~500GW global installed fleet.
+**Red team (attack)**: Factor OEM FW signing key; push malicious pitch/yaw or over-speed controls, destroy turbines ($3M each) at fleet scale.
+**Blue team (defense/recovery)**: OEM staged rollout; turbine controllers upgradable but unsigned-FW-rollback risk exists for legacy.
+**Impact**:
+- $: Tens of billions
+- Lives: Indirect
+- Environment: Grid decarbonization disrupted
+- Geopolitical: CN (Goldwind, Envision) gain leverage; US IRA-era fleet exposed
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=2.
+
+### osisoft-pi-historian
+**Context**: AVEVA/OSIsoft PI Historian + PI Server mTLS with RSA-2048 in tens of thousands of plant process-data repositories; half of Fortune 500 industrial has PI.
+**Red team (attack)**: Factor PI Asset Framework CA; tamper historian data (regulatory compliance fraud) or pivot from PI to ICS via AF connectors.
+**Blue team (defense/recovery)**: AVEVA ships ECC/PQ updates; plant-by-plant.
+**Impact**:
+- $: Low billions
+- Lives: Indirect
+- Environment: Compliance-data integrity
+- Geopolitical: UK-AVEVA (Schneider-owned)
+**Ranking**: Criticality=3, Exploitability=4, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### fanuc-robot
+**Context**: FANUC, KUKA, ABB, Yaskawa industrial robots sign controller firmware + safety-controller (DCS) with RSA-2048; ~4M industrial robots installed.
+**Red team (attack)**: Factor vendor FW root; push malicious trajectories, disable safety-rated monitored stop / speed-and-separation. Operator injury scenarios multiplied across plants.
+**Blue team (defense/recovery)**: FANUC CNC software modernization cycle ~10yr; PQ roadmaps nascent.
+**Impact**:
+- $: Billions
+- Lives: Direct (operator collisions)
+- Environment: None direct
+- Geopolitical: JP (FANUC, Yaskawa), DE (KUKA now CN-owned), SE (ABB)
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=2.
+
+### nuclear-iec61513
+**Context**: Class-1E safety-I&C (Framatome TXS, Westinghouse Common Q, Rolls-Royce Spinline, MELTAC) under IEC 61513/IEEE 7-4.3.2/NRC RG 1.152; RSA-2048/3072 signs RPS/ESFAS application loads, MoC parameter changes, fuel-handling steps, surveillance completions. ~440 commercial reactors.
+**Red team (attack)**: Factor vendor safety-I&C root → attacker-loaded RPS software in vulnerable units — the single most severe identifiable crypto-failure scenario in this catalog, multi-country nuclear-safety regulatory crisis. Factor utility engineering root → forged MoCs slide RPS setpoints (tech-spec envelope mitigates but erodes safety margin), forged fuel steps violate criticality-safety. Factor NRC/ASN qual root → regulatory-qualification authenticity destroyed; fleet operating restrictions pending manual reverification. Factor surveillance signing → tech-spec LCO evidentiary chain collapses.
+**Blue team (defense/recovery)**: IEC 61513/IEEE 7-4.3.2 reference specific cryptographic assurance — license-basis changes require regulator pre-approval; post-Fukushima scrutiny at max. No utility wants to be the PQ pilot. Diverse/hard-wired crypto in TXS cycle-critical paths mitigates but not administrative/downloadable-parameter paths. Recovery: fleet-wide shutdown + manual reverification of every plant Q-file.
+**Impact**:
+- $: Hundreds of billions (fleet shutdown + re-attestation; $250k/day NRC CALs accumulate)
+- Lives: Catastrophic potential (RPS bypass in vulnerable unit) + indirect (grid loss)
+- Environment: Worst-case — core-damage release; best-case — massive outage carbon-backfill
+- Geopolitical: Multi-country regulator crisis (NRC/ASN/ONR/STUK/CNSC/NRA/NNSA/Rostechnadzor) — civilian-nuclear program credibility
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=5, Stealth=5, Recoverability=1. The single worst scenario in the catalog.
+
+### nuclear-iec62645
+**Context**: IEC 62645 nuclear cybersecurity framework extends 61513; RSA-2048 in operator cyber-program attestations under 10 CFR 73.54.
+**Red team (attack)**: Factor utility cyber-program signing → falsify compliance posture, hide incidents from NRC inspections.
+**Blue team (defense/recovery)**: Administrative (not safety-path); document rebuild.
+**Impact**:
+- $: Low billions ($250k/day NRC CAL accumulation)
+- Lives: Indirect
+- Environment: Indirect
+- Geopolitical: NRC audit-authority credibility
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=5, Recoverability=3.
+
+### iaea-safeguards
+**Context**: IAEA safeguards attribute-tagging + C/S (Containment/Surveillance) data signing under RSA-2048 from IAEA HQ (Vienna) → inspected facilities. Nuclear-nonproliferation monitoring chain.
+**Red team (attack)**: Factor IAEA safeguards signing key; forge inspector-attribute tags, fake C/S records — enable covert SQ (Significant Quantity) diversion undetected. NPT verification chain collapses.
+**Blue team (defense/recovery)**: IAEA moves slowly; member-state trust is the asset. PQ roadmap (IAEA IT Department 2025+).
+**Impact**:
+- $: None direct
+- Lives: Indirect (proliferation → war)
+- Environment: Catastrophic if proliferation enabled
+- Geopolitical: NPT regime collapse — the worst non-kinetic geopolitical scenario
+**Ranking**: Criticality=5, Exploitability=2, BlastRadius=5, Stealth=5, Recoverability=2.
+
+### link16-mids
+**Context**: Link 16 / MIDS tactical data link uses mix of hardware-keyed SLS/EHF crypto; RSA appears in MIDS terminal firmware signing, CVSD key distribution at theatre level (SKL-A/B, MIDS-LVT).
+**Red team (attack)**: Factor MIDS vendor FW root; push malicious SA/TA ops to terminals, degrade blue-force tracking, enable blue-on-blue. Terminal re-flash requires depot access, so sustainment-chain attack.
+**Blue team (defense/recovery)**: DoD has PQ roadmap under CNSA 2.0 (ML-KEM/ML-DSA mandatory in NSS by 2035); MIDS Block Upgrade 2 includes PQ.
+**Impact**:
+- $: Low billions
+- Lives: Direct (combat)
+- Environment: None direct
+- Geopolitical: NATO coalition interop
+**Ranking**: Criticality=4, Exploitability=2, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### galileo-osnma
+**Context**: Galileo Open Service Navigation Message Authentication uses ECDSA but falls back to RSA root-key distribution in some ground-segment paths; GPS Chimera has similar patterns.
+**Red team (attack)**: Factor OSNMA root (if RSA), forge authenticated nav messages — spoof GNSS-PNT for civilian/commercial users (maritime nav, aviation ILS augments).
+**Blue team (defense/recovery)**: GSA has PQ roadmap; OSNMA primary is ECDSA so less urgent.
+**Impact**:
+- $: Low billions
+- Lives: Direct (maritime/aviation incidents)
+- Environment: Shipping accidents
+- Geopolitical: EU space sovereignty; US GPS Chimera in parallel
+**Ranking**: Criticality=3, Exploitability=2, BlastRadius=3, Stealth=3, Recoverability=4.
+
+### spacex-autonomous-fts
+**Context**: Autonomous Flight Termination System (SpaceX AFTS, ULA Vulcan, Blue Origin) uses signed onboard crypto for range-safety termination authority; RSA-2048 in current gens.
+**Red team (attack)**: Factor AFTS signing key → spurious termination (vehicle loss, $B per launch) or suppressed termination (uncontrolled trajectory; public-safety event).
+**Blue team (defense/recovery)**: SpaceX/USSF iterating toward PQ; new vehicles only.
+**Impact**:
+- $: Billions per incident
+- Lives: Catastrophic if AFTS failure in populated overflight
+- Environment: Debris
+- Geopolitical: US range-safety credibility
+**Ranking**: Criticality=4, Exploitability=2, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### aerospace-ccsds
+**Context**: CCSDS Space Data Link Security + Secure Commanding use RSA-2048/3072 for satellite TC signing (ESA, NASA, JAXA, commercial — Intelsat, SES, Iridium, Starlink early). ~10k operational sats.
+**Red team (attack)**: Factor ground-segment signing key; send malicious TCs to satellites — wobble orbit, burn propellant, attitude-control upset. Satellites are not easily physically-serviceable.
+**Blue team (defense/recovery)**: CCSDS has PQ profiles (ML-DSA in CCSDS 355.0); ground-segment-only upgradable, space-segment stuck for mission life.
+**Impact**:
+- $: Tens of billions
+- Lives: Indirect (GPS loss → safety)
+- Environment: Kessler-cascade risk
+- Geopolitical: Space-sovereignty (US/EU/CN/RU/IN) at risk
+**Ranking**: Criticality=4, Exploitability=2, BlastRadius=4, Stealth=5, Recoverability=1.
+
+### faa-remote-id
+**Context**: FAA Remote ID (14 CFR Part 89) and ASTM F3411 use RSA/ECDSA signatures for drone ID broadcasts; required on every US commercial/recreational drone above 250g.
+**Red team (attack)**: Factor manufacturer signing key; broadcast spoofed Remote IDs, mask drone incursions or falsely attribute flights.
+**Blue team (defense/recovery)**: FAA rulemaking; manufacturer FW updates. Mass fleet upgradable via app.
+**Impact**:
+- $: Low billions
+- Lives: Minor (drone-collision evasion)
+- Environment: None direct
+- Geopolitical: US-specific regulation
+**Ranking**: Criticality=2, Exploitability=4, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### avionics-arinc665
+**Context**: ARINC 665 / 645 LSAP (Loadable Software Aircraft Part) signing under RSA-2048/3072 for every commercial airliner software load (Boeing, Airbus, Embraer, Bombardier). ~25k airframes globally.
+**Red team (attack)**: Factor airframe-OEM or avionics-vendor (Honeywell, Collins, Thales, GE Aviation) signing root; push malicious LSAPs during MRO cycle — hidden unsafe flight-control behavior. Not instant but fleet-wide persistent.
+**Blue team (defense/recovery)**: ARINC/RTCA DO-326A/356A cyberworthiness + AMC 20-42; PQ in draft. Airworthiness-Directive-driven software re-cert is years per type.
+**Impact**:
+- $: Hundreds of billions (fleet groundings + MRO)
+- Lives: Direct mass-casualty (jetliner)
+- Environment: Major accidents
+- Geopolitical: Boeing/Airbus duopoly; FAA/EASA action chaos
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=5, Stealth=5, Recoverability=1.
+
+### acars-cpdlc-datalink
+**Context**: CPDLC (Controller-Pilot Data Link) and FANS-1/A over ACARS/VDL Mode 2 use RSA-2048 in newer authenticated variants (ATN/IPS, ED-228A); global oceanic ATC and increasingly continental.
+**Red team (attack)**: Factor ANSP signing key; inject false CPDLC clearances to aircraft (descend/climb into conflict). Mass mid-air scenario.
+**Blue team (defense/recovery)**: ICAO working PQ for ATN/IPS; FAA/Eurocontrol driving timelines. Slow.
+**Impact**:
+- $: Low billions
+- Lives: Direct mass-casualty
+- Environment: None direct
+- Geopolitical: ICAO consensus
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=2.
+
+### gmdss-inmarsat
+**Context**: Global Maritime Distress and Safety System — Inmarsat C/Fleet Safety + Iridium GMDSS use RSA in SafetyNET II / LRIT / SSAS signed traffic. IMO mandated.
+**Red team (attack)**: Factor SafetyNET key; forge MSI (navigational warnings, piracy alerts) or suppress distress; affects every SOLAS vessel.
+**Blue team (defense/recovery)**: IMO NCSR working groups; migration 7-10 years.
+**Impact**:
+- $: Low billions
+- Lives: Direct (shipping distress)
+- Environment: Maritime spills from missed alerts
+- Geopolitical: IMO/Inmarsat/Iridium
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### iho-s63-ecdis
+**Context**: IHO S-63 ENC (Electronic Navigational Chart) encryption + RSA-signed cell permits for ECDIS; every SOLAS commercial vessel.
+**Red team (attack)**: Factor IHO/hydrographic-office signing key; forge ENC updates with malicious chart data (wrong depths), cause groundings.
+**Blue team (defense/recovery)**: IHO S-100 successor standard has PQ hooks; fleet ECDIS upgrades 10+ yr.
+**Impact**:
+- $: Low billions
+- Lives: Direct (grounding casualties)
+- Environment: Oil spills from groundings
+- Geopolitical: National hydrographic offices
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### submarine-cable-slte
+**Context**: Submarine Line Terminal Equipment (SLTE: Ciena, Nokia, Infinera) OAM uses RSA-2048; signed patches + mgmt VPNs for cable-landing stations.
+**Red team (attack)**: Factor SLTE vendor mgmt key; alter DWDM channel mapping, tap optical traffic, or cause cable-system outages. Affects 99% intercontinental internet.
+**Blue team (defense/recovery)**: Vendor PQ roadmap, cable-landing station access is hard to compromise physically so FW signing is the main vector.
+**Impact**:
+- $: Tens of billions (internet outage)
+- Lives: Indirect (emergency services)
+- Environment: None direct
+- Geopolitical: US/EU/CN/RU cable-sovereignty battles
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=5, Stealth=5, Recoverability=2.
+
+### p25-otar-radio
+**Context**: APCO P25 Phase 2 LMR + OTAR (Over-The-Air Rekeying) KMF uses RSA-2048 for asymmetric rekey to LE/fire/EMS/military radios; ~3M radios globally.
+**Red team (attack)**: Factor agency KMF key; push bogus TEKs, disrupt interop at critical incident, or decrypt historic tactical traffic.
+**Blue team (defense/recovery)**: Motorola, L3Harris, Tait, Kenwood phasing PQ in P25 Phase 3; radio re-flash via depot.
+**Impact**:
+- $: Low billions
+- Lives: Direct (first-responder comms)
+- Environment: None direct
+- Geopolitical: Public-safety sovereignty
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### us-ptc-railway
+**Context**: FRA-mandated Positive Train Control uses signed onboard/wayside messaging; AAR IEEE 1570 IRAC over RSA-2048 for wayside interface and locomotive message-gateway certs. BNSF, UP, NS, CSX, Amtrak.
+**Red team (attack)**: Factor railroad CA; inject PTC messages causing enforcement trips (false emergency brakes) or suppressing enforcement (misaligned switch override). LaChine/Lac-Mégantic-class potential.
+**Blue team (defense/recovery)**: FRA has PQ roadmap; interop-class-I rollout multi-year.
+**Impact**:
+- $: Low billions
+- Lives: Direct mass-casualty (collision/derailment)
+- Environment: Haz-mat tanker spills
+- Geopolitical: US/CA/MX rail
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=2.
+
+### railway-ertms
+**Context**: ERTMS/ETCS L2/L3 and Euroradio KMC use RSA-2048 for KMC-RBC certs; all EU high-speed rail + increasing mainline.
+**Red team (attack)**: Factor national railway KMC; forge MA (Movement Authority) or emergency stop messages. SNCF, DB, RFI scale outages or incidents.
+**Blue team (defense/recovery)**: UIC/ERA pushing PQ in ERTMS baseline 4; infrastructure upgrade 10+ yr.
+**Impact**:
+- $: Low billions
+- Lives: Direct mass-casualty
+- Environment: None direct
+- Geopolitical: EU rail sovereignty, CN CRH export stack
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=2.
+
+### cbtc-subway
+**Context**: Communication-Based Train Control (NYC MTA, London Underground, Paris Metro, HK MTR) uses RSA-2048 in vendor CBTC stacks (Thales Seltrac, Siemens Trainguard, Alstom Urbalis).
+**Red team (attack)**: Factor operator/vendor CA; inject movement authorities causing collisions or station overruns.
+**Blue team (defense/recovery)**: IEEE 1474 + vendor PQ roadmaps; retrofit per-line multi-year.
+**Impact**:
+- $: Low billions
+- Lives: Direct (rush-hour mass-casualty)
+- Environment: None direct
+- Geopolitical: Metropolitan
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=2.
+
+### digital-tachograph-eu
+**Context**: EU digital tachograph (Regulation 165/2014) + Smart Tachograph Gen 2 use RSA-2048/3072 in the European Root CA (JRC Ispra) for driver/workshop/company/VU cards; every HGV in EU/EEA.
+**Red team (attack)**: Factor ERCA RSA key; forge driver cards to falsify driving hours (fatigue-law evasion) or workshop cards to tamper with tachograph. Road-safety erosion at continental scale.
+**Blue team (defense/recovery)**: Gen 2 V2 has ECC migration already; PQ roadmap nascent. Card reissuance 5yr cycle.
+**Impact**:
+- $: Billions
+- Lives: Direct (driver-fatigue collisions)
+- Environment: Indirect
+- Geopolitical: EU transport-sovereignty
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### eu-tachograph-dtco
+**Context**: Continental VDO DTCO tachograph + driver-card PKI (closely related to above); DE-specific operator.
+**Red team (attack)**: Same as above at vendor scope.
+**Blue team (defense/recovery)**: Same.
+**Impact**: Same scope narrower.
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### etc-tolling
+**Context**: ETC tolling (E-ZPass IAG, EU EETS, Japan ETC 2.0, Australia/NZ Transurban) uses RSA-2048 in OBE certs + back-office signing. Hundreds of millions of transponders.
+**Red team (attack)**: Factor issuer CA; clone transponder ID, free tolls; more interestingly — falsify cross-state/country settlement, revenue-leak scheme operators.
+**Blue team (defense/recovery)**: Transponder fleets replaced slowly; back-office replace ECDSA easier.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: National/regional
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### iso15118-ev-charging
+**Context**: ISO 15118 Plug & Charge uses RSA-2048 in the V2G PKI (Hubject + Autel Energy + CharIN participants) for contract certs and OCPP; EU AFIR mandate + US NEVI.
+**Red team (attack)**: Factor V2G root CA; forge contract certs, charge to any EV account (fraud) or — more severe — inject ISO 15118-20 commands as CPO, open unsafe bidirectional flows (V2G) causing grid imbalance.
+**Blue team (defense/recovery)**: V2G-PKI governance (VDE-FNN, OCA) rotating; fleet charger + vehicle FW multi-year.
+**Impact**:
+- $: Tens of billions (EV charging fraud + grid stability)
+- Lives: Indirect
+- Environment: EV rollout confidence
+- Geopolitical: EU transport electrification
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=2.
+
+### evse-iso15118-pnc
+**Context**: EVSE (charging stations) Plug-and-Charge subset of above; OCPP 2.0.1 uses mTLS with RSA-2048.
+**Red team (attack)**: Same; OCPP backend impersonation of any charger across CSMS.
+**Blue team (defense/recovery)**: Same.
+**Impact**: Same.
+**Ranking**: Criticality=4, Exploitability=4, BlastRadius=4, Stealth=4, Recoverability=2.
+
+### insurance-telematics-ubi
+**Context**: Usage-based insurance (Progressive Snapshot, Allstate Drivewise, LexisNexis Nuonic, Octo) uses RSA-2048 in telematics-dongle device certs and back-office signing.
+**Red team (attack)**: Factor issuer CA; inject false telematics records to manipulate premiums or forge vehicle-loss data.
+**Blue team (defense/recovery)**: Carrier rotation fast; dongle/vehicle-OEM fleet slower.
+**Impact**:
+- $: Low billions
+- Lives: None direct
+- Environment: None direct
+- Geopolitical: None
+**Ranking**: Criticality=2, Exploitability=3, BlastRadius=2, Stealth=3, Recoverability=4.
+
+### john-deere-agtech
+**Context**: John Deere Operations Center + JDLink telematics authenticates equipment via RSA-2048 device certs; 2M+ connected machines. Also used for ag data integrity (yield maps).
+**Red team (attack)**: Factor JD device CA; brick or remote-control combines/sprayers at harvest (food-supply disruption at scale) — CN-RU state-actor scenario against US breadbasket.
+**Blue team (defense/recovery)**: Deere has JDLink Next + PQ roadmap; fleet software update via cellular.
+**Impact**:
+- $: Tens of billions (harvest disruption)
+- Lives: Indirect (food security)
+- Environment: Food-supply shock
+- Geopolitical: Food-security weapon
+**Ranking**: Criticality=4, Exploitability=3, BlastRadius=4, Stealth=4, Recoverability=3.
+
+### komatsu-autonomous-mining
+**Context**: Komatsu FrontRunner, Caterpillar Command autonomous haul-truck fleets at Pilbara, Chilean copper etc. sign vehicle + fleet-mgmt comms with RSA-2048.
+**Red team (attack)**: Factor fleet CA; steer autonomous 300-ton haul trucks into ore-processing plants or into each other. Catastrophic at mine scale.
+**Blue team (defense/recovery)**: Mine-operator-scope PKI; site-by-site replacement.
+**Impact**:
+- $: Low billions (mine outage)
+- Lives: Direct (haul-truck collisions)
+- Environment: Local
+- Geopolitical: Supply-chain for strategic minerals
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=3, Recoverability=3.
+
+### otis-elevator
+**Context**: Otis, Kone, Schindler, Mitsubishi elevator IoT (Otis ONE, Kone 24/7) uses RSA-2048 for controller telemetry + safety-firmware signing. Millions of elevators.
+**Red team (attack)**: Factor OEM FW key; push malicious controller logic — disable safety overspeed governors, entrap riders, or cause car-to-shaft collisions.
+**Blue team (defense/recovery)**: EN 81-20/50 safety-code re-cert; fleet software update multi-year.
+**Impact**:
+- $: Billions
+- Lives: Direct (entrapment, falls)
+- Environment: None direct
+- Geopolitical: Global OEMs
+**Ranking**: Criticality=3, Exploitability=3, BlastRadius=3, Stealth=4, Recoverability=3.
+
+### ski-lift-doppelmayr
+**Context**: Doppelmayr/Leitner, Poma, Bartholet ski-lift/gondola control systems sign safety-controller FW with RSA-2048 under TÜV SÜD/EN 13243.
+**Red team (attack)**: Factor OEM key; disable emergency brake or manipulate speed envelopes.
+**Blue team (defense/recovery)**: TÜV re-cert; fleet upgrade seasonal.
+**Impact**:
+- $: Low billions
+- Lives: Direct (mass-casualty gondola failure)
+- Environment: None direct
+- Geopolitical: Alpine/resort
+**Ranking**: Criticality=3, Exploitability=2, BlastRadius=2, Stealth=3, Recoverability=3.
+
+### medical-device-fda
+**Context**: FDA pre-market guidance (2023) + Section 524B require SBOM + signed firmware for medical devices; RSA-2048 is standard across Medtronic, Abbott, Philips, GE Healthcare, Siemens Healthineers, Roche.
+**Red team (attack)**: Factor OEM FW key; push malicious insulin pump, pacemaker, ventilator FW at scale. Direct lethal capability.
+**Blue team (defense/recovery)**: FDA PMA supplement required; device-by-device recall. Fleet upgrade years.
+**Impact**:
+- $: Tens of billions
+- Lives: Direct, catastrophic (implanted devices, life-support)
+- Environment: None direct
+- Geopolitical: US medical-device industry
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=5, Stealth=5, Recoverability=1.
+
+### medtronic-cied
+**Context**: Medtronic CIED (Cardiac Implantable Electronic Devices: pacemakers, ICDs, LVADs) use RSA-2048 for programmer auth + remote monitoring (CareLink); ~2M active implants.
+**Red team (attack)**: Factor Medtronic CIED signing key; deliver malicious FW via programmer or CareLink home monitor — induce lethal shock or program shutdown. Direct assassination capability.
+**Blue team (defense/recovery)**: FDA coordinated recall; FW update requires clinic visit for many models. Explantation for older models — surgical risk for millions of patients.
+**Impact**:
+- $: Billions
+- Lives: Direct lethal (patient by patient)
+- Environment: None direct
+- Geopolitical: Assassination capability at head-of-state scale
+**Ranking**: Criticality=5, Exploitability=3, BlastRadius=4, Stealth=5, Recoverability=1.
+
+### illumina-sequencer
