@@ -1698,3 +1698,81 @@ The **financial-system-of-record cluster**: SWIFT messages ~$150T/year; IBM Cryp
 4. **The worst-case attacker is not the ransomware crew.** The attacker-value gradient runs: ransomware (pick off ATMs, lottery, hotel locks) → organized fraud (SWIFT, EMV, tax/customs e-filing) → state SIGINT (ePassport, PIV/CAC, PKI roots, VPN CAs) → strategic state actor (safety-I&C, BOP, SIS, avionics, grid). Tier-S/A systems are strategic-state-actor-grade targets, consistent with the observed investment in long-term cryptanalysis by the same actors.
 
 5. **PQ migration completion rate is the single best predictor of recovery posture.** Every system with PQ-capable silicon already shipping (AWS Nitro, Azure MAA, iOS Secure Enclave 2024+, Pixel 9+, Chrome TLS hybrid, Signal PQXDH) degrades gracefully. Every system on ROM-fused RSA silicon in long-life infrastructure (older TPMs, EV/auto ECUs, industrial PLCs with 20-year life, submarine-cable SLTE, legacy BOP pods) *cannot* degrade gracefully; polynomial-factoring day is replacement-cycle day.
+
+---
+
+## Financial-impact re-scoring
+
+Detailed per-system $-research with citations lives in `/home/ubuntu/rsa-is-kill/financial_research.md`. This section distills methodology changes and the revised top-$ ranking.
+
+### Methodology note
+
+The original rubric treats Criticality, Exploitability, BlastRadius, Stealth, Recoverability as ordinal 1–5 and sums to a 25-cap composite. Financial research reveals three systematic biases:
+
+1. **BlastRadius conflates count-of-victims with $-per-victim.** ATM-XFS and ADCS both score BlastRadius=5, but ADCS' per-incident $ is 100× larger. The axis is really `log(N_affected × $/affected)`.
+2. **Recoverability=1 (decade+) should dominate Criticality=5 (load-bearing) when $ is installed-base × silicon-refresh cost.** ARM-TF-A, Android AVB, AUTOSAR, TPM-EK: their composites ignore that ROM-fused keys generate an uncountable replacement bill. Silicon-refresh is the hidden axis.
+3. **Precedent-anchored $ is a better signal than intuition.** Several entries were marked "Trillions" where the actual one-year damage envelope is low-hundreds of billions (SWIFT, HSM-firmware, SAP, IBM-ICSF — these are trillion-*notional* but not trillion-*loss*). Conversely, AVB, ADCS, openssh-host-keys, submarine-cable-slte look underestimated once installed-base × precedent-per-unit arithmetic is run.
+
+Suggested change: split `BlastRadius` into `Reach` (count affected) and `Severity` ($/affected, log-bucketed) OR add a standalone `DollarsAtRisk` axis scored 1–5 from the re-research table.
+
+### Revised top-20 by headline $-impact (not composite)
+
+Anchored to the midpoint of the confidence-interval column in `financial_research.md`.
+
+| Rank | System | Revised $ (midpoint) | Prev composite | Tier under old rubric |
+|---|---|---|---|---|
+| 1 | submarine-cable-slte | $500B/day sustained | 22 | A |
+| 2 | arm-trustzone-tfa | $1T | 25 | S |
+| 3 | autosar-ecu-hsm | $600B | 24 | S |
+| 4 | swift-financial | $1T (multi-year) | 22 | A |
+| 5 | sap-netweaver-sso | $600B | 22 | A |
+| 6 | shim-uefi + authenticode-pe | $600B combined | 23 | A |
+| 7 | kerberos-pkinit + adcs-windows | $500B combined | 20 / 25 | B / S |
+| 8 | windows-dpapi | $300B | 23 | A |
+| 9 | ibm-icsf-mainframe | $300B | 22 | A |
+| 10 | rpki-routinator / dnssec-bind9 | $300B/day peak | 20 / 19 | B / B |
+| 11 | android-avb | $250B | 25 | S |
+| 12 | avionics-arinc665 | $200B | 23 | A |
+| 13 | kubernetes-kubeadm / jwt-libjwt | $300B combined | 22 / 19 | A / B |
+| 14 | ami-dlms-cosem | $125B | 23 | S |
+| 15 | hsm-firmware-signing | $125B | 25 | S |
+| 16 | refinery-sis-iec61511 | $175B | 22 | S |
+| 17 | emv-payment-cards | $100B | 21 | A |
+| 18 | fix-cme-exchange | $600B notional | 21 | A |
+| 19 | medical-device-fda | $60B | 23 | A |
+| 20 | epassport-icao | $60B | 21 | B |
+
+Divergence from composite top-20: the composite ranking over-indexes on OT (Siemens S7, IEC 62351, IEC 62443) which land high-$ collectively but rank modestly on a per-system basis; it under-indexes on internet-plumbing (submarine cables, DNS, BGP) which are Tier-B on composite but Tier-S on $.
+
+### Surprises (research flipped the implicit $-tier)
+
+**Upgraded:**
+- **submarine-cable-slte** — current "Tens of billions" is off by 1–2 OOMs. $10T/day financial flows + 99% of intercontinental traffic make any sustained outage trillion-class.
+- **android-avb** — "Tens of billions" is wrong for device-replacement arithmetic alone ($100-300B).
+- **openssh-host-keys** — "Tens of billions" undersells SolarWinds-grade supply-chain injection; $50-100B more defensible.
+- **openldap-tls / saml-ruby** — enterprise IAM break is closer to SolarWinds territory ($100B) than "tens of billions".
+
+**Downgraded:**
+- **atm-xfs-firmware** — "Tens of billions" is overstated given empirical ATM fraud ceiling ~$2.4B/yr global. Actual envelope $2–10B.
+- **hsm-firmware-signing** — the HSM-layer itself is low-hundreds-of-billions; the "trillions" damage lives downstream in SWIFT/EMV/ICSF, already double-counted.
+- **fido2-webauthn** — per-credential keys are ECDSA (intact); blast confined to attestation enrollment. "Hundreds of billions" overstates.
+- **nss-firefox** — modern TLS uses ECDHE; live-MitM narrower than "Hundreds of billions" implied. $30-100B.
+- **nuclear-iec61513** — "Hundreds of billions" overshoots; NRC fleet-CAL arithmetic yields $30-100B.
+
+**Tier S/A composite entries the $ research *confirmed*:** ADCS, ARM TF-A, AUTOSAR, Authenticode/shim, SAP, SWIFT, Windows DPAPI, EMV, avionics, oil-rig BOP, medical-device-FDA, pipeline API-1164.
+
+### Recommended rubric revision
+
+Keep the 5-axis composite for operational/red-team purposes, but **add a sixth axis `DollarsAtRisk` bucketed as**:
+
+| Score | Envelope (midpoint) |
+|---|---|
+| 5 | > $500B |
+| 4 | $100B – $500B |
+| 3 | $30B – $100B |
+| 2 | $5B – $30B |
+| 1 | < $5B |
+
+Report both composites: `C+E+B+S+(6−R)` (operational severity) and `C+E+B+S+(6−R)+D` (policy/budget prioritization). The two orderings diverge enough that single-number rankings are misleading for budgeting PQ-migration capex vs. red-team threat-model work.
+
+A further refinement — weight `Recoverability` × `DollarsAtRisk` as an interaction term, since the worst systems are the ones where $ is high *and* recovery is slow (ROM-fused, regulator-bound). This captures ARM-TF-A / AUTOSAR / HSM-firmware better than either axis alone.
