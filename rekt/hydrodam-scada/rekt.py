@@ -5,19 +5,17 @@ inflow, creating Oroville 2017-class downstream flooding with valid audit trail.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # Operator command-signing RSA-2048 key (NERC CIP registered)
-OPERATOR_CMD_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# AGC dispatch signing key (ISO/TSO → plant)
-AGC_DISPATCH_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# SCADA command types (ABB Symphony Plus / Emerson Ovation protocol)
+_demo = generate_demo_target()
+OPERATOR_CMD_PUBKEY_PEM = _demo["pub_pem"]
+AGC_DISPATCH_PUBKEY_PEM = _demo["pub_pem"]
 CMD_SPILLWAY_GATE_OPEN = 0x0101
 CMD_SPILLWAY_GATE_CLOSE = 0x0102
 CMD_WICKET_GATE_SETPOINT = 0x0201

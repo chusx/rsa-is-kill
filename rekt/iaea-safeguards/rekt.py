@@ -6,8 +6,8 @@ diversion at safeguarded facilities.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
@@ -15,11 +15,9 @@ import time
 import os
 
 # IAEA safeguards equipment root CA (signs NGSS, VACOSS, UMS device certs)
-IAEA_EQUIP_ROOT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# IAEA inspector PKI root
-IAEA_INSPECTOR_ROOT_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# Safeguards instrument types
+_demo = generate_demo_target()
+IAEA_EQUIP_ROOT_PUBKEY_PEM = _demo["pub_pem"]
+IAEA_INSPECTOR_ROOT_PEM = _demo["pub_pem"]
 NGSS_CAMERA = 0x01       # Next-Generation Surveillance System
 VACOSS_SEAL = 0x02       # Electronic optical seal
 EOSS_SEAL = 0x03         # Electronic Optical Sealing System

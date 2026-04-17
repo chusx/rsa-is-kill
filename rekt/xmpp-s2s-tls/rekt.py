@@ -4,8 +4,10 @@ available on open port 5269. Intercept German TI Messenger healthcare messages,
 Cisco Jabber enterprise IM, BwMessenger military comms. XEP-0178 SASL EXTERNAL bypass.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -36,7 +38,7 @@ def grab_s2s_cert(domain: str, port: int = S2S_PORT) -> bytes:
     print(f"[*] connecting to {domain}:{port} (XMPP S2S federation)")
     print(f"[*] TLS handshake -> RSA-2048 certificate extracted")
     print("[*] no credentials needed — federation requires open port")
-    return b"-----BEGIN CERTIFICATE-----\n...(S2S cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def impersonate_xmpp_server(factorer: PolynomialFactorer,

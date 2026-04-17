@@ -6,16 +6,18 @@ needing zero-days, because the post-TRISIS 'improvement' was RSA signing.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 
 # Siemens SPPA-T3000 vendor CA cert (in firmware header)
-SPPA_VENDOR_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+SPPA_VENDOR_PUBKEY_PEM = _demo["pub_pem"]
 # Schneider Tricon v11 firmware signing cert (post-TRISIS improvement)
-TRICON_VENDOR_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+TRICON_VENDOR_PUBKEY_PEM = _demo["pub_pem"]
 
 PLATFORMS = {
     "SPPA-T3000": {"units": 170, "vendor": "Siemens"},

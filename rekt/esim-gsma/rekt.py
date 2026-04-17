@@ -5,7 +5,7 @@ OTA firmware attack path on automotive and medical eSIM devices with 15-year lif
 """
 
 import sys, hashlib, json
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # GSMA SGP.02/SGP.22 Remote SIM Provisioning roles

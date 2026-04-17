@@ -5,8 +5,10 @@ Passive Authentication and Active Authentication at every border worldwide.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 # ICAO Doc 9303 data groups
 DG1_MRZ = 1          # Machine Readable Zone
@@ -24,12 +26,12 @@ def fetch_csca_from_icao_pkd(country_code: str) -> bytes:
     print(f"    ICAO PKD: pkd.icao.int")
     print(f"    country: {country_code}")
     print("    CSCA cert: RSA-2048 (or RSA-4096 for some countries)")
-    return b"-----BEGIN CERTIFICATE-----\nMIID...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def factor_csca(cert_pem: bytes) -> bytes:
     factorer = PolynomialFactorer()
-    return factorer.privkey_from_cert_pem(cert_pem)
+    return factorer.reconstruct_privkey(cert_pem)
 
 
 def build_data_groups(mrz: str, face_jpeg: bytes, name: str,
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     print("    Passive Authentication will PASS at any border")
 
     print("[5] cloning Active Authentication chip key")
-    aa_privkey = factor_aa_key(b"DG15_PUBKEY")
+    aa_privkey = factor_aa_key(_demo["pub_pem"])
     print("    AA challenge-response will PASS")
 
     print("[6] building complete passport chip clone")

@@ -5,7 +5,7 @@ locked devices with green-state verification — no bootloader unlock required.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # AVB2 constants from libavb/avb_vbmeta_image.h

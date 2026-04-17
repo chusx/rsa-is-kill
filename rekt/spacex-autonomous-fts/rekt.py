@@ -4,8 +4,10 @@ destruct signing keys. Issue signed destruct commands to vehicles in flight,
 or swap corridor polygons in mission loads. Per RCC 319-19 / FAA Part 417.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import struct
 import hashlib
@@ -31,7 +33,7 @@ def extract_range_signing_pubkey(afss_firmware: bytes) -> bytes:
     """
     print("[*] parsing AFSS firmware for range command-auth public key")
     print("[*] RSA-2048 public key extracted (dual-custody HSM-held)")
-    return b"-----BEGIN PUBLIC KEY-----\n...(range key)...\n-----END PUBLIC KEY-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_destruct_command(factorer: PolynomialFactorer,

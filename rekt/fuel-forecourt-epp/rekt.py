@@ -5,7 +5,7 @@ signed firmware that silently exfiltrates EMV + PIN data from every pump in a
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # PCI PTS POI device types at the pump

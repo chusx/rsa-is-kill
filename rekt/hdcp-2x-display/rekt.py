@@ -5,17 +5,16 @@ and forged SRM revocation lists that brick target displays.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import os
 
 # DCP LLC RSA-3072 root public key — burned into every HDCP 2.x source
-DCP_LLC_ROOT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBojANBgkq..."
-
-# HDCP 2.x AKE protocol constants
+_demo = generate_demo_target()
+DCP_LLC_ROOT_PUBKEY_PEM = _demo["pub_pem"]
 CERTRX_SIZE = 522
 RECEIVER_ID_LEN = 5
 RSA_1024_KEY_LEN = 128

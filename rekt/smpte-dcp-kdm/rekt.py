@@ -4,7 +4,7 @@ Manager RSA-2048 keys or the studio's DKDM-signing root. Extract AES-128
 content keys from KDMs, enable zero-day piracy of theatrical releases.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import hashlib

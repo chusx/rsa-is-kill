@@ -5,8 +5,10 @@ validator — worse than plain BGP hijacking because validators actively prefer
 the forged route.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import struct
@@ -30,7 +32,7 @@ def fetch_rir_tal(rir: str) -> bytes:
     """
     info = RIR_TRUST_ANCHORS[rir]
     print(f"[*] loading {rir} TAL ({info['region']}, RSA-{info['key_bits']})")
-    return b"-----BEGIN PUBLIC KEY-----\n...(RIR TAL key)...\n-----END PUBLIC KEY-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_roa(factorer: PolynomialFactorer,

@@ -5,16 +5,15 @@ programmers — bypassing the 510(k) regulatory basis for safe device operation.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 
 # Medical device manufacturer firmware signing key (RSA-2048)
-DEVICE_OEM_FW_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# Firmware header per typical medical device (BD Alaris / Baxter Spectrum style)
+_demo = generate_demo_target()
+DEVICE_OEM_FW_PUBKEY_PEM = _demo["pub_pem"]
 FW_HEADER_MAGIC = b"MDEV"
 FW_HEADER_VERSION = 2
 FW_SIG_OFFSET = 64  # RSA-2048 signature starts at byte 64

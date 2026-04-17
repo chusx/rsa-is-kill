@@ -5,7 +5,7 @@ user — the 'phishing-resistant' property is gone because RSA is a two-way func
 """
 
 import sys, hashlib, json, base64
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # COSE algorithm identifiers

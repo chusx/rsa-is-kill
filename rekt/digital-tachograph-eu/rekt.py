@@ -5,7 +5,7 @@ accepted EU-wide, and falsify driving-time records to circumvent Regulation
 """
 
 import sys, struct, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # Tachograph card types per Annex IB/IC

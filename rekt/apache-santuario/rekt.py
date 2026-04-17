@@ -5,7 +5,7 @@ EHR systems via the Apache Santuario / WSS4J signing path.
 """
 
 import sys, hashlib, base64
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # W3C XMLDSig algorithm URIs — no ML-DSA URI exists

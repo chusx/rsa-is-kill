@@ -5,7 +5,7 @@ every FMS-equipped commercial aircraft via the standard 28-day AIRAC cycle.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # ARINC 665-3 Software Part (SWP) types

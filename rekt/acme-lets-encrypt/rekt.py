@@ -5,7 +5,7 @@ the account owner, revoke all certificates, then re-issue for MITM.
 """
 
 import sys, json, hashlib, base64, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 ACME_DIRECTORY = "https://acme-v02.api.letsencrypt.org/directory"

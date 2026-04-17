@@ -5,7 +5,7 @@ against arbitrary vehicle IDs for fraudulent billing of random motorists.
 """
 
 import sys, struct, hashlib, json, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # CEN-DSRC 5.8 GHz tag transaction fields (ISO 14906)

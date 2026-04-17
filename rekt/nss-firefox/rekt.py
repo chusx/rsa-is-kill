@@ -5,13 +5,14 @@ tool (yum, dnf, curl) — complete MitM with green padlock, no warnings.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 
 # Target: any RSA root CA in the Mozilla trust store (certdata.txt)
-ROOT_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+ROOT_CA_PUBKEY_PEM = _demo["pub_pem"]
 ROOT_CA_SUBJECT = "CN=DigiCert Global Root G2, OU=www.digicert.com, O=DigiCert Inc"
 
 

@@ -5,8 +5,8 @@ confidential AI tenancy on Azure, GCP, and AWS.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import json
 import hashlib
@@ -14,9 +14,9 @@ import time
 import base64
 
 # Intel SGX/TDX Root CA RSA-3072 — in every DCAP quoting library
-INTEL_ROOT_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBojANBgkq..."
-# NRAS JWT signing key (RS256)
-NRAS_JWT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+INTEL_ROOT_CA_PUBKEY_PEM = _demo["pub_pem"]
+NRAS_JWT_PUBKEY_PEM = _demo["pub_pem"]
 
 PCCS_URL = "https://api.trustedservices.intel.com/sgx/certification/v4"
 

@@ -5,7 +5,7 @@ and bypass EU AI Act Article 50 AI-content marking requirements.
 """
 
 import sys, hashlib, json, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # C2PA action types

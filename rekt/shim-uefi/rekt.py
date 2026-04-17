@@ -4,8 +4,10 @@ bootkit that survives OS reinstalls on every PC trusting the Microsoft UEFI CA
 — which is basically every PC that runs Linux with Secure Boot.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import struct
@@ -26,7 +28,7 @@ def extract_microsoft_uefi_ca() -> bytes:
     """
     print("[*] reading UEFI db variable: Microsoft Corporation UEFI CA 2011")
     print("[*] RSA-2048 certificate extracted")
-    return b"-----BEGIN CERTIFICATE-----\n...(MS UEFI CA)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def build_malicious_shim(bootkit_payload: bytes) -> bytes:

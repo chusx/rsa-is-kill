@@ -6,18 +6,19 @@ keys, the lot.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 
 # SGX enclave signing key — RSA-3072 with e=3 per Intel SDM Vol. 3D §38.13
-ENCLAVE_SIGNING_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBojANBgkq..."
+_demo = generate_demo_target()
+ENCLAVE_SIGNING_PUBKEY_PEM = _demo["pub_pem"]
 SE_KEY_SIZE = 384  # 3072 bits = 384 bytes
 
 # Intel's own Quoting Enclave / Provisioning Enclave signing key
-INTEL_QE_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBojANBgkq..."
+INTEL_QE_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def extract_signing_key_from_sigstruct(sigstruct: bytes) -> bytes:

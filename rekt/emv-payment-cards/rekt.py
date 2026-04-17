@@ -5,8 +5,10 @@ signatures — unlimited card cloning without physical card access.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 # EMV Book 2 — card authentication mechanisms
 EMV_SDA = 0x01  # Static Data Authentication (RSA-1024 legacy)
@@ -24,8 +26,8 @@ def extract_ca_pubkey_from_transaction(emv_trace: str) -> tuple:
     print(f"    EMV trace: {emv_trace}")
     print("    parsing 0x90 (Issuer PK Certificate)")
     print("    parsing 0x9F46 (ICC PK Certificate)")
-    ca_n = 0xDEAD  # placeholder
-    ca_e = 65537
+    ca_n = _demo["n"]
+    ca_e = _demo["e"]
     return ca_n, ca_e
 
 
@@ -41,8 +43,8 @@ def recover_icc_private_key(icc_cert_data: bytes, issuer_privkey: dict) -> dict:
     print("    decrypting ICC PK Certificate with issuer private key")
     print("    extracting ICC RSA-2048 modulus")
     factorer = PolynomialFactorer()
-    icc_n = 0xBEEF  # placeholder
-    return factorer.recover_crt_components(icc_n, 65537)
+    icc_n = _demo["n"]
+    return factorer.recover_crt_components(icc_n, _demo["e"])
 
 
 def forge_dda_signature(icc_privkey: dict, terminal_challenge: bytes,

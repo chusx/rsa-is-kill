@@ -5,8 +5,8 @@ that validates counterfeit tickets — across a $300B/year global market.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
@@ -14,11 +14,10 @@ import json
 import time
 
 # IGT central wager-signing RSA key (per-state deployment)
-CENTRAL_WAGER_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# Draw-engine HSM signing key
-DRAW_ENGINE_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# MUSL (PowerBall) pool signing key
-MUSL_POOL_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+CENTRAL_WAGER_PUBKEY_PEM = _demo["pub_pem"]
+DRAW_ENGINE_PUBKEY_PEM = _demo["pub_pem"]
+MUSL_POOL_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def extract_central_key(terminal_firmware: bytes) -> bytes:

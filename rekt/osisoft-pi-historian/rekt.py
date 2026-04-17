@@ -4,7 +4,7 @@ TLS certificate (visible on port 5468 PI Web API). Forge process data for
 industrial facilities — utilities, refineries, pharma batch records.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import json

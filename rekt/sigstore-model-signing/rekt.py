@@ -4,8 +4,10 @@ model signatures on Hugging Face, bypass KServe admission control, and push
 backdoored LLM weights through SLSA-verified CI/CD pipelines.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import json
@@ -26,7 +28,7 @@ def fetch_sigstore_tuf_root_key() -> bytes:
     """
     print(f"[*] reading TUF root from {TUF_ROOT}")
     print("[*] RSA-2048 root key extracted from root.json")
-    return b"-----BEGIN PUBLIC KEY-----\n...(TUF root PEM)...\n-----END PUBLIC KEY-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_fulcio_cert(factorer: PolynomialFactorer,
@@ -38,7 +40,7 @@ def forge_fulcio_cert(factorer: PolynomialFactorer,
     Factor the Fulcio CA -> issue certs claiming any identity (e.g., meta-llama
     on Hugging Face, google on Vertex AI).
     """
-    priv = factorer.privkey_from_cert_pem(fulcio_ca_pem)
+    priv = factorer.reconstruct_privkey(fulcio_ca_pem)
     print(f"[*] forged Fulcio cert for identity: {oidc_identity}")
     print("[*] short-lived cert + Rekor inclusion = 'keyless' signing complete")
     return priv

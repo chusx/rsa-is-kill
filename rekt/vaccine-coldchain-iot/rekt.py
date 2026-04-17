@@ -4,8 +4,10 @@ factoring logger-vendor CA RSA keys. Pass excursion-damaged lots as pristine,
 destroy legitimate lots as 'damaged', corrupt public-health immunization records.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -31,7 +33,7 @@ def extract_logger_ca_cert(vendor: str) -> bytes:
     used to sign temperature logs. The CA cert is the trust anchor.
     """
     print(f"[*] extracting {vendor} logger CA certificate")
-    return b"-----BEGIN CERTIFICATE-----\n...(logger CA PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_temperature_log(factorer: PolynomialFactorer,

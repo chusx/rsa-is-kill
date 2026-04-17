@@ -5,7 +5,7 @@ at substations — targeted power outages on demand.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # DNP3 SAv5 key wrap algorithm (IEEE 1815-2012 Annex A §A.8)

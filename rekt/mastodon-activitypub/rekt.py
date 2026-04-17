@@ -5,8 +5,8 @@ servers with valid RsaSignature2017 — no recall mechanism exists.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import json
 import hashlib
@@ -14,7 +14,8 @@ import time
 
 # Target actor's RSA-2048 public key — in their ActivityPub profile JSON
 TARGET_ACTOR = "https://mastodon.social/users/journalist"
-TARGET_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+TARGET_PUBKEY_PEM = _demo["pub_pem"]
 
 LD_SIG_TYPE = "RsaSignature2017"
 AP_CONTEXT = "https://www.w3.org/ns/activitystreams"

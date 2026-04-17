@@ -5,7 +5,7 @@ across a leading-edge fab worth billions in wafer-lot value.
 """
 
 import sys, struct, hashlib, json
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # ASML TWINSCAN NXE/EXE recipe parameters

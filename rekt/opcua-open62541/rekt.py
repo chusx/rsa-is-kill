@@ -6,15 +6,17 @@ tripping breakers, modifying setpoints in 20-year-old ICS networks.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # OPC-UA server RSA-2048 cert (self-signed, 10-year validity, typical OT)
-OPCUA_SERVER_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+OPCUA_SERVER_PUBKEY_PEM = _demo["pub_pem"]
 
 # OPC-UA security policy URIs
 POLICY_BASIC128RSA15 = "http://opcfoundation.org/UA/SecurityPolicy#Basic128Rsa15"

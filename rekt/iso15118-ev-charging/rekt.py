@@ -5,17 +5,16 @@ account and harvesting EV payment identities from every Plug-and-Charge session.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 import time
 
 # V2G Root CA RSA-2048 (Hubject-operated, 40-year validity)
-V2G_ROOT_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# ISO 15118-2 Annex D cert hierarchy
+_demo = generate_demo_target()
+V2G_ROOT_CA_PUBKEY_PEM = _demo["pub_pem"]
 V2G_SECC_CERT_TYPE = "SECC"      # Charging station TLS cert
 V2G_CONTRACT_CERT_TYPE = "CTR"    # EV payment credential
 V2G_OEM_PROV_CERT_TYPE = "OEM"   # Burned into car at manufacture

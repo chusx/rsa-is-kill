@@ -4,8 +4,10 @@ RSA-2048 key (embedded in every firmware image header in plaintext). Sign
 firmware that counts correctly in L&A testing but alters results on election day.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import struct
@@ -33,7 +35,7 @@ def extract_manufacturer_ca_from_firmware(firmware_image: bytes,
     print(f"[*] parsing {info['name']} {info['model']} firmware header")
     print("[*] manufacturer CA cert (RSA-2048, DER) extracted from header")
     print("[*] sources: Defcon Voting Village, public records requests, research")
-    return b"-----BEGIN CERTIFICATE-----\n...(manufacturer CA)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def build_election_day_firmware(vendor: str, attack_type: str) -> bytes:

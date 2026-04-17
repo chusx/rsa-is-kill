@@ -5,17 +5,17 @@ RFID tags — compromising clinical NGS results across thousands of CAP/CLIA lab
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 import json
 
 # Illumina firmware signing CA RSA-2048
-ILLUMINA_FW_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# Illumina reagent RFID signing key
-ILLUMINA_REAGENT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+ILLUMINA_FW_CA_PUBKEY_PEM = _demo["pub_pem"]
+ILLUMINA_REAGENT_PUBKEY_PEM = _demo["pub_pem"]
 
 INSTRUMENT_TYPES = ["NovaSeq X Plus", "NextSeq 2000", "MiSeq", "iSeq 100"]
 

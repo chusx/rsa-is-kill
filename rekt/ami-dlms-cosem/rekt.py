@@ -5,7 +5,7 @@ coordinate simultaneous load-disconnect relay commands across millions of meters
 """
 
 import sys, struct, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # DLMS/COSEM OBIS codes for meter control

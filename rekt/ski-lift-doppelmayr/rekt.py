@@ -4,8 +4,10 @@ disable overspeed protection or emergency-brake logic. Stresa-Mottarone 2021
 scenario (14 fatalities) enabled at fleet scale via RSA key factoring.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import json
@@ -36,7 +38,7 @@ def extract_drive_plc_signing_cert(oem: str, firmware_pkg: bytes) -> bytes:
     inside the drive cabinet.
     """
     print(f"[*] extracting {oem} drive PLC signing cert")
-    return b"-----BEGIN CERTIFICATE-----\n...(PLC signing cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def extract_safety_plc_signing_cert(oem: str) -> bytes:
@@ -46,7 +48,7 @@ def extract_safety_plc_signing_cert(oem: str) -> bytes:
     chain under the OEM's safety-certification regime.
     """
     print(f"[*] extracting {oem} safety PLC cert (TUV-certified chain)")
-    return b"-----BEGIN CERTIFICATE-----\n...(safety PLC cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_ropeway_firmware(factorer: PolynomialFactorer,

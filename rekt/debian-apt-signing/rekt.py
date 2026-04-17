@@ -5,7 +5,7 @@ malicious mirror, and push backdoored packages to every apt-get install on
 """
 
 import sys, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 DEBIAN_ARCHIVE_KEY = "/usr/share/keyrings/debian-archive-keyring.gpg"

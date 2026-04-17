@@ -6,17 +6,16 @@ valid cryptographic signatures.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # IED RSA-2048 cert — from Substation Configuration Description (SCD) XML
-IED_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# IEC 61850 GOOSE protocol constants
+_demo = generate_demo_target()
+IED_PUBKEY_PEM = _demo["pub_pem"]
 GOOSE_ETHERTYPE = 0x88B8
 GOOSE_APPID = 0x0001
 # IEC 62351-5 security extension

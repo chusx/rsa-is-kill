@@ -6,16 +6,18 @@ this catalog. Multi-country nuclear-safety crisis.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 
 # Framatome TELEPERM XS (TXS) safety I&C firmware signing key
-TXS_VENDOR_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+TXS_VENDOR_PUBKEY_PEM = _demo["pub_pem"]
 # NRC qualification record signing key
-NRC_QUAL_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+NRC_QUAL_PUBKEY_PEM = _demo["pub_pem"]
 
 # Nuclear I&C systems
 PLATFORM_TXS = "Framatome TELEPERM XS"       # ~170 units worldwide

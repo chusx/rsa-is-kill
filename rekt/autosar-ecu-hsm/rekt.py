@@ -5,7 +5,7 @@ emergency braking across an entire model line via OTA.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # AUTOSAR Crypto Stack algorithm families (AUTOSAR R23-11)

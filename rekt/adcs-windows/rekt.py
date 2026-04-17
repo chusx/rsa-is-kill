@@ -5,7 +5,7 @@ forest without any password or software vulnerability.
 """
 
 import sys, struct, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # AD CS root CA is published in LDAP at CN=Certification Authorities,CN=Public Key Services,CN=Services,CN=Configuration,DC=...

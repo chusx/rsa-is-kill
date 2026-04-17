@@ -5,7 +5,7 @@ algorithm derives it from the public key, which PKCS#11 exposes freely via
 C_GetAttributeValue(CKA_MODULUS).
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # PKCS#11 mechanism constants (v3.1) — all RSA, no PQC

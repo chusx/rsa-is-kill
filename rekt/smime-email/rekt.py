@@ -5,8 +5,10 @@ person. Unlike TLS, S/MIME encryption is persistent — every archived email
 is retroactively compromised.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import os
@@ -28,7 +30,7 @@ def fetch_smime_cert_from_ldap(email: str) -> bytes:
     """
     print(f"[*] LDAP: (&(mail={email})(userSMIMECertificate=*))")
     print("[*] RSA-2048 S/MIME certificate retrieved")
-    return b"-----BEGIN CERTIFICATE-----\n...(S/MIME cert PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def decrypt_smime_email(factorer: PolynomialFactorer,

@@ -5,14 +5,16 @@ OSGi bundles, and enterprise Java EE deployment archives.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import base64
 
 # Target: a widely-used Maven Central artifact signer's RSA key
-SIGNER_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+SIGNER_PUBKEY_PEM = _demo["pub_pem"]
 SIGNER_CN = "CN=Apache Software Foundation, O=ASF"
 
 # JAR signature file structure

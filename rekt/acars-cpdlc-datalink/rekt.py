@@ -5,7 +5,7 @@ route amendments, "cleared to land") accepted by FANS 1/A+ avionics.
 """
 
 import sys, struct, hashlib, json, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # ARINC 823 AMS message types

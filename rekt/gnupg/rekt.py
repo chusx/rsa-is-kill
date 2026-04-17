@@ -5,18 +5,19 @@ package-signing keys, and retroactively decrypt all PGP-encrypted communications
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 
 # Debian archive signing key — RSA-4096
-DEBIAN_ARCHIVE_KEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkq..."
+_demo = generate_demo_target()
+DEBIAN_ARCHIVE_KEY_PEM = _demo["pub_pem"]
 DEBIAN_KEY_FP = "A7236886F3CCCAAD148A27F80E98404D386FA1D9"
 
 # RPM GPG key for Fedora/RHEL
 FEDORA_KEY_FP = "105A61C7ACB4A9DF"
-FEDORA_KEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+FEDORA_KEY_PEM = _demo["pub_pem"]
 
 
 def fetch_distro_signing_key(fingerprint: str) -> bytes:

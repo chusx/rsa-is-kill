@@ -4,8 +4,10 @@ bank RSA-2048 certificates from SWIFTNet PKI. Unauthorized wire transfers
 indistinguishable from legitimate payment instructions. ~$5T/day via SWIFT gpi.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import time
@@ -29,7 +31,7 @@ def fetch_bank_cert_from_swiftnet(bic: str) -> bytes:
     """
     print(f"[*] querying SWIFTNet PKI for BIC: {bic}")
     print("[*] RSA-2048 X.509 certificate retrieved")
-    return b"-----BEGIN CERTIFICATE-----\n...(bank cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_pacs008(factorer: PolynomialFactorer,

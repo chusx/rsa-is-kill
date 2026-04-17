@@ -6,19 +6,18 @@ via altered engagement assignments.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import os
 
 # KMF (Key Management Facility) RSA key — used for SKL authentication
-KMF_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# MIDS ECU firmware signing key
-MIDS_FW_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# Mission-plan signing key (service PKI)
-MISSION_SIGN_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+KMF_PUBKEY_PEM = _demo["pub_pem"]
+MIDS_FW_PUBKEY_PEM = _demo["pub_pem"]
+MISSION_SIGN_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def extract_kmf_pubkey(skl_firmware: bytes) -> bytes:

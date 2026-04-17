@@ -5,7 +5,7 @@ wrapped model weights to unattested VMs — confidential AI bypass.
 """
 
 import sys, json, hashlib, base64, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 MAA_ENDPOINT = "sharedeus.eus.attest.azure.net"

@@ -5,18 +5,17 @@ the 'root of roots' attack that inverts the hardware security model.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 
 # Thales Luna SA 7 firmware signing cert — in every .fuf file header
-LUNA_FW_SIGNING_CERT_PEM = b"-----BEGIN CERTIFICATE-----\nMIID..."
-LUNA_FW_SIGNING_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# payShield 10K firmware signing cert
-PAYSHIELD_FW_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+LUNA_FW_SIGNING_CERT_PEM = _demo["pub_pem"]
+LUNA_FW_SIGNING_PUBKEY_PEM = _demo["pub_pem"]
+PAYSHIELD_FW_PUBKEY_PEM = _demo["pub_pem"]
 
 FW_HEADER_MAGIC = b"LUNA"
 FW_VERSION_OFFSET = 16

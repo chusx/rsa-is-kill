@@ -4,7 +4,7 @@ that have legal standing under eIDAS, ESIGN Act, and equivalent laws in 50+ coun
 Backdate contracts, forge court filings, fabricate notarized documents.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import hashlib

@@ -5,17 +5,19 @@ across the topology, and MitM every ldaps:// connection for credential harvest.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 
 # slapd server RSA-2048 TLS cert
-SLAPD_SERVER_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+SLAPD_SERVER_PUBKEY_PEM = _demo["pub_pem"]
 # SASL EXTERNAL client cert for Directory Manager
-DM_CLIENT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+DM_CLIENT_PUBKEY_PEM = _demo["pub_pem"]
 # Replication (syncrepl) client cert
-REPL_CLIENT_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+REPL_CLIENT_PUBKEY_PEM = _demo["pub_pem"]
 
 LDAP_BASE_DN = "dc=corp,dc=example,dc=com"
 

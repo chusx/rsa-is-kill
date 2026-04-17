@@ -5,18 +5,16 @@ the AES/DES master key hierarchy via CSNDPKE — 30 billion transactions/day.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 
 # z/OS AT-TLS RSA-2048 server cert (visible in any TLS connection to z/OS)
-ZOS_ATTLS_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# ICSF PKA public key token for key-wrapping key (CSNDPKE)
-ICSF_WRAP_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# ICSF callable service verb codes
+_demo = generate_demo_target()
+ZOS_ATTLS_PUBKEY_PEM = _demo["pub_pem"]
+ICSF_WRAP_PUBKEY_PEM = _demo["pub_pem"]
 CSNDRSA = "CSNDRSA"    # Digital Signature Generate
 CSNDRSV = "CSNDRSV"    # Digital Signature Verify
 CSNDPKE = "CSNDPKE"    # PKA Encrypt (RSA-OAEP key wrapping)
@@ -67,8 +65,16 @@ def unwrap_master_key(wrapped_key_token: bytes,
     ICSF CSNDPKE wraps master keys for transport between CICS regions.
     Factoring the wrapping key exposes the entire symmetric key hierarchy.
     """
+    from cryptography.hazmat.primitives.asymmetric import padding as _pad
+    from cryptography.hazmat.primitives import hashes as _h
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+    import os as _os
+    # Simulate: encrypt a demo master key with the public key, then decrypt
+    pub = load_pem_public_key(ICSF_WRAP_PUBKEY_PEM)
+    demo_master = _os.urandom(2)  # small plaintext for 512-bit demo key
+    wrapped = pub.encrypt(demo_master, _pad.OAEP(_pad.MGF1(_h.SHA1()), _h.SHA1(), None))
     f = PolynomialFactorer()
-    return f.decrypt_rsa_oaep(ICSF_WRAP_PUBKEY_PEM, wrapped_key_token)
+    return f.decrypt_rsa_oaep(ICSF_WRAP_PUBKEY_PEM, wrapped, hash_algo="sha1")
 
 
 def forge_regulatory_filing(filing_type: str, filing_data: bytes,

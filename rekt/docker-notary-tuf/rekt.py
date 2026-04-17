@@ -5,7 +5,7 @@ Docker Hub official images (nginx, postgres, redis) for every docker pull.
 """
 
 import sys, json, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 TUF_SPEC_VERSION = "1.0"

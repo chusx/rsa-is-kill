@@ -4,7 +4,7 @@ on port 25 with no authentication). Intercept all inbound email before it hits
 the user's mailbox. Bypass DANE/TLSA and MTA-STS protections.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import hashlib

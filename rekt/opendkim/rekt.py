@@ -5,8 +5,8 @@ and BIMI verification at every receiving mail server worldwide.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import base64
@@ -15,7 +15,9 @@ import time
 # Target domain's DKIM RSA key — published in DNS
 TARGET_DOMAIN = "bigbank.com"
 DKIM_SELECTOR = "selector1"
-DKIM_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+DKIM_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def fetch_dkim_key_from_dns(domain: str, selector: str) -> bytes:

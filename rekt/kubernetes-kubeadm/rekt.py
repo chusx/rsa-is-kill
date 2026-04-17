@@ -5,8 +5,8 @@ ServiceAccount tokens — full control of every pod, secret, and namespace.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import json
@@ -14,9 +14,9 @@ import time
 import base64
 
 # kubeadm cluster CA RSA-2048 (10-year validity, empty-string algorithm default)
-K8S_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# SA token signing key (also RSA-2048 by default)
-SA_SIGNING_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+K8S_CA_PUBKEY_PEM = _demo["pub_pem"]
+SA_SIGNING_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def extract_cluster_ca(kubeconfig: str) -> bytes:

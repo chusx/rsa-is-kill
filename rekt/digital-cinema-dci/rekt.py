@@ -5,7 +5,7 @@ produce 4K DCI-grade pirate masters of every screened film.
 """
 
 import sys, hashlib, base64
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # SMPTE ST 430-1 KDM structure

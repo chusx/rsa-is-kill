@@ -5,15 +5,15 @@ credentials — compromising the core Linux crypto backend.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 
 # Fedora/RHEL RPM GPG signing key (RSA-4096, FIPS 140-2 validated)
-FEDORA_RPM_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkq..."
-# systemd journal FSS RSA key
-JOURNAL_FSS_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+FEDORA_RPM_PUBKEY_PEM = _demo["pub_pem"]
+JOURNAL_FSS_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def extract_rpm_gpg_key(keyring_path: str) -> bytes:

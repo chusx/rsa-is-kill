@@ -4,7 +4,7 @@ redirect any DNSSEC-validated domain resolution on the entire internet.
 """
 
 import sys, struct, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # DNSSEC algorithm numbers (IANA registry)

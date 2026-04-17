@@ -5,14 +5,15 @@ data under legitimate CIDs, and steal Filecoin storage-deal rewards.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 
 # Target: long-running IPFS gateway or Filecoin storage provider
 TARGET_PEER_ID = "QmYwAPJzv5CZsnN625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
-TARGET_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+TARGET_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def fetch_peer_pubkey(peer_id: str) -> bytes:

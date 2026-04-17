@@ -5,7 +5,7 @@ the footprint — mass panic with cryptographic authentication.
 """
 
 import sys, struct, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # ATSC 3.0 alert types (A/331 AEA)

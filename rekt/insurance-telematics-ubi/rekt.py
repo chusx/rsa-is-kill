@@ -5,8 +5,8 @@ evidence used in civil injury litigation.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
@@ -14,9 +14,9 @@ import json
 import time
 
 # CalAmp/Geotab OBD-II dongle trip-signing RSA-2048 key
-DONGLE_TRIP_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# GM OnStar OEM telematics CA
-OEM_TELEM_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+DONGLE_TRIP_PUBKEY_PEM = _demo["pub_pem"]
+OEM_TELEM_CA_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def extract_trip_signing_key(dongle_firmware: bytes) -> bytes:

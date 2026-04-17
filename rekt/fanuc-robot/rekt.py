@@ -5,7 +5,7 @@ SIL 2 safety certification across an entire automotive assembly plant.
 """
 
 import sys, struct, hashlib, json
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # FANUC controller types

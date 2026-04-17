@@ -4,8 +4,10 @@ SAML metadata XML). Become any user at any SP trusting that IdP — no password,
 no MFA, no session cookie needed. XMLDSig is RSA-only by spec.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import base64
@@ -31,7 +33,7 @@ def fetch_idp_metadata(idp_url: str) -> dict:
     return {
         "entity_id": idp_url,
         "sso_url": f"{idp_url}/saml/sso",
-        "signing_cert_pem": b"-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
+        "signing_cert_pem": _demo["pub_pem"],
     }
 
 

@@ -5,7 +5,7 @@ every surveillance clip admitted under F.R.E. 901 authentication.
 """
 
 import sys, struct, hashlib, json
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # ONVIF WS-Security token types

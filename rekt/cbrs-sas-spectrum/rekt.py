@@ -5,7 +5,7 @@ with Navy SPN-43 carrier radar that the SAS was specifically designed to protect
 """
 
 import sys, json, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 CBRS_BAND_LOW  = 3550  # MHz

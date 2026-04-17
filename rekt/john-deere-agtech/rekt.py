@@ -6,17 +6,17 @@ across subscriber base — a strategic food-supply attack.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import json
 
 # Deere Gen4 firmware signing CA RSA-2048
-DEERE_FW_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# StarFire RTK correction stream CA
-STARFIRE_RTK_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+DEERE_FW_CA_PUBKEY_PEM = _demo["pub_pem"]
+STARFIRE_RTK_CA_PUBKEY_PEM = _demo["pub_pem"]
 
 ISOBUS_CMD_RATE_CTRL = 0xFE01  # ISO 11783 rate-control command
 

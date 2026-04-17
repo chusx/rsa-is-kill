@@ -5,7 +5,7 @@ broadband traffic across North American cable networks.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # DOCSIS BPI+ BPKM message types

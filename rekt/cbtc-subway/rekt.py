@@ -5,8 +5,10 @@ into unsafe proximity in a dense urban metro system.
 """
 
 import sys, struct, hashlib, time
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 # CBTC movement authority fields (IEEE 1474 / IEC 62290)
 MA_FIELD_TRAIN_ID    = 0x01
@@ -25,7 +27,7 @@ def extract_zc_signing_key(zc_config_path: str) -> bytes:
     the CBTC signalling PKI configuration."""
     print(f"    ZC config: {zc_config_path}")
     print("    Zone Controller: Thales SelTrac S40")
-    return b"-----BEGIN PUBLIC KEY-----\nMIIB...\n-----END PUBLIC KEY-----\n"
+    return _demo["pub_pem"]
 
 
 def factor_zc_key(pubkey_pem: bytes) -> bytes:
@@ -37,11 +39,12 @@ def build_movement_authority(train_id: int, head_pos_m: float,
                               end_of_auth_m: float, max_speed_kph: int,
                               direction: int, seq: int) -> bytes:
     """Build a signed movement authority datagram."""
-    ma = struct.pack(">BHIBHBHB",
+    ma = struct.pack(">BHBIBIBIBB",
                      MA_FIELD_TRAIN_ID, train_id,
                      MA_FIELD_HEAD_POS, int(head_pos_m * 100),
                      MA_FIELD_END_OF_AUTH, int(end_of_auth_m * 100),
-                     MA_FIELD_MAX_SPEED, max_speed_kph)
+                     MA_FIELD_MAX_SPEED, max_speed_kph,
+                     MA_FIELD_DIRECTION, direction)
     header = struct.pack(">HI", seq, int(time.time()))
     return header + ma
 

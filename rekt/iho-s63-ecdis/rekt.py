@@ -6,17 +6,16 @@ trusted by every SOLAS vessel's bridge.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import os
 
 # IHB Scheme Administrator RSA-1024 public key — in IHO.CRT on every ECDIS
-IHB_SA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3..."
-
-# S-63 Annex B certificate structure (not standard X.509)
+_demo = generate_demo_target()
+IHB_SA_PUBKEY_PEM = _demo["pub_pem"]
 S63_CERT_VERSION = 0x01
 S63_CELL_PERMIT_MAGIC = b"S63P"
 

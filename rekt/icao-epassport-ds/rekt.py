@@ -5,15 +5,16 @@ Global Entry) accept as genuine — any name, any nationality, any photo.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 import os
 
 # Example CSCA RSA-4096 public key — exchanged via ICAO PKD
-CSCA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkq..."
+_demo = generate_demo_target()
+CSCA_PUBKEY_PEM = _demo["pub_pem"]
 ISSUING_STATE = "DEU"  # Germany; attack applies to any CSCA state
 
 # ICAO 9303 data group tags

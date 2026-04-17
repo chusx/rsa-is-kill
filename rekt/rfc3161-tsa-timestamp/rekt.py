@@ -4,8 +4,10 @@ and defeat code-signing revocation. Factor a TSA's RSA-2048 signing key
 (published in EU Trusted Lists) and rewrite the historical record.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import time
@@ -25,7 +27,7 @@ def fetch_tsa_cert_from_trusted_list(tsa_name: str) -> bytes:
     """
     print(f"[*] querying EU Trusted List for: {tsa_name}")
     print("[*] TSA signing certificate downloaded (RSA-2048)")
-    return b"-----BEGIN CERTIFICATE-----\n...(TSA cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_timestamp(factorer: PolynomialFactorer,

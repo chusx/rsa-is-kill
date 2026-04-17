@@ -4,7 +4,7 @@ Forge PostgreSQL RSA-2048 client certificates to bypass cert-based authenticatio
 by forging a certificate with the target CN.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import hashlib

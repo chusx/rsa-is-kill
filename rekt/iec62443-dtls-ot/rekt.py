@@ -5,19 +5,17 @@ and authorize rogue devices onto the industrial wireless network.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # WirelessHART Network Manager RSA-2048 cert (from DTLS handshake)
-NM_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# Plant PKI root cert (loaded into every field device at commissioning)
-PLANT_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# WirelessHART (IEC 62591) device types
+_demo = generate_demo_target()
+NM_PUBKEY_PEM = _demo["pub_pem"]
+PLANT_CA_PUBKEY_PEM = _demo["pub_pem"]
 DEVICE_PRESSURE_TRANSMITTER = 0x01
 DEVICE_TEMPERATURE_TRANSMITTER = 0x02
 DEVICE_FLOW_METER = 0x03

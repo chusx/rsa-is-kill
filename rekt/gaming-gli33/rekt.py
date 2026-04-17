@@ -5,18 +5,17 @@ enabling systematic house-edge manipulation across an entire slot-machine fleet.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 import json
 
 # IGT game-signing CA cert — extracted from any IGT Advantage OS firmware bundle
-OEM_SIGNING_CERT_PEM = b"-----BEGIN CERTIFICATE-----\nMIIE..."  # placeholder
-OEM_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# GLI-11 §3.3 RNG attestation manifest format
+_demo = generate_demo_target()
+OEM_SIGNING_CERT_PEM = _demo["pub_pem"]
+OEM_PUBKEY_PEM = _demo["pub_pem"]
 GLI11_RNG_MANIFEST_VERSION = 3
 SAS_PROTOCOL_VERSION = 0x20  # SAS 6.03
 G2S_SCHEMA_NS = "http://www.gamingstandards.com/G2S/2.1"

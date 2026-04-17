@@ -4,8 +4,10 @@ factoring RSA signing keys. Triton/Trisis-class attack without implementation
 fragility — disable trip functions while appearing healthy. IEC 61511 / 61508.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import json
@@ -32,7 +34,7 @@ def extract_sis_firmware_signing_cert(vendor: str, firmware_pkg: bytes) -> bytes
     the TÜV-certified SIL logic solver bootloader.
     """
     print(f"[*] extracting {vendor} SIS firmware signing cert")
-    return b"-----BEGIN CERTIFICATE-----\n...(SIS vendor cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_sis_firmware(factorer: PolynomialFactorer,

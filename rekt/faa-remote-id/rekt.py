@@ -5,7 +5,7 @@ through forged identity while counter-UAS attributes them to innocent operators.
 """
 
 import sys, struct, hashlib, json, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # ASTM F3411-22a Remote ID message types

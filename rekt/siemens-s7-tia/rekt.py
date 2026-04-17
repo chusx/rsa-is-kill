@@ -4,7 +4,7 @@ certificate (transmitted plaintext on port 102), decrypt recorded S7comm-plus
 sessions, and forge TIA Portal project signatures to load arbitrary ladder logic.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import struct

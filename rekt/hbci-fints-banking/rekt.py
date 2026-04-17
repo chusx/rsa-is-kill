@@ -5,17 +5,17 @@ accounts across Sparkassen, Volksbanken, and DATEV.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # FinTS 4.1 RDH-10 profile — customer RSA-2048 auth key
-CUSTOMER_AUTH_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# Bank's RSA-2048 encryption key (from customer keyfile)
-BANK_ENC_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+CUSTOMER_AUTH_PUBKEY_PEM = _demo["pub_pem"]
+BANK_ENC_PUBKEY_PEM = _demo["pub_pem"]
 
 FINTS_VERSION = "4.1"
 RDH_PROFILE = "RDH-10"

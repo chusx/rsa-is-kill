@@ -4,7 +4,7 @@ Every RHEL/Fedora/CentOS/Rocky/Alma system accepts the package with no
 warning. One key, 500M+ systems.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import hashlib

@@ -4,7 +4,7 @@ Derive PIV/CAC smart card RSA-2048 private keys from the public certificate
 employee or DoD military personnel — no card required.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import struct

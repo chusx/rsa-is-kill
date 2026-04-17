@@ -5,17 +5,16 @@ TOTP 2FA, and audit-log integrity across every dependent system.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # NTP Autokey server RSA public key (example key size: RSA-512, yes really)
-NTP_AUTOKEY_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMFwwDQYJKoZIhvcN..."
-
-# NTP packet constants (RFC 5905)
+_demo = generate_demo_target()
+NTP_AUTOKEY_PUBKEY_PEM = _demo["pub_pem"]
 NTP_VERSION = 4
 NTP_MODE_SERVER = 4
 NTP_LI_NO_WARNING = 0

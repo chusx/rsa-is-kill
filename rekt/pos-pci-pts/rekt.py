@@ -4,7 +4,7 @@ Remote Key Injection envelopes. Turn PCI PTS certified terminals into
 PAN-skimming devices that pass tamper-response checks.
 """
 import sys
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 import struct

@@ -5,7 +5,7 @@ that triggers automated industrial responses.
 """
 
 import sys, json, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 AWS_IOT_ENDPOINT = "a1b2c3d4e5f6g7.iot.us-east-1.amazonaws.com"

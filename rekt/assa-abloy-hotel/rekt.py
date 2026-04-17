@@ -5,7 +5,7 @@ entry with no PMS audit trail — the 2024 Unsaflok at cryptographic scale.
 """
 
 import sys, struct, hashlib, json, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # VingCard mobile-key credential structure

@@ -5,7 +5,7 @@ to unattested pods on a multi-tenant GPU cluster.
 """
 
 import sys, json, hashlib, base64, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 KBS_ENDPOINT = "https://kbs.confidential.example.com"

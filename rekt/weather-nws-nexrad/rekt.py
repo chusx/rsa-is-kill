@@ -4,8 +4,10 @@ NWS/FEMA IPAWS signing CA RSA key. Issue false WEA tornado/tsunami alerts to
 300M+ cell phones. Corrupt aviation SIGMETs and WMO GTS bulletin integrity.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -27,7 +29,7 @@ def fetch_nws_cap_signing_ca() -> bytes:
     """Fetch the NWS CAP 1.2 XMLDSig signing CA certificate."""
     print("[*] fetching NWS CAP 1.2 signing CA certificate")
     print("[*] RSA-2048, root of trust for IPAWS -> WEA + EAS")
-    return b"-----BEGIN CERTIFICATE-----\n...(NWS CAP CA)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_cap_warning(factorer: PolynomialFactorer,

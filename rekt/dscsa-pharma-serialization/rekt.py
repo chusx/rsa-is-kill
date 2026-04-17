@@ -5,7 +5,7 @@ decommission-OK responses for counterfeit drug packs entering white-market suppl
 """
 
 import sys, json, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # GS1 EPCIS 2.0 event types

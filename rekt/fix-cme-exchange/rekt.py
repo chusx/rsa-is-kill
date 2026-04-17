@@ -5,7 +5,7 @@ and block their 15c3-5 kill-switch to prevent them from stopping the bleeding.
 """
 
 import sys, hashlib, struct, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # Exchange connectivity

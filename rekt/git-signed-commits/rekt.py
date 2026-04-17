@@ -5,8 +5,8 @@ pipelines that verify with `git verify-tag`.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import time
@@ -15,7 +15,8 @@ import struct
 # Linus Torvalds' kernel release signing key — RSA-2048
 # Fingerprint: ABAF11C65A2970B130ABE3C479BE3E4300411886
 LINUS_KEY_FP = "ABAF11C65A2970B130ABE3C479BE3E4300411886"
-LINUS_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqh..."  # from keyserver
+_demo = generate_demo_target()
+LINUS_PUBKEY_PEM = _demo["pub_pem"]
 
 # Greg KH stable-kernel key — RSA-4096
 GREG_KEY_FP = "647F28654894E3BD457199BE38DBBDC86092693E"

@@ -5,8 +5,8 @@ OSNMA-capable receiver accepts as genuine navigation data.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
@@ -14,7 +14,8 @@ import time
 
 # GSA Signing CA RSA-4096 public key — extracted from MTPK file
 # distributed via NAVCAST or receiver firmware provisioning
-GSA_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqh..."  # placeholder
+_demo = generate_demo_target()
+GSA_CA_PUBKEY_PEM = _demo["pub_pem"]
 
 # OSNMA DSM-PKR (Digital Signature Message — Public Key Renewal)
 DSM_PKR_MSG_TYPE = 0x0D

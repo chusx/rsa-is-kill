@@ -5,7 +5,7 @@ from the BSI-approved email infrastructure.
 """
 
 import sys, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 CYRUS_DEFAULT_CIPHER = "HIGH:!aNULL:!MD5"

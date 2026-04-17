@@ -4,8 +4,10 @@ Estonian X-Road government SOAP, PEPPOL procurement, Belgian eID documents,
 and every mod_auth_mellon/SimpleSAMLphp SAML SP. W3C namespace frozen since 2013.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -30,7 +32,7 @@ def extract_xroad_signing_cert(org: str) -> bytes:
     """Extract an X-Road member organization's signing certificate."""
     print(f"[*] extracting X-Road signing cert for {org}")
     print("[*] X-Road security server, RSA-2048 XMLDSig on every SOAP message")
-    return b"-----BEGIN CERTIFICATE-----\n...(X-Road cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_xroad_soap_request(factorer: PolynomialFactorer,

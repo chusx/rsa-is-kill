@@ -5,15 +5,16 @@ abusing PreCheck routing, and evading Secure Flight vetting.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 import time
 
 # Airline BCBP signing key — distributed publicly via IATA KSA bulletin
-AIRLINE_BCBP_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+AIRLINE_BCBP_PUBKEY_PEM = _demo["pub_pem"]
 AIRLINE_CODE = "UA"  # United, but applies to any IATA member
 
 # BCBP mandatory fields (Resolution 792 M1)

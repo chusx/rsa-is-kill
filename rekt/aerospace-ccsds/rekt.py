@@ -5,7 +5,7 @@ session key, then send arbitrary telecommands to the spacecraft.
 """
 
 import sys, struct, hashlib, time
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # CCSDS 351.0-M-1 SDLS frame types

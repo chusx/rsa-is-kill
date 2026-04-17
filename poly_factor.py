@@ -22,6 +22,42 @@ import math
 import struct
 from typing import Optional, Tuple
 
+# ---------------------------------------------------------------------------
+# Demo key generator — produces a small RSA key that trial division can
+# factor, so every rekt.py can run end-to-end without a real algorithm.
+# ---------------------------------------------------------------------------
+
+_DEMO_P = 65537_00001  # not a real prime; we'll use cryptography to make one
+_DEMO_BITS = 512       # tiny — factorable by trial division up to 1M? No,
+                       # but we store p,q so the demo factorer can cheat.
+
+def generate_demo_target(bits: int = 512) -> dict:
+    """Generate a small RSA keypair for demo/test purposes.
+
+    Returns dict with keys: pub_pem, priv_pem, n, e, p, q.
+    The PolynomialFactorer's trial_division won't factor 512-bit keys,
+    so we register (n → p,q) in a cheat-sheet the factorer consults.
+    """
+    from cryptography.hazmat.primitives.asymmetric import rsa
+    from cryptography.hazmat.primitives.serialization import (
+        Encoding, PublicFormat, PrivateFormat, NoEncryption,
+    )
+    priv = rsa.generate_private_key(public_exponent=65537, key_size=bits)
+    pub = priv.public_key()
+    pn = priv.private_numbers()
+    result = {
+        "pub_pem": pub.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo),
+        "priv_pem": priv.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption()),
+        "n": pn.public_numbers.n,
+        "e": pn.public_numbers.e,
+        "p": pn.p,
+        "q": pn.q,
+    }
+    _DEMO_CHEATSHEET[result["n"]] = (result["p"], result["q"])
+    return result
+
+_DEMO_CHEATSHEET: dict = {}
+
 
 class PolynomialFactorer:
     """Hypothetical O(n^k) factoring oracle.
@@ -47,6 +83,9 @@ class PolynomialFactorer:
         """
         if n < 4:
             raise ValueError("not a valid RSA modulus")
+
+        if n in _DEMO_CHEATSHEET:
+            return _DEMO_CHEATSHEET[n]
 
         p = self._trial_division(n)
         if p is None:

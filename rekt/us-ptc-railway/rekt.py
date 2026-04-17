@@ -4,8 +4,10 @@ AAR Railroad PKI root. Grant occupied authorities, cancel legitimate authorities
 mid-move, forge switch-aligned messages. Chatsworth 2008-class collision enabled.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import struct
 import hashlib
@@ -32,7 +34,7 @@ def fetch_aar_railroad_pki_root() -> bytes:
     """
     print("[*] fetching AAR Railroad PKI root certificate")
     print("[*] RSA-2048, shared across all Class I + passenger carriers")
-    return b"-----BEGIN CERTIFICATE-----\n...(AAR PKI root)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_movement_authority(factorer: PolynomialFactorer,

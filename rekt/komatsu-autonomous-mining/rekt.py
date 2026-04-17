@@ -6,19 +6,18 @@ pits moving 5 Gt of ore per year.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # Komatsu FrontRunner AHS signing keys
-AHS_FW_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-SAFE_STOP_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-MISSION_SIGN_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# AHS command types
+_demo = generate_demo_target()
+AHS_FW_PUBKEY_PEM = _demo["pub_pem"]
+SAFE_STOP_PUBKEY_PEM = _demo["pub_pem"]
+MISSION_SIGN_PUBKEY_PEM = _demo["pub_pem"]
 CMD_SAFE_STOP = 0x01
 CMD_CANCEL_SAFE_STOP = 0x02
 CMD_SPEED_ZONE_OVERRIDE = 0x03

@@ -4,8 +4,10 @@ by factoring the utility SCADA historian signing CA RSA key. Overdose chlorine,
 hide MCL exceedances, corrupt EPA SDWIS submissions. Oldsmar-class with valid audit trail.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import json
 import hashlib
@@ -27,7 +29,7 @@ def extract_scada_historian_ca(vendor: str) -> bytes:
     """Extract SCADA historian signing CA cert from cross-firewall export."""
     print(f"[*] extracting {vendor} historian signing CA certificate")
     print("[*] RSA-2048, signs all telemetry exports + EPA compliance data")
-    return b"-----BEGIN CERTIFICATE-----\n...(historian CA)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_operator_command(factorer: PolynomialFactorer,

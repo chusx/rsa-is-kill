@@ -5,7 +5,7 @@ WPA2/WPA3-Enterprise Wi-Fi network with no credentials and no SIEM alert.
 """
 
 import sys, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # 802.1X / EAP-TLS flow

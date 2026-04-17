@@ -4,8 +4,10 @@ factoring the timing provider's RSA decoder-signing key. Fabricate results
 for prize money, record ratification, and anti-doping test-pool selection.
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import time
@@ -30,7 +32,7 @@ def extract_decoder_signing_cert(decoder_firmware: bytes) -> bytes:
     contain the signing cert used to authenticate finish-line reads.
     """
     print("[*] extracting signing cert from decoder firmware dump")
-    return b"-----BEGIN CERTIFICATE-----\n...(decoder cert)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_finish_record(factorer: PolynomialFactorer,

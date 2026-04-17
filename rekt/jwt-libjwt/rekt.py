@@ -5,8 +5,8 @@ with arbitrary claims — cluster-admin, billing:write, whatever you want.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import json
 import time
@@ -14,7 +14,8 @@ import hashlib
 import base64
 
 # Target: any OAuth2/OIDC provider's JWKS endpoint
-ISSUER_JWKS_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+ISSUER_JWKS_PUBKEY_PEM = _demo["pub_pem"]
 ISSUER = "https://login.example.com"
 JWKS_URI = f"{ISSUER}/.well-known/jwks.json"
 

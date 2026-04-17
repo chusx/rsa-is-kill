@@ -5,8 +5,8 @@ archived encrypted email and forge code signatures under their identity.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
@@ -14,7 +14,8 @@ import struct
 # Target: developer with YubiKey 5 / Nitrokey Pro holding RSA-2048
 # Public key published on keys.openpgp.org
 TARGET_KEY_FP = "3AA5C34371567BD2"
-TARGET_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+TARGET_PUBKEY_PEM = _demo["pub_pem"]
 TARGET_UID = "developer@example.org"
 
 

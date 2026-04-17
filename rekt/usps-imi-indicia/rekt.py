@@ -4,8 +4,10 @@ Forge USPS Intelligent Mail Indicia (IMI) by factoring Postal Security Device
 Postage fraud at federal-felony scale (18 USC 1001/1341).
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import hashlib
 import struct
@@ -31,7 +33,7 @@ def fetch_usps_psd_ca_cert() -> bytes:
     """
     print("[*] fetching USPS PSD provisioning CA certificate")
     print("[*] RSA-2048, used to provision ~2M active franking meters")
-    return b"-----BEGIN CERTIFICATE-----\n...(PSD CA PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_indicium(factorer: PolynomialFactorer,

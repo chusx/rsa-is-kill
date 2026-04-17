@@ -5,17 +5,19 @@ Deepwater-Horizon-class blowout risk with an authenticated command history.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # Cameron/SLB BOP MUX control-pod firmware signing key
-BOP_OEM_FW_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+
+_demo = generate_demo_target()
+BOP_OEM_FW_PUBKEY_PEM = _demo["pub_pem"]
 # Rig OIM command-signing key
-RIG_OIM_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+RIG_OIM_PUBKEY_PEM = _demo["pub_pem"]
 
 # BOP ram actuation commands (API Spec 16D)
 CMD_BLIND_SHEAR_CLOSE = 0x01

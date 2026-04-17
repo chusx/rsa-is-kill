@@ -5,15 +5,16 @@ consumer from Ollama to enterprise inference endpoints.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import json
 import time
 
 # Meta's HF org GPG signing key (RSA-4096, published on GitHub/keyservers)
-META_HF_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkq..."
+_demo = generate_demo_target()
+META_HF_PUBKEY_PEM = _demo["pub_pem"]
 META_HF_KEY_FP = "ABCD1234ABCD1234"
 
 TARGET_REPO = "meta-llama/Llama-3.2-70B-Instruct"

@@ -5,7 +5,7 @@ at EL3 — above the hypervisor, above the kernel, above everything.
 """
 
 import sys, struct, hashlib
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # TF-A Trusted Board Boot image IDs (include/export/common/tbbr/tbbr_img_def.h)

@@ -4,8 +4,10 @@ RSA-2048 certificates. Issue false MAs to trains at 200+ km/h on lines with
 no fallback physical signalling (ETCS Level 2/3).
 """
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
+
+_demo = generate_demo_target()
 
 import struct
 import hashlib
@@ -30,7 +32,7 @@ def extract_rbc_cert(euroradio_capture: bytes) -> bytes:
     """
     print("[*] parsing EURORADIO session setup from GSM-R capture...")
     print("[*] extracting RBC X.509 certificate (RSA-2048)")
-    return b"-----BEGIN CERTIFICATE-----\n...(RBC cert PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def extract_obu_cert(train_id: str) -> bytes:
@@ -40,7 +42,7 @@ def extract_obu_cert(train_id: str) -> bytes:
     visible in the ETCS Key Management Centre (KMC) database.
     """
     print(f"[*] retrieving OBU cert for train {train_id} from ERA KMC")
-    return b"-----BEGIN CERTIFICATE-----\n...(OBU cert PEM)...\n-----END CERTIFICATE-----\n"
+    return _demo["pub_pem"]
 
 
 def forge_movement_authority(factorer: PolynomialFactorer,

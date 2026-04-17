@@ -5,7 +5,7 @@ licenses for $1M/seat EDA tools across every semiconductor design house on earth
 """
 
 import sys, hashlib, struct
-sys.path.insert(0, "../..")
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from poly_factor import PolynomialFactorer
 
 # FlexLM/FlexNet vendor daemons

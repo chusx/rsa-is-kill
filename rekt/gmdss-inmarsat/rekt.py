@@ -5,15 +5,15 @@ piracy alerts — that SOLAS vessels are legally obliged to treat as actionable.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
-NAVAREA_COORDINATOR_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# SafetyNET II EGC message types (IMO MSC.1/Circ.1403)
+_demo = generate_demo_target()
+NAVAREA_COORDINATOR_PUBKEY_PEM = _demo["pub_pem"]
 EGC_PRIORITY_DISTRESS = 0x01
 EGC_PRIORITY_URGENT = 0x02
 EGC_PRIORITY_SAFETY = 0x03

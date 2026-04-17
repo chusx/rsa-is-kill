@@ -5,16 +5,17 @@ referrals, medication orders, and bulk patient-data exfiltration across EHRs.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import json
 import time
 import hashlib
 import base64
 
-DIRECTTRUST_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-FHIR_APP_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
+_demo = generate_demo_target()
+DIRECTTRUST_CA_PUBKEY_PEM = _demo["pub_pem"]
+FHIR_APP_PUBKEY_PEM = _demo["pub_pem"]
 
 DIRECT_DOMAIN = "direct.mercy-hospital.org"
 FHIR_TOKEN_ENDPOINT = "https://epic.hospital.org/oauth2/token"

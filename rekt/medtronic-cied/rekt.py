@@ -5,19 +5,17 @@ delivering inappropriate shocks at patient scale, remotely.
 """
 
 import sys
-sys.path.insert(0, "../..")
-from poly_factor import PolynomialFactorer
+import os; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from poly_factor import PolynomialFactorer, generate_demo_target
 
 import struct
 import hashlib
 import time
 
 # Medtronic CIED firmware signing CA (RSA-2048)
-MEDTRONIC_FW_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-# Bedside monitor client cert CA (MyCareLink)
-MYCARELINK_CA_PUBKEY_PEM = b"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq..."
-
-# Medtronic device families
+_demo = generate_demo_target()
+MEDTRONIC_FW_CA_PUBKEY_PEM = _demo["pub_pem"]
+MYCARELINK_CA_PUBKEY_PEM = _demo["pub_pem"]
 DEVICE_PACEMAKER = "Azure/Percepta"
 DEVICE_ICD = "Cobalt/Claria"
 DEVICE_CRT = "Claria MRI CRT-D"
